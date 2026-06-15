@@ -1,0 +1,47 @@
+{
+    "name": "meetanshi/magento2-reward-points",
+    "description": "Meetanshi RewardPoints — Full-featured loyalty and reward points extension for Magento 2",
+    "type": "magento2-module",
+    "version": "1.0.0",
+    "license": "proprietary",
+    "authors": [
+        {
+            "name": "Meetanshi",
+            "email": "support@meetanshi.com",
+            "homepage": "https://meetanshi.com"
+        }
+    ],
+    "require": {
+        "php": "~8.3.0|~8.4.0",
+        "magento/framework": "~103.0.8|~103.1.0",
+        "magento/module-customer": "*",
+        "magento/module-sales": "*",
+        "magento/module-sales-rule": "*",
+        "magento/module-catalog-rule": "*",
+        "magento/module-quote": "*",
+        "magento/module-checkout": "*",
+        "magento/module-newsletter": "*",
+        "magento/module-review": "*",
+        "magento/module-store": "*",
+        "magento/module-backend": "*",
+        "magento/module-ui": "*",
+        "magento/module-catalog": "*",
+        "magento/module-rule": "*"
+    },
+    "autoload": {
+        "files": [
+            "registration.php"
+        ],
+        "psr-4": {
+            "Meetanshi\\RewardPoints\\": ""
+        }
+    },
+    "extra": {
+        "map": [
+            [
+                "*",
+                "Meetanshi/RewardPoints"
+            ]
+        ]
+    }
+}

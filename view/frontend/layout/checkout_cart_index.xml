@@ -1,0 +1,34 @@
+<?xml version="1.0"?>
+<page xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+      xsi:noNamespaceSchemaLocation="urn:magento:framework:View/Layout/etc/page_configuration.xsd">
+    <body>
+        <!-- Apply block below discount code in cart summary sidebar -->
+        <referenceContainer name="cart.summary">
+            <block class="Meetanshi\RewardPoints\Block\Frontend\Cart\RewardPoints"
+                   name="rewardpoints.cart.block"
+                   template="Meetanshi_RewardPoints::cart/rewardpoints.phtml"
+                   after="checkout.cart.coupon"/>
+        </referenceContainer>
+
+        <!-- Register reward_points totals segment in the cart totals table -->
+        <referenceBlock name="checkout.cart.totals">
+            <arguments>
+                <argument name="jsLayout" xsi:type="array">
+                    <item name="components" xsi:type="array">
+                        <item name="block-totals" xsi:type="array">
+                            <item name="children" xsi:type="array">
+                                <item name="reward-points" xsi:type="array">
+                                    <item name="component" xsi:type="string">Meetanshi_RewardPoints/js/view/cart/totals/reward-points</item>
+                                    <item name="sortOrder" xsi:type="string">25</item>
+                                    <item name="config" xsi:type="array">
+                                        <item name="title" xsi:type="string" translate="true">Reward Points</item>
+                                    </item>
+                                </item>
+                            </item>
+                        </item>
+                    </item>
+                </argument>
+            </arguments>
+        </referenceBlock>
+    </body>
+</page>

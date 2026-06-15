@@ -1,0 +1,11 @@
+<?xml version="1.0"?>
+<!--
+ Tab is added via ui_component/customer_form.xml which is the correct approach
+ for Magento 2.4.x where the customer edit page uses a UI Component form.
+ The customer_edit_tabs block no longer exists in the layout in Magento 2.4.x.
+-->
+<page xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+      xsi:noNamespaceSchemaLocation="urn:magento:framework:View/Layout/etc/page_configuration.xsd">
+    <body>
+    </body>
+</page>

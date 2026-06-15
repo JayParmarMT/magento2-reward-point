@@ -1,0 +1,565 @@
+<?php
+/**
+ * Customer Reward Points Tab Template
+ *
+ * @var \Meetanshi\RewardPoints\Block\Adminhtml\Customer\Edit\Tab\RewardPoints $block
+ * @var \Magento\Framework\Escaper $escaper
+ */
+
+$customerId = $block->getCustomerId();
+$account    = $block->getRewardAccount();
+
+$balance      = $account ? (int) $account->getPointsBalance() : 0;
+$totalEarned  = $account ? (int) $account->getTotalEarned()   : 0;
+$totalSpent   = $account ? (int) $account->getTotalSpent()    : 0;
+$tierName     = $account ? $block->getCurrentTierName($account) : __('N/A');
+$isEnabled    = $account ? $account->isEnabled() : false;
+$subBalance   = $account ? $account->isSubscribedBalance()    : false;
+$subExpiry    = $account ? $account->isSubscribedExpiration() : false;
+?>
+<style>
+.rp-tab-wrap { padding: 20px 24px; }
+
+/* ── Stat cards ── */
+.rp-stats {
+    display: flex;
+    gap: 16px;
+    margin-bottom: 24px;
+    flex-wrap: wrap;
+}
+.rp-stat-card {
+    flex: 1;
+    min-width: 140px;
+    background: #fff;
+    border: 1px solid #d6d6d6;
+    border-radius: 4px;
+    padding: 16px 20px;
+    text-align: center;
+    box-shadow: 0 1px 3px rgba(0,0,0,.06);
+}
+.rp-stat-card .rp-stat-value {
+    font-size: 28px;
+    font-weight: 700;
+    line-height: 1.1;
+    color: #1a7e33;
+    display: block;
+}
+.rp-stat-card.rp-stat--spent .rp-stat-value  { color: #c0392b; }
+.rp-stat-card.rp-stat--earned .rp-stat-value { color: #1565c0; }
+.rp-stat-card .rp-stat-label {
+    font-size: 11px;
+    text-transform: uppercase;
+    letter-spacing: .05em;
+    color: #888;
+    margin-top: 4px;
+    display: block;
+}
+
+/* ── Section panels ── */
+.rp-panel {
+    background: #fff;
+    border: 1px solid #d6d6d6;
+    border-radius: 4px;
+    margin-bottom: 20px;
+    box-shadow: 0 1px 3px rgba(0,0,0,.06);
+    overflow: hidden;
+}
+.rp-panel-header {
+    background: #f5f5f5;
+    border-bottom: 1px solid #d6d6d6;
+    padding: 10px 16px;
+    display: flex;
+    align-items: center;
+    gap: 8px;
+}
+.rp-panel-header .rp-panel-title {
+    font-size: 13px;
+    font-weight: 600;
+    color: #333;
+    text-transform: uppercase;
+    letter-spacing: .04em;
+}
+.rp-panel-body { padding: 16px 20px; }
+
+/* ── Info rows ── */
+.rp-info-row {
+    display: flex;
+    align-items: center;
+    padding: 8px 0;
+    border-bottom: 1px solid #f0f0f0;
+    gap: 12px;
+}
+.rp-info-row:last-child { border-bottom: none; }
+.rp-info-label {
+    width: 200px;
+    flex-shrink: 0;
+    font-size: 12px;
+    color: #666;
+    font-weight: 500;
+}
+.rp-info-value { font-size: 13px; color: #333; }
+
+/* ── Status badge ── */
+.rp-badge {
+    display: inline-block;
+    padding: 2px 10px;
+    border-radius: 3px;
+    font-size: 11px;
+    font-weight: 600;
+    letter-spacing: .03em;
+}
+.rp-badge--enabled  { background:#e6f4ea; color:#1a7e33; border:1px solid #a8d5b5; }
+.rp-badge--disabled { background:#fce8e8; color:#c0392b; border:1px solid #f5b7b1; }
+.rp-badge--tier     { background:#e8f0fe; color:#1565c0; border:1px solid #aac4f5; }
+
+/* ── Form ── */
+.rp-form-grid {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 16px;
+}
+@media (max-width: 900px) { .rp-form-grid { grid-template-columns: 1fr; } }
+.rp-form-field label {
+    display: block;
+    font-size: 12px;
+    font-weight: 600;
+    color: #555;
+    margin-bottom: 5px;
+}
+.rp-form-field label .required { color: #e22626; margin-left: 3px; }
+.rp-form-field .note {
+    font-size: 11px;
+    color: #888;
+    margin-top: 4px;
+}
+.rp-form-field input.admin__control-text,
+.rp-form-field select.admin__control-select,
+.rp-form-field textarea.admin__control-textarea {
+    width: 100%;
+    box-sizing: border-box;
+}
+.rp-form-full { grid-column: 1 / -1; }
+.rp-form-actions { margin-top: 16px; display: flex; align-items: center; gap: 12px; }
+#rp-balance-message .message { margin: 0; }
+
+/* ── Transactions table ── */
+.rp-txn-table {
+    width: 100%;
+    border-collapse: collapse;
+    font-size: 12px;
+}
+.rp-txn-table thead tr {
+    background: #f5f5f5;
+}
+.rp-txn-table th {
+    padding: 8px 12px;
+    text-align: left;
+    font-weight: 600;
+    color: #555;
+    border-bottom: 2px solid #d6d6d6;
+    white-space: nowrap;
+}
+.rp-txn-table td {
+    padding: 8px 12px;
+    border-bottom: 1px solid #f0f0f0;
+    color: #333;
+    vertical-align: middle;
+}
+.rp-txn-table tbody tr:hover { background: #fafafa; }
+.rp-delta-positive { color: #1a7e33; font-weight: 600; }
+.rp-delta-negative { color: #c0392b; font-weight: 600; }
+.rp-status-active   { background:#e6f4ea; color:#1a7e33; border:1px solid #a8d5b5; }
+.rp-status-expired  { background:#fff3e0; color:#e65100; border:1px solid #ffcc80; }
+.rp-status-cancelled{ background:#fce8e8; color:#c0392b; border:1px solid #f5b7b1; }
+.rp-status-badge {
+    display: inline-block;
+    padding: 1px 8px;
+    border-radius: 3px;
+    font-size: 11px;
+    font-weight: 600;
+}
+.rp-empty { color: #999; font-style: italic; padding: 16px 0; }
+</style>
+
+<div class="rp-tab-wrap">
+<?php if (!$customerId): ?>
+    <div class="message message-notice">
+        <?= $escaper->escapeHtml(__('Please save the customer first to manage reward points.')) ?>
+    </div>
+<?php else: ?>
+
+    <!-- ── Stat Cards ── -->
+    <div class="rp-stats">
+        <div class="rp-stat-card">
+            <span class="rp-stat-value"><?= $escaper->escapeHtml((string) $balance) ?></span>
+            <span class="rp-stat-label"><?= $escaper->escapeHtml(__('Current Balance')) ?></span>
+        </div>
+        <div class="rp-stat-card rp-stat--earned">
+            <span class="rp-stat-value"><?= $escaper->escapeHtml((string) $totalEarned) ?></span>
+            <span class="rp-stat-label"><?= $escaper->escapeHtml(__('Total Earned')) ?></span>
+        </div>
+        <div class="rp-stat-card rp-stat--spent">
+            <span class="rp-stat-value"><?= $escaper->escapeHtml((string) $totalSpent) ?></span>
+            <span class="rp-stat-label"><?= $escaper->escapeHtml(__('Total Spent')) ?></span>
+        </div>
+        <div class="rp-stat-card">
+            <span class="rp-stat-value" style="font-size:18px; color:#555;">
+                <?= $escaper->escapeHtml((string) $tierName) ?>
+            </span>
+            <span class="rp-stat-label"><?= $escaper->escapeHtml(__('Current Tier')) ?></span>
+        </div>
+    </div>
+
+    <!-- ── Account Settings ── -->
+    <div class="rp-panel">
+        <div class="rp-panel-header">
+            <span class="rp-panel-title"><?= $escaper->escapeHtml(__('Account Settings')) ?></span>
+        </div>
+        <div class="rp-panel-body">
+            <div class="rp-info-row">
+                <span class="rp-info-label"><?= $escaper->escapeHtml(__('Account Status')) ?></span>
+                <span class="rp-info-value">
+                    <?php if ($account): ?>
+                        <span class="rp-badge <?= /* @noEscape */ $isEnabled ? 'rp-badge--enabled' : 'rp-badge--disabled' ?>">
+                            <?= $escaper->escapeHtml($isEnabled ? __('Enabled') : __('Disabled')) ?>
+                        </span>
+                    <?php else: ?>
+                        <span class="rp-badge rp-badge--disabled"><?= $escaper->escapeHtml(__('No Account')) ?></span>
+                    <?php endif; ?>
+                </span>
+            </div>
+            <?php if ($account): ?>
+            <div class="rp-info-row">
+                <span class="rp-info-label"><?= $escaper->escapeHtml(__('Balance Update Emails')) ?></span>
+                <span class="rp-info-value">
+                    <span class="rp-badge <?= /* @noEscape */ $subBalance ? 'rp-badge--enabled' : 'rp-badge--disabled' ?>">
+                        <?= $escaper->escapeHtml($subBalance ? __('Subscribed') : __('Unsubscribed')) ?>
+                    </span>
+                </span>
+            </div>
+            <div class="rp-info-row">
+                <span class="rp-info-label"><?= $escaper->escapeHtml(__('Expiration Reminder Emails')) ?></span>
+                <span class="rp-info-value">
+                    <span class="rp-badge <?= /* @noEscape */ $subExpiry ? 'rp-badge--enabled' : 'rp-badge--disabled' ?>">
+                        <?= $escaper->escapeHtml($subExpiry ? __('Subscribed') : __('Unsubscribed')) ?>
+                    </span>
+                </span>
+            </div>
+            <?php endif; ?>
+        </div>
+    </div>
+
+    <!-- ── Update Balance ── -->
+    <div class="rp-panel">
+        <div class="rp-panel-header">
+            <span class="rp-panel-title"><?= $escaper->escapeHtml(__('Update Balance')) ?></span>
+        </div>
+        <div class="rp-panel-body">
+            <form id="reward-points-balance-form"
+                  method="post"
+                  action="<?= $escaper->escapeUrl($block->getSaveUrl()) ?>">
+                <input type="hidden" name="form_key"
+                       value="<?= $escaper->escapeHtmlAttr($block->getFormKeyValue()) ?>"/>
+                <input type="hidden" name="customer_id"
+                       value="<?= $escaper->escapeHtmlAttr((string) $customerId) ?>"/>
+
+                <div class="rp-form-grid">
+                    <div class="rp-form-field">
+                        <label for="rp_update_points">
+                            <?= $escaper->escapeHtml(__('Points Adjustment')) ?>
+                            <span class="required">*</span>
+                        </label>
+                        <input type="number" name="update_points" id="rp_update_points"
+                               class="admin__control-text"
+                               placeholder="<?= $escaper->escapeHtmlAttr(__('e.g. 100 or -50')) ?>"
+                               step="1" required/>
+                        <p class="note">
+                            <?= $escaper->escapeHtml(__('Use a positive value to add points, negative to deduct.')) ?>
+                        </p>
+                    </div>
+
+                    <div class="rp-form-field">
+                        <label for="rp_expire_days">
+                            <?= $escaper->escapeHtml(__('Expire After (days)')) ?>
+                        </label>
+                        <input type="number" name="expire_after_days" id="rp_expire_days"
+                               class="admin__control-text" value="0" min="0" step="1"/>
+                        <p class="note">
+                            <?= $escaper->escapeHtml(__('Leave 0 to use the global expiry default.')) ?>
+                        </p>
+                    </div>
+
+                    <div class="rp-form-field">
+                        <label for="rp_notify">
+                            <?= $escaper->escapeHtml(__('Notify Customer by Email')) ?>
+                        </label>
+                        <select name="notify_customer" id="rp_notify" class="admin__control-select">
+                            <option value="0"><?= $escaper->escapeHtml(__('No')) ?></option>
+                            <option value="1"><?= $escaper->escapeHtml(__('Yes')) ?></option>
+                        </select>
+                    </div>
+
+                    <div class="rp-form-field">
+                        <label for="rp_comment">
+                            <?= $escaper->escapeHtml(__('Internal Comment')) ?>
+                        </label>
+                        <textarea name="comment" id="rp_comment"
+                                  class="admin__control-textarea" rows="2"
+                                  maxlength="500"
+                                  placeholder="<?= $escaper->escapeHtmlAttr(__('Optional note visible to admins only')) ?>"></textarea>
+                    </div>
+                </div>
+
+                <div class="rp-form-actions">
+                    <button type="button" id="rp_balance_save_btn"
+                            class="action-default scalable save primary">
+                        <?= $escaper->escapeHtml(__('Update Balance')) ?>
+                    </button>
+                    <div id="rp-balance-message" style="display:none;"></div>
+                </div>
+            </form>
+        </div>
+    </div>
+
+    <!-- ── Transaction Grid ── -->
+    <div class="rp-panel">
+        <div class="rp-panel-header">
+            <span class="rp-panel-title"><?= $escaper->escapeHtml(__('Transactions')) ?></span>
+            <span style="margin-left:auto;">
+                <input type="text" id="rp-txn-search"
+                       placeholder="<?= $escaper->escapeHtmlAttr(__('Search action / status / comment…')) ?>"
+                       style="padding:4px 8px;font-size:12px;border:1px solid #ccc;border-radius:3px;width:240px;">
+            </span>
+        </div>
+        <div class="rp-panel-body" style="padding:0;">
+            <div id="rp-txn-grid-wrap">
+                <p style="padding:16px 20px;color:#888;" id="rp-txn-loading">
+                    <?= $escaper->escapeHtml(__('Loading…')) ?>
+                </p>
+            </div>
+        </div>
+    </div>
+
+<?php endif; ?>
+<?php if ($customerId): ?>
+<script type="text/javascript">
+(function () {
+    'use strict';
+
+    var BASE_URL = '<?= /* @noEscape */ $block->getUrl(
+        'meetanshi_rewardpoints/customer/transactions',
+        ['id' => $customerId, '_current' => false]
+    ) ?>';
+
+    var state = { page: 1, sort: 'created_at', dir: 'DESC', q: '' };
+
+    function esc(v) {
+        if (v === null || v === undefined) return '—';
+        var d = document.createElement('div');
+        d.appendChild(document.createTextNode(String(v)));
+        return d.innerHTML;
+    }
+
+    function deltaHtml(v) {
+        var n = parseInt(v, 10) || 0;
+        var cls = n >= 0 ? 'rp-delta-positive' : 'rp-delta-negative';
+        var txt = (n >= 0 ? '+' : '') + n;
+        return '<span class="' + cls + '">' + esc(txt) + '</span>';
+    }
+
+    function statusHtml(v) {
+        var s = String(v || '').toLowerCase();
+        var cls = s === 'active' ? 'rp-status-active'
+                : s === 'expired' ? 'rp-status-expired'
+                : s === 'cancelled' ? 'rp-status-cancelled'
+                : 'rp-status-active';
+        return '<span class="rp-status-badge ' + cls + '">'
+             + esc(s.charAt(0).toUpperCase() + s.slice(1))
+             + '</span>';
+    }
+
+    function sortIcon(col) {
+        if (state.sort !== col) return ' <span style="color:#bbb;font-size:10px;">⇅</span>';
+        return state.dir === 'ASC'
+            ? ' <span style="font-size:10px;">▲</span>'
+            : ' <span style="font-size:10px;">▼</span>';
+    }
+
+    function renderTable(data) {
+        var wrap = document.getElementById('rp-txn-grid-wrap');
+        if (data.error) {
+            wrap.innerHTML = '<p style="padding:16px 20px;color:#e22626;">' + esc(data.message) + '</p>';
+            return;
+        }
+        if (!data.rows || data.rows.length === 0) {
+            wrap.innerHTML = '<p style="padding:16px 20px;color:#888;"><?= $escaper->escapeHtml(__('No transactions found.')) ?></p>';
+            return;
+        }
+
+        var cols = [
+            { key: 'transaction_id',     label: '#',            sort: true  },
+            { key: 'action_code',        label: 'Action',       sort: true  },
+            { key: 'points_delta',       label: 'Points',       sort: true  },
+            { key: 'points_balance_after', label: 'Balance After', sort: true },
+            { key: 'status',             label: 'Status',       sort: true  },
+            { key: 'expires_at',         label: 'Expires At',   sort: true  },
+            { key: 'created_at',         label: 'Created At',   sort: true  },
+            { key: 'comment',            label: 'Comment',      sort: false },
+            { key: 'order_id',           label: 'Order ID',     sort: false },
+        ];
+
+        var html = '<div style="overflow-x:auto;">'
+                 + '<table class="rp-txn-table" style="width:100%;">'
+                 + '<thead><tr>';
+
+        cols.forEach(function (c) {
+            html += '<th style="white-space:nowrap;cursor:' + (c.sort ? 'pointer' : 'default') + ';"'
+                  + (c.sort ? ' data-sort="' + c.key + '"' : '') + '>'
+                  + esc(c.label)
+                  + (c.sort ? sortIcon(c.key) : '')
+                  + '</th>';
+        });
+        html += '</tr></thead><tbody>';
+
+        data.rows.forEach(function (row) {
+            html += '<tr>';
+            cols.forEach(function (c) {
+                if (c.key === 'points_delta') {
+                    html += '<td>' + deltaHtml(row[c.key]) + '</td>';
+                } else if (c.key === 'status') {
+                    html += '<td>' + statusHtml(row[c.key]) + '</td>';
+                } else {
+                    html += '<td>' + esc(row[c.key]) + '</td>';
+                }
+            });
+            html += '</tr>';
+        });
+
+        html += '</tbody></table></div>';
+
+        // pagination
+        html += '<div style="display:flex;align-items:center;gap:8px;padding:10px 16px;border-top:1px solid #e3e3e3;">';
+        html += '<span style="font-size:12px;color:#666;"><?= $escaper->escapeHtml(__('Total')) ?>: <strong>' + data.total + '</strong></span>';
+        html += '<span style="margin-left:auto;display:flex;gap:4px;">';
+        for (var i = 1; i <= data.pages; i++) {
+            var active = i === data.page ? 'background:#1979c3;color:#fff;' : 'background:#f5f5f5;color:#333;';
+            html += '<button data-page="' + i + '" style="' + active + 'border:1px solid #ccc;padding:2px 8px;font-size:12px;cursor:pointer;border-radius:3px;">' + i + '</button>';
+        }
+        html += '</span></div>';
+
+        wrap.innerHTML = html;
+
+        // sort click
+        wrap.querySelectorAll('th[data-sort]').forEach(function (th) {
+            th.addEventListener('click', function () {
+                var col = th.getAttribute('data-sort');
+                if (state.sort === col) {
+                    state.dir = state.dir === 'ASC' ? 'DESC' : 'ASC';
+                } else {
+                    state.sort = col;
+                    state.dir  = 'DESC';
+                }
+                state.page = 1;
+                load();
+            });
+        });
+
+        // page click
+        wrap.querySelectorAll('button[data-page]').forEach(function (btn) {
+            btn.addEventListener('click', function () {
+                state.page = parseInt(btn.getAttribute('data-page'), 10);
+                load();
+            });
+        });
+    }
+
+    function load() {
+        var url = BASE_URL
+                + '?sort=' + encodeURIComponent(state.sort)
+                + '&dir='  + encodeURIComponent(state.dir)
+                + '&p='    + state.page
+                + '&q='    + encodeURIComponent(state.q);
+
+        var wrap = document.getElementById('rp-txn-grid-wrap');
+        wrap.style.opacity = '0.5';
+
+        fetch(url, { credentials: 'same-origin' })
+            .then(function (r) { return r.json(); })
+            .then(function (data) {
+                wrap.style.opacity = '1';
+                renderTable(data);
+            })
+            .catch(function () {
+                wrap.style.opacity = '1';
+                wrap.innerHTML = '<p style="padding:16px 20px;color:#e22626;"><?= $escaper->escapeHtml(__('Failed to load transactions.')) ?></p>';
+            });
+    }
+
+    // search with debounce
+    var searchTimer;
+    document.getElementById('rp-txn-search').addEventListener('input', function () {
+        clearTimeout(searchTimer);
+        var val = this.value;
+        searchTimer = setTimeout(function () {
+            state.q    = val;
+            state.page = 1;
+            load();
+        }, 350);
+    });
+
+    load();
+}());
+</script>
+<?php endif; ?>
+</div>
+
+<script type="text/javascript">
+require(['jquery', 'mage/translate'], function ($, $t) {
+    'use strict';
+
+    $('#rp_balance_save_btn').on('click', function () {
+        var $btn    = $(this);
+        var $form   = $('#reward-points-balance-form');
+        var $msg    = $('#rp-balance-message');
+        var points  = parseInt($('#rp_update_points').val(), 10);
+
+        if (!points || isNaN(points) || points === 0) {
+            $msg.html('<div class="message message-error">' +
+                $t('Please enter a non-zero integer for points adjustment.') +
+                '</div>').show();
+            return;
+        }
+
+        $.ajax({
+            url:      $form.attr('action'),
+            type:     'POST',
+            data:     $form.serialize(),
+            dataType: 'json',
+            beforeSend: function () {
+                $btn.prop('disabled', true).text($t('Saving…'));
+                $msg.hide();
+            },
+            success: function (response) {
+                if (response.error) {
+                    $msg.html('<div class="message message-error">' +
+                        $('<div>').text(response.message).html() +
+                        '</div>').show();
+                } else {
+                    $msg.html('<div class="message message-success">' +
+                        $('<div>').text(response.message).html() +
+                        '</div>').show();
+                    $form[0].reset();
+                }
+            },
+            error: function () {
+                $msg.html('<div class="message message-error">' +
+                    $t('An error occurred. Please try again.') +
+                    '</div>').show();
+            },
+            complete: function () {
+                $btn.prop('disabled', false).text($t('Update Balance'));
+            }
+        });
+    });
+});
+</script>

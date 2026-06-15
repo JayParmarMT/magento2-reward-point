@@ -1,0 +1,32 @@
+<?php
+/**
+ * Buy With Points Product Template
+ *
+ * @var \Meetanshi\RewardPoints\Block\Frontend\Product\BuyWithPoints $block
+ * @var \Magento\Framework\Escaper $escaper
+ */
+
+if (!$block->canBuyWithPoints()) {
+    return;
+}
+
+$pointPrice = $block->getPointPrice();
+$balance = $block->getCustomerBalance();
+$buyUrl = $block->getBuyWithPointsUrl();
+?>
+
+<div class="buy-with-points-wrapper" id="buy-with-points-block">
+    <div class="buy-with-points-message">
+        <?= $escaper->escapeHtml(__('Or buy with %1 points', $pointPrice)) ?>
+        <span class="points-balance-note">
+            (<?= $escaper->escapeHtml(__('Your balance: %1 points', $balance)) ?>)
+        </span>
+    </div>
+    <div class="buy-with-points-action">
+        <a href="<?= $escaper->escapeUrl($buyUrl) ?>"
+           class="action buy-with-points primary"
+           title="<?= $escaper->escapeHtmlAttr(__('Buy with %1 points', $pointPrice)) ?>">
+            <span><?= $escaper->escapeHtml(__('Buy with %1 points', $pointPrice)) ?></span>
+        </a>
+    </div>
+</div>

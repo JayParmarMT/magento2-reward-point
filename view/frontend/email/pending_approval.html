@@ -1,0 +1,29 @@
+<!--@subject Your Reward Points Are Pending Approval @-->
+<!--@vars {
+"var customer.name":"Customer Name",
+"var points_pending":"Pending Points",
+"var store_name":"Store Name"
+} @-->
+
+{{template config_path="design/email/header_template"}}
+
+<table>
+    <tr>
+        <td>
+            <p>{{trans "Dear %name," name=$customer.name}}</p>
+            <p>{{trans "We wanted to let you know that you have reward points pending approval at %store_name." store_name=$store_name}}</p>
+
+            <table cellspacing="0" cellpadding="5" border="0" width="100%">
+                <tr>
+                    <td><strong>{{trans "Points Pending Approval"}}</strong></td>
+                    <td>{{var points_pending}} {{trans "points"}}</td>
+                </tr>
+            </table>
+
+            <p>{{trans "Once your points are approved by our team, they will be added to your available balance and you can start using them on your next purchase."}}</p>
+            <p>{{trans "Thank you for your patience and for shopping with %store_name." store_name=$store_name}}</p>
+        </td>
+    </tr>
+</table>
+
+{{template config_path="design/email/footer_template"}}

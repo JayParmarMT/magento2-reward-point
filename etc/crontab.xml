@@ -1,0 +1,41 @@
+<?xml version="1.0"?>
+<config xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+        xsi:noNamespaceSchemaLocation="urn:magento:module:Magento_Cron:etc/crontab.xsd">
+    <group id="default">
+        <job name="meetanshi_rewardpoints_expire"
+             instance="Meetanshi\RewardPoints\Cron\ExpirePoints"
+             method="execute">
+            <schedule>0 0 * * *</schedule>
+        </job>
+        <job name="meetanshi_rewardpoints_birthday"
+             instance="Meetanshi\RewardPoints\Cron\BirthdayBonus"
+             method="execute">
+            <schedule>5 0 * * *</schedule>
+        </job>
+        <job name="meetanshi_rewardpoints_inactivity"
+             instance="Meetanshi\RewardPoints\Cron\InactivityBonus"
+             method="execute">
+            <schedule>10 0 * * *</schedule>
+        </job>
+        <job name="meetanshi_rewardpoints_reminders"
+             instance="Meetanshi\RewardPoints\Cron\ExpirationReminders"
+             method="execute">
+            <schedule>15 0 * * *</schedule>
+        </job>
+        <job name="meetanshi_rewardpoints_tier_recalculate"
+             instance="Meetanshi\RewardPoints\Cron\TierRecalculate"
+             method="execute">
+            <schedule>0 2 * * *</schedule>
+        </job>
+        <job name="meetanshi_rewardpoints_activate_pending"
+             instance="Meetanshi\RewardPoints\Cron\ActivatePendingPoints"
+             method="execute">
+            <schedule>*/30 * * * *</schedule>
+        </job>
+        <job name="meetanshi_rewardpoints_catalog_rule_reindex"
+             instance="Meetanshi\RewardPoints\Cron\CatalogRuleReindex"
+             method="execute">
+            <schedule>30 1 * * *</schedule>
+        </job>
+    </group>
+</config>

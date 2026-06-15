@@ -1,0 +1,15 @@
+<?xml version="1.0"?>
+<!--
+    The earn message on category/listing pages is injected via a plugin on
+    AbstractProduct::getProductDetailsHtml() (ProductDetailsHtmlPlugin).
+
+    The previous approach of adding a child block to
+    category.product.type.details.renderers.default did not work because that
+    block is a plain Template with no template file — Magento returns '' from
+    _toHtml() when no template is set, so children are never rendered.
+-->
+<page xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+      xsi:noNamespaceSchemaLocation="urn:magento:framework:View/Layout/etc/page_configuration.xsd">
+    <body>
+    </body>
+</page>

@@ -1,0 +1,39 @@
+<!--@subject You Have Been Invited to Join and Earn Rewards @-->
+<!--@vars {
+"var referrer_name":"Referrer Name",
+"var referral_url":"Referral URL",
+"var invitation_message":"Invitation Message",
+"var store_name":"Store Name"
+} @-->
+
+{{template config_path="design/email/header_template"}}
+
+<table>
+    <tr>
+        <td>
+            <p>{{trans "Hello,"}}</p>
+            <p>{{trans "Your friend %referrer_name has invited you to join %store_name and start earning reward points!" referrer_name=$referrer_name store_name=$store_name}}</p>
+
+            {{depend invitation_message}}
+            <p><em>{{var invitation_message}}</em></p>
+            {{/depend}}
+
+            <p>{{trans "Sign up using the link below and you may receive a special welcome bonus:"}}</p>
+
+            <p style="text-align: center;">
+                <a href="{{var referral_url}}"
+                   style="background-color:#1979c3;color:#ffffff;padding:10px 20px;text-decoration:none;border-radius:3px;">
+                    {{trans "Accept Invitation"}}
+                </a>
+            </p>
+
+            <p>{{trans "Or copy and paste this URL into your browser:"}}<br/>
+               <a href="{{var referral_url}}">{{var referral_url}}</a>
+            </p>
+
+            <p>{{trans "We look forward to welcoming you to %store_name!" store_name=$store_name}}</p>
+        </td>
+    </tr>
+</table>
+
+{{template config_path="design/email/footer_template"}}

@@ -1,0 +1,56 @@
+<?php
+
+declare(strict_types=1);
+
+namespace Meetanshi\RewardPoints\Ui\DataProvider\Tier;
+
+use Magento\Framework\Api\FilterBuilder;
+use Magento\Framework\Api\Search\ReportingInterface;
+use Magento\Framework\Api\Search\SearchCriteriaBuilder;
+use Magento\Framework\App\RequestInterface;
+use Magento\Framework\View\Element\UiComponent\DataProvider\DataProvider;
+
+/**
+ * UI DataProvider for Tier Listing
+ *
+ * Extends the framework DataProvider so the standard Magento filter pipeline
+ * (FilterPool → addFieldToFilter) is applied, enabling all grid column filters
+ * including the websites and customer_groups EXISTS subquery filters.
+ */
+class ListingDataProvider extends DataProvider
+{
+    /**
+     * @param string $name
+     * @param string $primaryFieldName
+     * @param string $requestFieldName
+     * @param ReportingInterface $reporting
+     * @param SearchCriteriaBuilder $searchCriteriaBuilder
+     * @param RequestInterface $request
+     * @param FilterBuilder $filterBuilder
+     * @param array $meta
+     * @param array $data
+     */
+    public function __construct(
+        string $name,
+        string $primaryFieldName,
+        string $requestFieldName,
+        ReportingInterface $reporting,
+        SearchCriteriaBuilder $searchCriteriaBuilder,
+        RequestInterface $request,
+        FilterBuilder $filterBuilder,
+        array $meta = [],
+        array $data = [],
+    ) {
+        parent::__construct(
+            $name,
+            $primaryFieldName,
+            $requestFieldName,
+            $reporting,
+            $searchCriteriaBuilder,
+            $request,
+            $filterBuilder,
+            $meta,
+            $data,
+        );
+    }
+}

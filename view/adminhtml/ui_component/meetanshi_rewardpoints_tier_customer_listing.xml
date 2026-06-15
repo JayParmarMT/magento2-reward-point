@@ -1,0 +1,101 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<listing xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+         xsi:noNamespaceSchemaLocation="urn:magento:module:Magento_Ui:etc/ui_configuration.xsd">
+
+    <argument name="data" xsi:type="array">
+        <item name="js_config" xsi:type="array">
+            <item name="provider" xsi:type="string">meetanshi_rewardpoints_tier_customer_listing.meetanshi_rewardpoints_tier_customer_listing_data_source</item>
+        </item>
+    </argument>
+
+    <settings>
+        <spinner>meetanshi_rewardpoints_tier_customer_listing_columns</spinner>
+        <deps>
+            <dep>meetanshi_rewardpoints_tier_customer_listing.meetanshi_rewardpoints_tier_customer_listing_data_source</dep>
+        </deps>
+    </settings>
+
+    <dataSource name="meetanshi_rewardpoints_tier_customer_listing_data_source" component="Magento_Ui/js/grid/provider">
+        <settings>
+            <storageConfig>
+                <param name="indexField" xsi:type="string">account_id</param>
+            </storageConfig>
+            <updateUrl path="mui/index/render"/>
+        </settings>
+        <aclResource>Meetanshi_RewardPoints::tier</aclResource>
+        <dataProvider class="Meetanshi\RewardPoints\Ui\DataProvider\Tier\CustomerListingDataProvider"
+                      name="meetanshi_rewardpoints_tier_customer_listing_data_source">
+            <settings>
+                <requestFieldName>tier_id</requestFieldName>
+                <primaryFieldName>account_id</primaryFieldName>
+            </settings>
+        </dataProvider>
+    </dataSource>
+
+    <listingToolbar name="listing_top">
+        <settings>
+            <sticky>true</sticky>
+        </settings>
+        <filterSearch name="fulltext"/>
+        <filters name="listing_filters"/>
+        <paging name="listing_paging"/>
+    </listingToolbar>
+
+    <columns name="meetanshi_rewardpoints_tier_customer_listing_columns">
+
+        <settings>
+            <editorConfig>
+                <param name="enabled" xsi:type="boolean">false</param>
+            </editorConfig>
+            <childDefaults>
+                <param name="fieldAction" xsi:type="array">
+                    <item name="provider" xsi:type="string">meetanshi_rewardpoints_tier_customer_listing.meetanshi_rewardpoints_tier_customer_listing.meetanshi_rewardpoints_tier_customer_listing_columns_editor</item>
+                    <item name="target" xsi:type="string">startEdit</item>
+                    <item name="params" xsi:type="array">
+                        <item name="0" xsi:type="string">${ $.$data.rowIndex }</item>
+                        <item name="1" xsi:type="boolean">true</item>
+                    </item>
+                </param>
+            </childDefaults>
+        </settings>
+
+        <column name="account_id" sortOrder="5">
+            <settings>
+                <filter>textRange</filter>
+                <label translate="true">Account ID</label>
+                <sorting>asc</sorting>
+                <visible>false</visible>
+            </settings>
+        </column>
+
+        <column name="customer_id" sortOrder="10">
+            <settings>
+                <filter>textRange</filter>
+                <label translate="true">Customer ID</label>
+            </settings>
+        </column>
+
+        <column name="customer_name" sortOrder="20">
+            <settings>
+                <filter>text</filter>
+                <label translate="true">Customer Name</label>
+            </settings>
+        </column>
+
+        <column name="customer_email" sortOrder="30">
+            <settings>
+                <filter>text</filter>
+                <label translate="true">Email</label>
+            </settings>
+        </column>
+
+        <column name="points_balance" sortOrder="40">
+            <settings>
+                <filter>textRange</filter>
+                <label translate="true">Points Balance</label>
+            </settings>
+        </column>
+
+    </columns>
+
+</listing>

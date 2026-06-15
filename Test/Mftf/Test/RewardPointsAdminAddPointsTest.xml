@@ -1,0 +1,58 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<tests xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+       xsi:noNamespaceSchemaLocation="urn:magento:mftf:Test/etc/testSchema.xsd">
+
+    <test name="AdminCanAddPointsManually">
+        <annotations>
+            <features value="Meetanshi Reward Points"/>
+            <stories value="Admin Manual Point Adjustment"/>
+            <title value="Admin can manually add reward points to a customer account"/>
+            <description value="Verifies that on the customer edit page the Reward Points tab is accessible, the balance-adjustment form is present, and the admin can submit a points update. Checks for the presence of the reward-points-balance-form and the submit button."/>
+            <severity value="MAJOR"/>
+            <group value="RewardPoints"/>
+        </annotations>
+
+        <before>
+            <createData entity="CustomerWithPoints" stepKey="createCustomer"/>
+            <actionGroup ref="AdminLoginActionGroup" stepKey="loginAsAdmin"/>
+        </before>
+
+        <after>
+            <actionGroup ref="AdminLogoutActionGroup" stepKey="logoutAdmin"/>
+            <deleteData createDataKey="createCustomer" stepKey="deleteCustomer"/>
+        </after>
+
+        <!-- Navigate to the customer edit page -->
+        <amOnPage url="{{AdminEditCustomerPage.url($$createCustomer.id$$)}}" stepKey="navigateToCustomerEditPage"/>
+        <waitForPageLoad time="30" stepKey="waitForCustomerEditPageLoad"/>
+
+        <!-- Click on the Reward Points tab in the customer form -->
+        <waitForElementVisible selector="[data-index='meetanshi_rewardpoints_tab_content']" time="30" stepKey="waitForRewardPointsTab"/>
+        <click selector="[data-index='meetanshi_rewardpoints_tab_content']" stepKey="clickRewardPointsTab"/>
+        <waitForPageLoad time="15" stepKey="waitForTabContent"/>
+
+        <!-- Scroll to and verify the balance adjustment form is visible -->
+        <scrollTo selector="#reward-points-balance-form" stepKey="scrollToBalanceForm"/>
+        <waitForElementVisible selector="#reward-points-balance-form" time="15" stepKey="waitForBalanceFormVisible"/>
+        <seeElement selector="#reward-points-balance-form" stepKey="seeBalanceForm"/>
+
+        <!-- Verify the points input field is present -->
+        <seeElement selector="#rp_update_points" stepKey="seeUpdatePointsInput"/>
+
+        <!-- Enter a point adjustment value -->
+        <fillField selector="#rp_update_points" userInput="50" stepKey="fillPointsAmount"/>
+
+        <!-- Optionally fill comment -->
+        <fillField selector="#rp_comment" userInput="Manual test adjustment via MFTF" stepKey="fillComment"/>
+
+        <!-- Click the Save button for the reward points form -->
+        <waitForElementVisible selector="#rp_balance_save_btn" time="15" stepKey="waitForSaveBtnVisible"/>
+        <click selector="#rp_balance_save_btn" stepKey="clickSavePointsButton"/>
+        <waitForPageLoad time="30" stepKey="waitAfterSave"/>
+
+        <!-- Verify a success or response message is displayed -->
+        <waitForElementVisible selector="#rp-balance-message" time="15" stepKey="waitForResponseMessage"/>
+        <seeElement selector="#rp-balance-message" stepKey="seeResponseMessageElement"/>
+    </test>
+
+</tests>

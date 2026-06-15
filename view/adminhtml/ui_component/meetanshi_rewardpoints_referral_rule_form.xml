@@ -1,0 +1,251 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<form xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+      xsi:noNamespaceSchemaLocation="urn:magento:module:Magento_Ui:etc/ui_configuration.xsd">
+
+    <argument name="data" xsi:type="array">
+        <item name="js_config" xsi:type="array">
+            <item name="provider" xsi:type="string">meetanshi_rewardpoints_referral_rule_form.meetanshi_rewardpoints_referral_rule_form_data_source</item>
+        </item>
+        <item name="label" xsi:type="string" translate="true">Referral Rule Information</item>
+        <item name="template" xsi:type="string">templates/form/collapsible</item>
+    </argument>
+
+    <settings>
+        <buttons>
+            <button name="back">
+                <url path="meetanshi_rewardpoints/referralrule/index"/>
+                <class>back</class>
+                <label translate="true">Back</label>
+            </button>
+            <button name="save_and_continue" class="Meetanshi\RewardPoints\Block\Adminhtml\ReferralRule\Edit\SaveAndContinueButton"/>
+            <button name="save">
+                <url path="*/*/save"/>
+                <class>save primary</class>
+                <label translate="true">Save</label>
+            </button>
+        </buttons>
+        <namespace>meetanshi_rewardpoints_referral_rule_form</namespace>
+        <dataScope>data</dataScope>
+        <deps>
+            <dep>meetanshi_rewardpoints_referral_rule_form.meetanshi_rewardpoints_referral_rule_form_data_source</dep>
+        </deps>
+    </settings>
+
+    <dataSource name="meetanshi_rewardpoints_referral_rule_form_data_source">
+        <argument name="data" xsi:type="array">
+            <item name="js_config" xsi:type="array">
+                <item name="component" xsi:type="string">Magento_Ui/js/form/provider</item>
+            </item>
+        </argument>
+        <settings>
+            <validateUrl path="meetanshi_rewardpoints/referralrule/validate"/>
+            <submitUrl path="meetanshi_rewardpoints/referralrule/save"/>
+        </settings>
+        <aclResource>Meetanshi_RewardPoints::referral_rule</aclResource>
+        <dataProvider class="Meetanshi\RewardPoints\Ui\DataProvider\ReferralRule\FormDataProvider"
+                      name="meetanshi_rewardpoints_referral_rule_form_data_source">
+            <settings>
+                <requestFieldName>rule_id</requestFieldName>
+                <primaryFieldName>rule_id</primaryFieldName>
+            </settings>
+        </dataProvider>
+    </dataSource>
+
+    <fieldset name="general" sortOrder="10">
+        <settings>
+            <label translate="true">General</label>
+            <collapsible>true</collapsible>
+            <opened>true</opened>
+        </settings>
+
+        <field name="rule_id" formElement="input">
+            <settings>
+                <dataType>text</dataType>
+                <visible>false</visible>
+            </settings>
+        </field>
+
+        <field name="name" formElement="input">
+            <settings>
+                <dataType>text</dataType>
+                <label translate="true">Rule Name</label>
+                <dataScope>name</dataScope>
+                <validation>
+                    <rule name="required-entry" xsi:type="boolean">true</rule>
+                </validation>
+            </settings>
+        </field>
+
+        <field name="description" formElement="textarea">
+            <settings>
+                <dataType>text</dataType>
+                <label translate="true">Description</label>
+                <dataScope>description</dataScope>
+            </settings>
+        </field>
+
+        <field name="is_active" formElement="select">
+            <settings>
+                <dataType>select</dataType>
+                <label translate="true">Status</label>
+                <dataScope>is_active</dataScope>
+            </settings>
+            <formElements>
+                <select>
+                    <settings>
+                        <options class="Meetanshi\RewardPoints\Model\Source\IsActive"/>
+                    </settings>
+                </select>
+            </formElements>
+        </field>
+
+        <field name="from_date" formElement="date">
+            <settings>
+                <dataType>text</dataType>
+                <label translate="true">From Date</label>
+                <dataScope>from_date</dataScope>
+            </settings>
+        </field>
+
+        <field name="to_date" formElement="date">
+            <settings>
+                <dataType>text</dataType>
+                <label translate="true">To Date</label>
+                <dataScope>to_date</dataScope>
+            </settings>
+        </field>
+
+        <field name="website_ids" formElement="multiselect">
+            <settings>
+                <dataType>int</dataType>
+                <label translate="true">Websites</label>
+                <dataScope>website_ids</dataScope>
+                <notice translate="true">If nothing is selected, the rule applies to all websites.</notice>
+            </settings>
+            <formElements>
+                <multiselect>
+                    <settings>
+                        <options class="Meetanshi\RewardPoints\Model\Source\Website"/>
+                    </settings>
+                </multiselect>
+            </formElements>
+        </field>
+
+        <field name="customer_group_ids" formElement="multiselect">
+            <settings>
+                <dataType>int</dataType>
+                <label translate="true">Customer Groups</label>
+                <dataScope>customer_group_ids</dataScope>
+                <notice translate="true">If nothing is selected, the rule applies to all customer groups.</notice>
+            </settings>
+            <formElements>
+                <multiselect>
+                    <settings>
+                        <options class="Magento\Customer\Ui\Component\Listing\Column\Group\Options"/>
+                    </settings>
+                </multiselect>
+            </formElements>
+        </field>
+
+    </fieldset>
+
+    <fieldset name="conditions" sortOrder="20">
+        <settings>
+            <collapsible>true</collapsible>
+            <opened>true</opened>
+            <label translate="true">Conditions</label>
+        </settings>
+        <container name="conditions_apply_to" sortOrder="10">
+            <htmlContent name="html_content">
+                <block class="Meetanshi\RewardPoints\Block\Adminhtml\ReferralRule\Edit\Tab\Conditions"
+                       name="referral_rule_conditions"/>
+            </htmlContent>
+        </container>
+    </fieldset>
+
+    <fieldset name="rewards" sortOrder="30">
+        <settings>
+            <label translate="true">Reward Configuration</label>
+            <collapsible>true</collapsible>
+            <opened>true</opened>
+        </settings>
+
+        <field name="referrer_points" formElement="input">
+            <settings>
+                <dataType>number</dataType>
+                <label translate="true">Referrer Points</label>
+                <dataScope>referrer_points</dataScope>
+                <validation>
+                    <rule name="validate-zero-or-greater" xsi:type="boolean">true</rule>
+                    <rule name="validate-digits" xsi:type="boolean">true</rule>
+                </validation>
+                <notice translate="true">Points awarded to the customer who referred.</notice>
+            </settings>
+        </field>
+
+        <field name="referee_points" formElement="input">
+            <settings>
+                <dataType>number</dataType>
+                <label translate="true">Referee Points</label>
+                <dataScope>referee_points</dataScope>
+                <validation>
+                    <rule name="validate-zero-or-greater" xsi:type="boolean">true</rule>
+                    <rule name="validate-digits" xsi:type="boolean">true</rule>
+                </validation>
+                <notice translate="true">Points awarded to the new customer who was referred.</notice>
+            </settings>
+        </field>
+
+        <field name="referee_discount" formElement="input">
+            <settings>
+                <dataType>number</dataType>
+                <label translate="true">Referee Discount</label>
+                <dataScope>referee_discount</dataScope>
+                <validation>
+                    <rule name="validate-zero-or-greater" xsi:type="boolean">true</rule>
+                    <rule name="validate-number" xsi:type="boolean">true</rule>
+                </validation>
+                <notice translate="true">Discount amount or percentage for the referred customer.</notice>
+            </settings>
+        </field>
+
+        <field name="discount_type" formElement="select">
+            <settings>
+                <dataType>select</dataType>
+                <label translate="true">Discount Type</label>
+                <dataScope>discount_type</dataScope>
+            </settings>
+            <formElements>
+                <select>
+                    <settings>
+                        <options>
+                            <option name="fixed" xsi:type="array">
+                                <item name="value" xsi:type="string">fixed</item>
+                                <item name="label" xsi:type="string" translate="true">Fixed Amount</item>
+                            </option>
+                            <option name="percent" xsi:type="array">
+                                <item name="value" xsi:type="string">percent</item>
+                                <item name="label" xsi:type="string" translate="true">Percentage</item>
+                            </option>
+                        </options>
+                    </settings>
+                </select>
+            </formElements>
+        </field>
+
+        <field name="max_invitations" formElement="input">
+            <settings>
+                <dataType>number</dataType>
+                <label translate="true">Max Invitations</label>
+                <dataScope>max_invitations</dataScope>
+                <validation>
+                    <rule name="validate-zero-or-greater" xsi:type="boolean">true</rule>
+                    <rule name="validate-digits" xsi:type="boolean">true</rule>
+                </validation>
+                <notice translate="true">Maximum number of successful referrals per customer. Set 0 for unlimited.</notice>
+            </settings>
+        </field>
+
+    </fieldset>
+
+</form>

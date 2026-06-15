@@ -1,0 +1,189 @@
+<?xml version="1.0"?>
+<listing xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+         xsi:noNamespaceSchemaLocation="urn:magento:module:Magento_Ui:etc/ui_configuration.xsd">
+
+    <argument name="data" xsi:type="array">
+        <item name="js_config" xsi:type="array">
+            <item name="provider" xsi:type="string">meetanshi_rewardpoints_cart_rule_listing.meetanshi_rewardpoints_cart_rule_listing_data_source</item>
+        </item>
+    </argument>
+
+    <settings>
+        <buttons>
+            <button name="add">
+                <url path="*/*/new"/>
+                <class>primary</class>
+                <label translate="true">Add New Rule</label>
+            </button>
+        </buttons>
+        <spinner>meetanshi_rewardpoints_cart_rule_columns</spinner>
+        <deps>
+            <dep>meetanshi_rewardpoints_cart_rule_listing.meetanshi_rewardpoints_cart_rule_listing_data_source</dep>
+        </deps>
+    </settings>
+
+    <dataSource name="meetanshi_rewardpoints_cart_rule_listing_data_source" component="Magento_Ui/js/grid/provider">
+        <settings>
+            <storageConfig>
+                <param name="indexField" xsi:type="string">rule_id</param>
+            </storageConfig>
+            <updateUrl path="mui/index/render"/>
+        </settings>
+        <aclResource>Meetanshi_RewardPoints::cart_rule</aclResource>
+        <dataProvider class="Meetanshi\RewardPoints\Ui\DataProvider\CartRule\ListingDataProvider"
+                      name="meetanshi_rewardpoints_cart_rule_listing_data_source">
+            <settings>
+                <requestFieldName>rule_id</requestFieldName>
+                <primaryFieldName>rule_id</primaryFieldName>
+            </settings>
+        </dataProvider>
+    </dataSource>
+
+    <listingToolbar name="listing_top">
+        <settings>
+            <sticky>true</sticky>
+        </settings>
+        <bookmark name="bookmarks"/>
+        <columnsControls name="columns_controls"/>
+        <filterSearch name="fulltext"/>
+        <filters name="listing_filters"/>
+        <massaction name="listing_massaction">
+            <action name="delete">
+                <settings>
+                    <confirm>
+                        <message translate="true">Are you sure you want to delete selected rules?</message>
+                        <title translate="true">Delete Rules</title>
+                    </confirm>
+                    <url path="meetanshi_rewardpoints/cartrule/massDelete"/>
+                    <type>delete</type>
+                    <label translate="true">Delete</label>
+                </settings>
+            </action>
+            <action name="enable">
+                <settings>
+                    <url path="meetanshi_rewardpoints/cartrule/massStatus">
+                        <param name="status">1</param>
+                    </url>
+                    <type>enable</type>
+                    <label translate="true">Enable</label>
+                </settings>
+            </action>
+            <action name="disable">
+                <settings>
+                    <url path="meetanshi_rewardpoints/cartrule/massStatus">
+                        <param name="status">0</param>
+                    </url>
+                    <type>disable</type>
+                    <label translate="true">Disable</label>
+                </settings>
+            </action>
+        </massaction>
+        <paging name="listing_paging"/>
+    </listingToolbar>
+
+    <columns name="meetanshi_rewardpoints_cart_rule_columns">
+        <selectionsColumn name="ids">
+            <settings>
+                <indexField>rule_id</indexField>
+            </settings>
+        </selectionsColumn>
+
+        <column name="rule_id">
+            <settings>
+                <filter>textRange</filter>
+                <label translate="true">ID</label>
+                <sorting>asc</sorting>
+            </settings>
+        </column>
+
+        <column name="name">
+            <settings>
+                <filter>text</filter>
+                <label translate="true">Rule Name</label>
+            </settings>
+        </column>
+
+        <column name="is_active" component="Meetanshi_RewardPoints/js/grid/columns/status">
+            <settings>
+                <options class="Meetanshi\RewardPoints\Model\Source\IsActive"/>
+                <filter>select</filter>
+                <dataType>select</dataType>
+                <label translate="true">Status</label>
+            </settings>
+        </column>
+
+        <column name="from_date" class="Magento\Ui\Component\Listing\Columns\Date"
+               component="Magento_Ui/js/grid/columns/date">
+            <settings>
+                <filter>dateRange</filter>
+                <dataType>date</dataType>
+                <dateFormat>MMM d, YYYY h:mm:ss A</dateFormat>
+                <label translate="true">From</label>
+            </settings>
+        </column>
+
+        <column name="to_date" class="Magento\Ui\Component\Listing\Columns\Date"
+               component="Magento_Ui/js/grid/columns/date">
+            <settings>
+                <filter>dateRange</filter>
+                <dataType>date</dataType>
+                <dateFormat>MMM d, YYYY h:mm:ss A</dateFormat>
+                <label translate="true">To</label>
+            </settings>
+        </column>
+
+        <column name="priority">
+            <settings>
+                <filter>textRange</filter>
+                <label translate="true">Priority</label>
+            </settings>
+        </column>
+
+        <column name="action_type" component="Magento_Ui/js/grid/columns/select">
+            <settings>
+                <options class="Meetanshi\RewardPoints\Model\Source\CartActionType"/>
+                <filter>select</filter>
+                <dataType>select</dataType>
+                <label translate="true">Action Type</label>
+            </settings>
+        </column>
+
+        <column name="points">
+            <settings>
+                <filter>textRange</filter>
+                <label translate="true">Points</label>
+            </settings>
+        </column>
+
+        <column name="websites">
+            <settings>
+                <options class="Meetanshi\RewardPoints\Model\Source\WebsiteFilter"/>
+                <filter>select</filter>
+                <dataType>select</dataType>
+                <label translate="true">Websites</label>
+                <sortable>false</sortable>
+            </settings>
+        </column>
+        <column name="customer_groups">
+            <settings>
+                <options class="Meetanshi\RewardPoints\Model\Source\CustomerGroupFilter"/>
+                <filter>select</filter>
+                <dataType>select</dataType>
+                <label translate="true">Customer Groups</label>
+                <sortable>false</sortable>
+            </settings>
+        </column>
+
+        <actionsColumn name="actions" class="Magento\Backend\Ui\Component\Listing\Column\EditAction">
+            <argument name="data" xsi:type="array">
+                <item name="config" xsi:type="array">
+                    <item name="editUrlPath" xsi:type="string">meetanshi_rewardpoints/cartrule/edit</item>
+                    <item name="urlEntityParamName" xsi:type="string">rule_id</item>
+                </item>
+            </argument>
+            <settings>
+                <indexField>rule_id</indexField>
+            </settings>
+        </actionsColumn>
+    </columns>
+</listing>

@@ -1,0 +1,188 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<listing xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+         xsi:noNamespaceSchemaLocation="urn:magento:module:Magento_Ui:etc/ui_configuration.xsd">
+    <argument name="data" xsi:type="array">
+        <item name="js_config" xsi:type="array">
+            <item name="provider" xsi:type="string">meetanshi_rewardpoints_transaction_listing.meetanshi_rewardpoints_transaction_listing_data_source</item>
+        </item>
+    </argument>
+    <settings>
+        <buttons>
+            <button name="add">
+                <url path="meetanshi_rewardpoints/transaction/add"/>
+                <class>primary</class>
+                <label translate="true">Add Transaction</label>
+            </button>
+        </buttons>
+        <spinner>meetanshi_rewardpoints_transaction_columns</spinner>
+        <deps>
+            <dep>meetanshi_rewardpoints_transaction_listing.meetanshi_rewardpoints_transaction_listing_data_source</dep>
+        </deps>
+    </settings>
+    <dataSource name="meetanshi_rewardpoints_transaction_listing_data_source" component="Magento_Ui/js/grid/provider">
+        <settings>
+            <storageConfig>
+                <param name="indexField" xsi:type="string">transaction_id</param>
+            </storageConfig>
+            <updateUrl path="mui/index/render"/>
+        </settings>
+        <aclResource>Meetanshi_RewardPoints::transactions</aclResource>
+        <dataProvider class="Meetanshi\RewardPoints\Ui\DataProvider\Transaction\ListingDataProvider"
+                      name="meetanshi_rewardpoints_transaction_listing_data_source">
+            <settings>
+                <requestFieldName>transaction_id</requestFieldName>
+                <primaryFieldName>transaction_id</primaryFieldName>
+            </settings>
+        </dataProvider>
+    </dataSource>
+    <listingToolbar name="listing_top">
+        <settings>
+            <sticky>true</sticky>
+        </settings>
+        <bookmark name="bookmarks"/>
+        <columnsControls name="columns_controls"/>
+        <exportButton name="export_button"/>
+        <filterSearch name="fulltext"/>
+        <filters name="listing_filters">
+            <settings>
+                <templates>
+                    <filters>
+                        <select>
+                            <param name="template" xsi:type="string">ui/grid/filters/elements/ui-select</param>
+                            <param name="component" xsi:type="string">Magento_Ui/js/form/element/ui-select</param>
+                        </select>
+                    </filters>
+                </templates>
+            </settings>
+            <filterSelect name="status" provider="${ $.parentName }">
+                <settings>
+                    <captionValue>0</captionValue>
+                    <options class="Meetanshi\RewardPoints\Model\Source\TransactionStatus"/>
+                    <label translate="true">Status</label>
+                    <dataScope>status</dataScope>
+                    <imports>
+                        <link name="visible">componentType = column, index = status:visible</link>
+                    </imports>
+                </settings>
+            </filterSelect>
+        </filters>
+        <massaction name="listing_massaction">
+            <action name="cancel">
+                <settings>
+                    <confirm>
+                        <message translate="true">Are you sure you want to cancel the selected transactions?</message>
+                        <title translate="true">Cancel Transactions</title>
+                    </confirm>
+                    <url path="meetanshi_rewardpoints/transaction/massCancel"/>
+                    <type>cancel</type>
+                    <label translate="true">Cancel</label>
+                </settings>
+            </action>
+            <action name="expire">
+                <settings>
+                    <confirm>
+                        <message translate="true">Are you sure you want to force-expire the selected transactions?</message>
+                        <title translate="true">Force Expire Transactions</title>
+                    </confirm>
+                    <url path="meetanshi_rewardpoints/transaction/massExpire"/>
+                    <type>expire</type>
+                    <label translate="true">Force Expire</label>
+                </settings>
+            </action>
+        </massaction>
+        <paging name="listing_paging"/>
+    </listingToolbar>
+    <columns name="meetanshi_rewardpoints_transaction_columns">
+        <settings>
+            <editorConfig>
+                <param name="enabled" xsi:type="boolean">false</param>
+                <param name="indexField" xsi:type="string">transaction_id</param>
+            </editorConfig>
+        </settings>
+        <selectionsColumn name="ids">
+            <settings>
+                <indexField>transaction_id</indexField>
+            </settings>
+        </selectionsColumn>
+        <column name="transaction_id">
+            <settings>
+                <filter>textRange</filter>
+                <label translate="true">ID</label>
+                <sorting>desc</sorting>
+            </settings>
+        </column>
+        <column name="customer_name" class="Meetanshi\RewardPoints\Ui\Component\Listing\Transaction\Column\CustomerName">
+            <settings>
+                <filter>text</filter>
+                <label translate="true">Customer</label>
+                <bodyTmpl>ui/grid/cells/html</bodyTmpl>
+            </settings>
+        </column>
+        <column name="action_code">
+            <settings>
+                <label translate="true">Action</label>
+            </settings>
+        </column>
+        <column name="points_delta">
+            <settings>
+                <filter>textRange</filter>
+                <label translate="true">Points Delta</label>
+            </settings>
+        </column>
+        <column name="points_balance_after">
+            <settings>
+                <filter>textRange</filter>
+                <label translate="true">Balance After</label>
+            </settings>
+        </column>
+        <column name="expires_at" class="Magento\Ui\Component\Listing\Columns\Date" component="Magento_Ui/js/grid/columns/date">
+            <settings>
+                <filter>dateRange</filter>
+                <dataType>date</dataType>
+                <dateFormat>MMM d, YYYY h:mm:ss A</dateFormat>
+                <label translate="true">Expires At</label>
+            </settings>
+        </column>
+        <column name="created_at" class="Magento\Ui\Component\Listing\Columns\Date" component="Magento_Ui/js/grid/columns/date">
+            <settings>
+                <filter>dateRange</filter>
+                <dataType>date</dataType>
+                <dateFormat>MMM d, YYYY h:mm:ss A</dateFormat>
+                <label translate="true">Created At</label>
+            </settings>
+        </column>
+        <column name="status" component="Meetanshi_RewardPoints/js/grid/columns/status">
+            <settings>
+                <options class="Meetanshi\RewardPoints\Model\Source\TransactionStatus"/>
+                <filter>select</filter>
+                <dataType>select</dataType>
+                <label translate="true">Status</label>
+            </settings>
+        </column>
+        <column name="comment">
+            <settings>
+                <filter>text</filter>
+                <label translate="true">Comment</label>
+            </settings>
+        </column>
+        <column name="order_id" class="Meetanshi\RewardPoints\Ui\Component\Listing\Transaction\Column\OrderId">
+            <settings>
+                <filter>textRange</filter>
+                <label translate="true">Order ID</label>
+                <bodyTmpl>ui/grid/cells/html</bodyTmpl>
+            </settings>
+        </column>
+        <column name="admin_user_name">
+            <settings>
+                <filter>text</filter>
+                <label translate="true">Admin User</label>
+            </settings>
+        </column>
+        <actionsColumn name="actions" class="Meetanshi\RewardPoints\Ui\Component\Listing\Transaction\Column\Actions">
+            <settings>
+                <indexField>transaction_id</indexField>
+                <label translate="true">Actions</label>
+            </settings>
+        </actionsColumn>
+    </columns>
+</listing>

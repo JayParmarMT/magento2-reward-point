@@ -1,0 +1,31 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<sections xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+          xsi:noNamespaceSchemaLocation="urn:magento:mftf:Page/etc/SectionObject.xsd">
+    <section name="RewardPointsCartSection">
+        <!-- Block wrapper -->
+        <element name="applyPointsBlock" type="block" selector="#reward-points-cart-block"/>
+        <element name="blockTitle" type="button" selector="#reward-points-cart-title"/>
+        <element name="blockContent" type="block" selector="#reward-points-cart-content"/>
+        <!-- Points form widget -->
+        <element name="formWidget" type="block" selector="#reward-points-form-widget"/>
+        <!-- Points input fields -->
+        <element name="pointsInput" type="input" selector="#reward-points-amount"/>
+        <element name="pointsSlider" type="input" selector="#reward-points-slider"/>
+        <element name="useMaxCheckbox" type="checkbox" selector="#reward-points-use-max"/>
+        <!-- Action buttons -->
+        <element name="applyButton" type="button" selector=".reward-points-apply-btn"/>
+        <element name="removeButton" type="button" selector=".reward-points-remove-btn"/>
+        <!-- Balance display -->
+        <element name="balanceDisplay" type="text" selector=".reward-points-balance-display"/>
+        <!-- Applied notice -->
+        <element name="appliedNotice" type="block" selector=".reward-points-applied-notice"/>
+        <!-- Message area -->
+        <element name="messageArea" type="block" selector=".reward-points-messages"/>
+        <!-- Login notice (shown to guests) -->
+        <element name="loginNotice" type="text" selector=".reward-points-login-notice"/>
+        <!-- Zero balance notice -->
+        <element name="zeroBalanceNotice" type="text" selector=".reward-points-zero-notice"/>
+        <!-- Min balance notice -->
+        <element name="minBalanceNotice" type="text" selector=".reward-points-min-notice"/>
+    </section>
+</sections>

@@ -1,0 +1,38 @@
+<?xml version="1.0"?>
+<!--
+    Hyvä-specific PDP layout.
+
+    On Hyvä, product.info.price is a BLOCK (not a container), so
+    referenceContainer name="product.info.price" in the Luma layout silently
+    fails — child blocks added there are never rendered.
+
+    On Hyvä, product-info.phtml renders child blocks by explicit name only.
+    The container 'product.info.additional' IS rendered via:
+        $block->getChildHtml("product.info.additional")
+    so it is the correct injection point for custom blocks below the price area.
+
+    The buyWithPoints block is also moved here and its template swapped to the
+    Hyvä Alpine.js version.
+-->
+<page xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+      xsi:noNamespaceSchemaLocation="urn:magento:framework:View/Layout/etc/page_configuration.xsd">
+    <body>
+
+        <!-- Add earn message to product.info.additional so it renders on Hyvä PDP -->
+        <referenceContainer name="product.info.additional">
+            <block class="Meetanshi\RewardPoints\Block\Frontend\Product\EarnMessage"
+                   name="rewardpoints.earn.message.hyva"
+                   template="Meetanshi_RewardPoints::product/earn_message.phtml"
+                   before="-"/>
+        </referenceContainer>
+
+        <!-- Add buy-with-points to product.info.additional after earn message -->
+        <referenceContainer name="product.info.additional">
+            <block class="Meetanshi\RewardPoints\Block\Frontend\Product\BuyWithPoints"
+                   name="rewardpoints.buy.with.points.hyva"
+                   template="Meetanshi_RewardPoints::hyva/product/buyWithPoints.phtml"
+                   after="rewardpoints.earn.message.hyva"/>
+        </referenceContainer>
+
+    </body>
+</page>

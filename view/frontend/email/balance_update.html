@@ -1,0 +1,49 @@
+<!--@subject Your Reward Points Balance Has Been Updated @-->
+<!--@vars {
+"var customer.name":"Customer Name",
+"var points_delta":"Points Change",
+"var new_balance":"New Balance",
+"var action_label":"Action Label",
+"var comment":"Comment",
+"var store_name":"Store Name"
+} @-->
+
+{{template config_path="design/email/header_template"}}
+
+<table>
+    <tr>
+        <td>
+            <p>{{trans "Dear %name," name=$customer.name}}</p>
+            <p>{{trans "Your reward points balance at %store_name has been updated." store_name=$store_name}}</p>
+
+            <table cellspacing="0" cellpadding="5" border="0" width="100%">
+                <tr>
+                    <td><strong>{{trans "Action"}}</strong></td>
+                    <td>{{var action_label}}</td>
+                </tr>
+                <tr>
+                    <td><strong>{{trans "Points Change"}}</strong></td>
+                    <td>
+                        {{depend points_delta}}
+                            {{if points_delta >= 0}}+{{/if}}{{var points_delta}}
+                        {{/depend}}
+                    </td>
+                </tr>
+                <tr>
+                    <td><strong>{{trans "New Balance"}}</strong></td>
+                    <td>{{var new_balance}} {{trans "points"}}</td>
+                </tr>
+                {{depend comment}}
+                <tr>
+                    <td><strong>{{trans "Note"}}</strong></td>
+                    <td>{{var comment}}</td>
+                </tr>
+                {{/depend}}
+            </table>
+
+            <p>{{trans "Thank you for being a valued customer of %store_name." store_name=$store_name}}</p>
+        </td>
+    </tr>
+</table>
+
+{{template config_path="design/email/footer_template"}}

@@ -1,0 +1,94 @@
+<?php
+/**
+ * Color Picker field renderer for system configuration
+ *
+ * @var \Meetanshi\RewardPoints\Block\Adminhtml\System\Config\ColorPicker $block
+ * @var \Magento\Framework\Escaper $escaper
+ */
+
+$htmlId    = $block->getData('html_id');
+$fieldName = $block->getData('name');
+$value     = $block->getData('value');
+
+// Ensure value is a valid hex color; fall back to black
+if (!preg_match('/^#[0-9a-fA-F]{3,6}$/', (string) $value)) {
+    $value = '#000000';
+}
+?>
+<div class="meetanshi-color-picker-wrap"
+     style="display:inline-flex; align-items:center; gap:8px;">
+
+    <!-- Native HTML5 color swatch -->
+    <input type="color"
+           id="<?= $escaper->escapeHtmlAttr($htmlId) ?>_picker"
+           value="<?= $escaper->escapeHtmlAttr($value) ?>"
+           style="width:40px; height:32px; padding:2px; border:1px solid #adadad;
+                  border-radius:3px; cursor:pointer; background:none;" />
+
+    <!-- Hex text input — this is the real form field submitted to Magento -->
+    <input type="text"
+           id="<?= $escaper->escapeHtmlAttr($htmlId) ?>"
+           name="<?= $escaper->escapeHtmlAttr($fieldName) ?>"
+           value="<?= $escaper->escapeHtmlAttr($value) ?>"
+           maxlength="7"
+           class="input-text"
+           style="width:90px;"
+           placeholder="#000000" />
+
+    <!-- Live preview swatch -->
+    <span id="<?= $escaper->escapeHtmlAttr($htmlId) ?>_preview"
+          style="display:inline-block; width:28px; height:28px;
+                 border:1px solid #adadad; border-radius:3px;
+                 background:<?= $escaper->escapeHtmlAttr($value) ?>;
+                 vertical-align:middle;"></span>
+</div>
+
+<script>
+(function () {
+    'use strict';
+
+    var picker  = document.getElementById('<?= $escaper->escapeJs($htmlId) ?>_picker');
+    var text    = document.getElementById('<?= $escaper->escapeJs($htmlId) ?>');
+    var preview = document.getElementById('<?= $escaper->escapeJs($htmlId) ?>_preview');
+
+    if (!picker || !text || !preview) {
+        return;
+    }
+
+    function isValidHex(val) {
+        return /^#[0-9a-fA-F]{3,6}$/.test(val);
+    }
+
+    // Sync swatch → text + preview
+    picker.addEventListener('input', function () {
+        text.value = picker.value;
+        preview.style.background = picker.value;
+    });
+
+    // Sync text → swatch + preview (on every keystroke)
+    text.addEventListener('input', function () {
+        var val = text.value.trim();
+        if (isValidHex(val)) {
+            picker.value  = val;
+            preview.style.background = val;
+        }
+    });
+
+    // On blur: normalise — prepend # if missing
+    text.addEventListener('blur', function () {
+        var val = text.value.trim();
+        if (val && val.charAt(0) !== '#') {
+            val = '#' + val;
+        }
+        if (isValidHex(val)) {
+            text.value    = val;
+            picker.value  = val;
+            preview.style.background = val;
+        } else {
+            // Revert to picker value on invalid input
+            text.value = picker.value;
+            preview.style.background = picker.value;
+        }
+    });
+}());
+</script>

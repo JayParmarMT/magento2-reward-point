@@ -1,0 +1,482 @@
+{
+    "meetanshi_rewardpoints_account": {
+        "column": {
+            "account_id": true,
+            "customer_id": true,
+            "website_id": true,
+            "points_balance": true,
+            "total_earned": true,
+            "total_spent": true,
+            "is_enabled": true,
+            "is_subscribed_balance": true,
+            "is_subscribed_expiration": true,
+            "current_tier_id": true,
+            "lifetime_invoice_amount": true,
+            "created_at": true,
+            "updated_at": true
+        },
+        "constraint": {
+            "PRIMARY": true,
+            "MEETANSHI_REWARDPOINTS_ACCOUNT_CUSTOMER_WEBSITE": true,
+            "MEETANSHI_REWARDPOINTS_ACCOUNT_CUSTOMER_ID": true,
+            "MEETANSHI_REWARDPOINTS_ACCOUNT_WEBSITE_ID": true,
+            "MEETANSHI_REWARDPOINTS_ACCOUNT_CUSTOMER_ID_WEBSITE_ID": true,
+            "MEETANSHI_REWARDPOINTS_ACCOUNT_CSTR_ID_CSTR_ENTT_ENTT_ID": true,
+            "MEETANSHI_REWARDPOINTS_ACCOUNT_WS_ID_STORE_WS_WS_ID": true
+        },
+        "index": {
+            "MEETANSHI_REWARDPOINTS_ACCOUNT_CUSTOMER_ID_IDX": true,
+            "MEETANSHI_REWARDPOINTS_ACCOUNT_WEBSITE_ID_IDX": true,
+            "MEETANSHI_REWARDPOINTS_ACCOUNT_CUSTOMER_ID": true,
+            "MEETANSHI_REWARDPOINTS_ACCOUNT_WEBSITE_ID": true
+        }
+    },
+    "meetanshi_rewardpoints_transaction": {
+        "column": {
+            "transaction_id": true,
+            "account_id": true,
+            "customer_id": true,
+            "store_id": true,
+            "points_delta": true,
+            "points_balance_after": true,
+            "action_code": true,
+            "status": true,
+            "comment": true,
+            "expires_at": true,
+            "order_id": true,
+            "creditmemo_id": true,
+            "rule_id": true,
+            "rule_type": true,
+            "admin_user_id": true,
+            "admin_user_name": true,
+            "created_at": true
+        },
+        "constraint": {
+            "PRIMARY": true,
+            "MEETANSHI_REWARDPOINTS_TXN_ACCOUNT_ID": true,
+            "MEETANSHI_REWARDPOINTS_TXN_CUSTOMER_ID": true,
+            "MEETANSHI_REWARDPOINTS_TXN_STORE_ID": true,
+            "MEETANSHI_REWARDPOINTS_TXN_ORDER_ID": true,
+            "MEETANSHI_REWARDPOINTS_TXN_CREDITMEMO_ID": true,
+            "FK_9B13A188AADE7CF1A94C45A2B567ED0C": true,
+            "MEETANSHI_REWARDPOINTS_TRANSACTION_CSTR_ID_CSTR_ENTT_ENTT_ID": true,
+            "MEETANSHI_REWARDPOINTS_TRANSACTION_STORE_ID_STORE_STORE_ID": true,
+            "MEETANSHI_REWARDPOINTS_TRANSACTION_ORDER_ID_SALES_ORDER_ENTT_ID": true,
+            "FK_831157A88F1E53F7E17CFF4DE0734D27": true
+        },
+        "index": {
+            "MEETANSHI_REWARDPOINTS_TXN_ACCOUNT_STATUS": true,
+            "MEETANSHI_REWARDPOINTS_TXN_CUSTOMER_CREATED": true,
+            "MEETANSHI_REWARDPOINTS_TXN_STATUS_EXPIRES": true,
+            "MEETANSHI_REWARDPOINTS_TXN_ORDER_ID_IDX": true,
+            "MEETANSHI_REWARDPOINTS_TRANSACTION_ACCOUNT_ID_STATUS": true,
+            "MEETANSHI_REWARDPOINTS_TRANSACTION_CUSTOMER_ID_CREATED_AT": true,
+            "MEETANSHI_REWARDPOINTS_TRANSACTION_STATUS_EXPIRES_AT": true,
+            "MEETANSHI_REWARDPOINTS_TRANSACTION_ORDER_ID": true
+        }
+    },
+    "meetanshi_rewardpoints_earning_rate": {
+        "column": {
+            "rate_id": true,
+            "money_step": true,
+            "points": true,
+            "min_order_total": true,
+            "priority": true,
+            "is_active": true,
+            "created_at": true,
+            "updated_at": true
+        },
+        "constraint": {
+            "PRIMARY": true
+        },
+        "index": {
+            "MEETANSHI_REWARDPOINTS_EARNING_RATE_PRIORITY": true
+        }
+    },
+    "meetanshi_rewardpoints_spending_rate": {
+        "column": {
+            "rate_id": true,
+            "points": true,
+            "currency_amount": true,
+            "min_points_per_order": true,
+            "priority": true,
+            "is_active": true,
+            "created_at": true,
+            "updated_at": true
+        },
+        "constraint": {
+            "PRIMARY": true
+        },
+        "index": {
+            "MEETANSHI_REWARDPOINTS_SPENDING_RATE_PRIORITY": true
+        }
+    },
+    "meetanshi_rewardpoints_catalog_rule": {
+        "column": {
+            "rule_id": true,
+            "name": true,
+            "description": true,
+            "is_active": true,
+            "from_date": true,
+            "to_date": true,
+            "priority": true,
+            "action_type": true,
+            "points": true,
+            "money_step": true,
+            "max_points": true,
+            "stop_rules_processing": true,
+            "conditions_serialized": true,
+            "created_at": true,
+            "updated_at": true
+        },
+        "constraint": {
+            "PRIMARY": true
+        },
+        "index": {
+            "MEETANSHI_REWARDPOINTS_CATALOG_RULE_IS_ACTIVE": true
+        }
+    },
+    "meetanshi_rewardpoints_catalog_rule_product": {
+        "column": {
+            "rule_product_id": true,
+            "rule_id": true,
+            "product_id": true,
+            "customer_group_id": true,
+            "website_id": true,
+            "points": true,
+            "action_type": true,
+            "money_step": true,
+            "max_points": true,
+            "priority": true,
+            "stop_rules_processing": true
+        },
+        "constraint": {
+            "PRIMARY": true
+        },
+        "index": {
+            "MEETANSHI_REWARDPOINTS_CATALOG_RULE_PRODUCT_LOOKUP": true,
+            "MEETANSHI_REWARDPOINTS_CAT_RULE_PRD_PRD_ID_WS_ID_CSTR_GROUP_ID": true
+        }
+    },
+    "meetanshi_rewardpoints_cart_rule": {
+        "column": {
+            "rule_id": true,
+            "name": true,
+            "description": true,
+            "is_active": true,
+            "from_date": true,
+            "to_date": true,
+            "priority": true,
+            "action_type": true,
+            "points": true,
+            "money_step": true,
+            "max_points": true,
+            "stop_rules_processing": true,
+            "is_shown_on_product_page": true,
+            "conditions_serialized": true,
+            "actions_serialized": true,
+            "created_at": true,
+            "updated_at": true
+        },
+        "constraint": {
+            "PRIMARY": true
+        },
+        "index": []
+    },
+    "meetanshi_rewardpoints_behavior_rule": {
+        "column": {
+            "rule_id": true,
+            "name": true,
+            "description": true,
+            "is_active": true,
+            "event_code": true,
+            "from_date": true,
+            "to_date": true,
+            "priority": true,
+            "action_type": true,
+            "points": true,
+            "step": true,
+            "max_points": true,
+            "expire_after_days": true,
+            "cap_per_day": true,
+            "cap_per_month": true,
+            "cap_per_year": true,
+            "cap_lifetime": true,
+            "stop_rules_processing": true,
+            "display_name": true,
+            "history_message": true,
+            "email_message": true,
+            "conditions_serialized": true,
+            "extra_data": true,
+            "created_at": true,
+            "updated_at": true
+        },
+        "constraint": {
+            "PRIMARY": true
+        },
+        "index": {
+            "MEETANSHI_REWARDPOINTS_BEHAVIOR_RULE_EVENT": true,
+            "MEETANSHI_REWARDPOINTS_BEHAVIOR_RULE_EVENT_CODE": true
+        }
+    },
+    "meetanshi_rewardpoints_spending_rule": {
+        "column": {
+            "rule_id": true,
+            "name": true,
+            "description": true,
+            "is_active": true,
+            "from_date": true,
+            "to_date": true,
+            "priority": true,
+            "spending_style": true,
+            "spending_action": true,
+            "points_step": true,
+            "discount_action": true,
+            "discount_amount": true,
+            "max_points": true,
+            "min_points": true,
+            "apply_to_shipping": true,
+            "stop_rules_processing": true,
+            "conditions_serialized": true,
+            "actions_serialized": true,
+            "created_at": true,
+            "updated_at": true
+        },
+        "constraint": {
+            "PRIMARY": true
+        },
+        "index": []
+    },
+    "meetanshi_rewardpoints_referral_rule": {
+        "column": {
+            "rule_id": true,
+            "name": true,
+            "description": true,
+            "is_active": true,
+            "from_date": true,
+            "to_date": true,
+            "priority": true,
+            "stop_rules_processing": true,
+            "referrer_action_type": true,
+            "referrer_points": true,
+            "referrer_money_step": true,
+            "referee_action_type": true,
+            "referee_points": true,
+            "referee_money_step": true,
+            "referee_discount": true,
+            "discount_type": true,
+            "referee_apply_to_shipping": true,
+            "max_invitations": true,
+            "referrer_customer_group_ids": true,
+            "referee_customer_group_ids": true,
+            "conditions_serialized": true,
+            "created_at": true,
+            "updated_at": true
+        },
+        "constraint": {
+            "PRIMARY": true
+        },
+        "index": []
+    },
+    "meetanshi_rewardpoints_referral_code": {
+        "column": {
+            "code_id": true,
+            "customer_id": true,
+            "website_id": true,
+            "code": true,
+            "created_at": true
+        },
+        "constraint": {
+            "PRIMARY": true,
+            "MEETANSHI_REWARDPOINTS_REFERRAL_CODE_UNIQUE": true,
+            "MEETANSHI_REWARDPOINTS_REFERRAL_CODE_CUSTOMER_WEBSITE": true,
+            "MEETANSHI_REWARDPOINTS_REFERRAL_CODE_CUSTOMER": true,
+            "MEETANSHI_REWARDPOINTS_REFERRAL_CODE_CODE": true,
+            "MEETANSHI_REWARDPOINTS_REFERRAL_CODE_CUSTOMER_ID_WEBSITE_ID": true,
+            "MEETANSHI_REWARDPOINTS_REFERRAL_CODE_CSTR_ID_CSTR_ENTT_ENTT_ID": true
+        },
+        "index": []
+    },
+    "meetanshi_rewardpoints_invitation": {
+        "column": {
+            "invitation_id": true,
+            "referrer_customer_id": true,
+            "referee_customer_id": true,
+            "website_id": true,
+            "referee_email": true,
+            "referral_code": true,
+            "status": true,
+            "referrer_points_earned": true,
+            "referee_discount_earned": true,
+            "referee_points_earned": true,
+            "created_at": true,
+            "updated_at": true
+        },
+        "constraint": {
+            "PRIMARY": true,
+            "MEETANSHI_REWARDPOINTS_INVITATION_REFERRER": true,
+            "FK_2D537D9474D106F2E771B21A6752A9BE": true
+        },
+        "index": {
+            "MEETANSHI_REWARDPOINTS_INVITATION_REFEREE_EMAIL": true,
+            "MEETANSHI_REWARDPOINTS_INVITATION_REFERRER_ID": true,
+            "MEETANSHI_REWARDPOINTS_INVITATION_REFERRER_CUSTOMER_ID": true
+        }
+    },
+    "meetanshi_rewardpoints_tier": {
+        "column": {
+            "tier_id": true,
+            "name": true,
+            "description": true,
+            "is_active": true,
+            "image": true,
+            "min_points": true,
+            "min_orders": true,
+            "earning_bonus_percent": true,
+            "behavior_bonus_points": true,
+            "spending_discount_percent": true,
+            "free_shipping": true,
+            "linked_cart_rule_id": true,
+            "email_template": true,
+            "sort_order": true,
+            "created_at": true,
+            "updated_at": true
+        },
+        "constraint": {
+            "PRIMARY": true
+        },
+        "index": {
+            "MEETANSHI_REWARDPOINTS_TIER_MIN_POINTS": true
+        }
+    },
+    "meetanshi_rewardpoints_tier_history": {
+        "column": {
+            "history_id": true,
+            "customer_id": true,
+            "website_id": true,
+            "from_tier_id": true,
+            "to_tier_id": true,
+            "change_type": true,
+            "created_at": true
+        },
+        "constraint": {
+            "PRIMARY": true,
+            "MEETANSHI_REWARDPOINTS_TIER_HISTORY_CUSTOMER": true,
+            "MEETANSHI_REWARDPOINTS_TIER_HISTORY_CSTR_ID_CSTR_ENTT_ENTT_ID": true
+        },
+        "index": {
+            "MEETANSHI_REWARDPOINTS_TIER_HISTORY_CUSTOMER_IDX": true,
+            "MEETANSHI_REWARDPOINTS_TIER_HISTORY_CUSTOMER_ID_CREATED_AT": true
+        }
+    },
+    "meetanshi_rewardpoints_rule_website": {
+        "column": {
+            "row_id": true,
+            "rule_id": true,
+            "rule_type": true,
+            "website_id": true
+        },
+        "constraint": {
+            "PRIMARY": true,
+            "MEETANSHI_REWARDPOINTS_RULE_WEBSITE_UNIQUE": true,
+            "MEETANSHI_REWARDPOINTS_RULE_WEBSITE_FK": true,
+            "MEETANSHI_REWARDPOINTS_RULE_WEBSITE_RULE_ID_RULE_TYPE_WEBSITE_ID": true,
+            "MEETANSHI_REWARDPOINTS_RULE_WS_WS_ID_STORE_WS_WS_ID": true
+        },
+        "index": {
+            "MEETANSHI_REWARDPOINTS_RULE_WEBSITE_RULE_IDX": true,
+            "MEETANSHI_REWARDPOINTS_RULE_WEBSITE_RULE_ID_RULE_TYPE": true
+        }
+    },
+    "meetanshi_rewardpoints_rule_customer_group": {
+        "column": {
+            "row_id": true,
+            "rule_id": true,
+            "rule_type": true,
+            "customer_group_id": true
+        },
+        "constraint": {
+            "PRIMARY": true,
+            "MEETANSHI_REWARDPOINTS_RULE_CG_UNIQUE": true,
+            "MEETANSHI_REWARDPOINTS_RULE_CG_FK": true,
+            "UNQ_3BE49A0BBECCF9EB8548A7B1C47AFD3E": true,
+            "FK_E0E63D678BED1FCD51F236A8842AD097": true
+        },
+        "index": {
+            "MEETANSHI_REWARDPOINTS_RULE_CG_RULE_IDX": true,
+            "MEETANSHI_REWARDPOINTS_RULE_CUSTOMER_GROUP_RULE_ID_RULE_TYPE": true
+        }
+    },
+    "meetanshi_rewardpoints_rule_label": {
+        "column": {
+            "label_id": true,
+            "rule_id": true,
+            "rule_type": true,
+            "store_id": true,
+            "label": true,
+            "notification_message": true
+        },
+        "constraint": {
+            "PRIMARY": true,
+            "MEETANSHI_REWARDPOINTS_RULE_LABEL_UNIQUE": true,
+            "MEETANSHI_REWARDPOINTS_RULE_LABEL_STORE": true,
+            "MEETANSHI_REWARDPOINTS_RULE_LABEL_RULE_ID_RULE_TYPE_STORE_ID": true,
+            "MEETANSHI_REWARDPOINTS_RULE_LABEL_STORE_ID_STORE_STORE_ID": true
+        },
+        "index": []
+    },
+    "meetanshi_rewardpoints_behavior_log": {
+        "column": {
+            "log_id": true,
+            "customer_id": true,
+            "rule_id": true,
+            "event_code": true,
+            "points_earned_today": true,
+            "points_earned_this_month": true,
+            "points_earned_this_year": true,
+            "points_earned_lifetime": true,
+            "last_earned_date": true,
+            "created_at": true,
+            "updated_at": true
+        },
+        "constraint": {
+            "PRIMARY": true,
+            "MEETANSHI_REWARDPOINTS_BEHAVIOR_LOG_UNIQUE": true,
+            "MEETANSHI_REWARDPOINTS_BEHAVIOR_LOG_CUSTOMER": true,
+            "MEETANSHI_REWARDPOINTS_BEHAVIOR_LOG_CUSTOMER_ID_RULE_ID": true,
+            "MEETANSHI_REWARDPOINTS_BEHAVIOR_LOG_CSTR_ID_CSTR_ENTT_ENTT_ID": true
+        },
+        "index": {
+            "MEETANSHI_REWARDPOINTS_BEHAVIOR_LOG_RULE_IDX": true,
+            "MEETANSHI_REWARDPOINTS_BEHAVIOR_LOG_RULE_ID_EVENT_CODE": true
+        }
+    },
+    "quote": {
+        "column": {
+            "reward_points_used": true,
+            "reward_points_discount": true,
+            "base_reward_points_discount": true
+        }
+    },
+    "sales_order": {
+        "column": {
+            "reward_points_used": true,
+            "reward_points_discount": true,
+            "base_reward_points_discount": true
+        }
+    },
+    "sales_invoice": {
+        "column": {
+            "rp_reward_points_used": true,
+            "rp_reward_points_discount": true,
+            "rp_base_reward_points_discount": true
+        }
+    },
+    "sales_creditmemo": {
+        "column": {
+            "rp_reward_points_used": true,
+            "rp_reward_points_discount": true,
+            "rp_base_reward_points_discount": true
+        }
+    }
+}

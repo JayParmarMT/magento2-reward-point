@@ -1,0 +1,10 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<form xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+      xsi:noNamespaceSchemaLocation="urn:magento:module:Magento_Ui:etc/ui_configuration.xsd">
+    <htmlContent name="meetanshi_rewardpoints_tab_content">
+        <block class="Meetanshi\RewardPoints\Block\Adminhtml\Customer\Edit\Tab\RewardPoints"
+               name="meetanshi_rewardpoints_customer_tab"
+               template="Meetanshi_RewardPoints::customer/tab/rewardpoints.phtml"
+               acl="Meetanshi_RewardPoints::transactions"/>
+    </htmlContent>
+</form>

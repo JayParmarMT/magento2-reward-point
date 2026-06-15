@@ -1,0 +1,31 @@
+<?xml version="1.0"?>
+<page xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+      xsi:noNamespaceSchemaLocation="urn:magento:framework:View/Layout/etc/page_configuration.xsd">
+    <body>
+
+        <!-- Disable the Luma block — it uses a jQuery widget incompatible with Hyvä -->
+        <referenceBlock name="rewardpoints.cart.block" display="false"/>
+
+        <!--
+            Reward points apply block — placed inside cart.summary.before so it appears
+            ABOVE the totals table and checkout button (not after them).
+            cart.summary.before renders: coupon code + shipping estimate.
+            after="checkout.cart.coupon" positions reward points just below coupon.
+        -->
+        <referenceContainer name="cart.summary.before">
+            <block class="Meetanshi\RewardPoints\Block\Frontend\Cart\RewardPoints"
+                   name="rewardpoints.cart.block.hyva"
+                   template="Meetanshi_RewardPoints::hyva/cart/rewardpoints.phtml"
+                   after="checkout.cart.coupon"/>
+        </referenceContainer>
+
+        <!-- Reward points discount row in the cart totals segment list -->
+        <referenceBlock name="checkout.cart.totals">
+            <block class="Meetanshi\RewardPoints\Block\Frontend\Cart\RewardPointsTotal"
+                   name="rewardpoints.cart.total.hyva"
+                   template="Meetanshi_RewardPoints::hyva/cart/totals.phtml"
+                   after="discount"/>
+        </referenceBlock>
+
+    </body>
+</page>

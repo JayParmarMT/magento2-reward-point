@@ -1,0 +1,46 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<tests xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+       xsi:noNamespaceSchemaLocation="urn:magento:mftf:Test/etc/testSchema.xsd">
+
+    <!--
+        Test 1: Logged-in customer can view the Reward Points dashboard and see the balance section.
+    -->
+    <test name="RewardPointsCustomerCanViewDashboard">
+        <annotations>
+            <features value="Meetanshi Reward Points"/>
+            <stories value="Customer Account Dashboard"/>
+            <title value="Customer can view the Reward Points dashboard with balance card"/>
+            <description value="Verifies that a logged-in customer can navigate to the Reward Points account dashboard and see the balance card, balance value, and email notifications form."/>
+            <severity value="CRITICAL"/>
+            <group value="RewardPoints"/>
+        </annotations>
+
+        <before>
+            <createData entity="CustomerWithPoints" stepKey="createCustomer"/>
+        </before>
+
+        <after>
+            <actionGroup ref="StorefrontCustomerLogoutActionGroup" stepKey="logoutCustomer"/>
+            <deleteData createDataKey="createCustomer" stepKey="deleteCustomer"/>
+        </after>
+
+        <!-- Log in and navigate to dashboard -->
+        <actionGroup ref="NavigateToRewardPointsDashboardActionGroup" stepKey="navigateToDashboard">
+            <argument name="Customer" value="$$createCustomer$$"/>
+        </actionGroup>
+
+        <!-- Assert balance card is visible -->
+        <seeElement selector="{{RewardPointsDashboardSection.balanceCard}}" stepKey="seeBalanceCard"/>
+        <seeElement selector="{{RewardPointsDashboardSection.balanceValue}}" stepKey="seeBalanceValue"/>
+        <seeElement selector="{{RewardPointsDashboardSection.balanceLabel}}" stepKey="seeBalanceLabel"/>
+
+        <!-- Assert email notifications form is present -->
+        <seeElement selector="{{RewardPointsDashboardSection.emailNotificationsForm}}" stepKey="seeEmailNotificationsForm"/>
+        <seeElement selector="{{RewardPointsDashboardSection.saveSettingsButton}}" stepKey="seeSaveSettingsButton"/>
+
+        <!-- Assert the page URL contains the expected route -->
+        <seeInCurrentUrl url="/rewardpoints/account" stepKey="seeRewardPointsRouteInUrl"/>
+    </test>
+
+
+</tests>

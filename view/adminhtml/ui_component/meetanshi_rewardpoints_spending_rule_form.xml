@@ -1,0 +1,312 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<form xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+      xsi:noNamespaceSchemaLocation="urn:magento:module:Magento_Ui:etc/ui_configuration.xsd">
+    <argument name="data" xsi:type="array">
+        <item name="js_config" xsi:type="array">
+            <item name="provider" xsi:type="string">meetanshi_rewardpoints_spending_rule_form.meetanshi_rewardpoints_spending_rule_form_data_source</item>
+        </item>
+        <item name="label" xsi:type="string" translate="true">Cart Spending Rule</item>
+        <item name="template" xsi:type="string">templates/form/collapsible</item>
+    </argument>
+    <settings>
+        <buttons>
+            <button name="back">
+                <url path="meetanshi_rewardpoints/spendingrule/index"/>
+                <class>back</class>
+                <label translate="true">Back</label>
+            </button>
+            <button name="delete" class="Meetanshi\RewardPoints\Block\Adminhtml\SpendingRule\Edit\DeleteButton"/>
+            <button name="reset">
+                <class>reset</class>
+                <label translate="true">Reset</label>
+            </button>
+            <button name="save">
+                <class>save primary</class>
+                <label translate="true">Save Rule</label>
+            </button>
+            <button name="save_and_continue" class="Meetanshi\RewardPoints\Block\Adminhtml\SpendingRule\Edit\SaveAndContinueButton"/>
+        </buttons>
+        <namespace>meetanshi_rewardpoints_spending_rule_form</namespace>
+        <dataScope>data</dataScope>
+        <deps>
+            <dep>meetanshi_rewardpoints_spending_rule_form.meetanshi_rewardpoints_spending_rule_form_data_source</dep>
+        </deps>
+    </settings>
+    <dataSource name="meetanshi_rewardpoints_spending_rule_form_data_source">
+        <argument name="data" xsi:type="array">
+            <item name="js_config" xsi:type="array">
+                <item name="component" xsi:type="string">Magento_Ui/js/form/provider</item>
+            </item>
+        </argument>
+        <settings>
+            <validateUrl path="meetanshi_rewardpoints/spendingrule/validate"/>
+            <submitUrl path="meetanshi_rewardpoints/spendingrule/save"/>
+        </settings>
+        <dataProvider class="Meetanshi\RewardPoints\Ui\DataProvider\SpendingRule\FormDataProvider"
+                      name="meetanshi_rewardpoints_spending_rule_form_data_source">
+            <settings>
+                <requestFieldName>rule_id</requestFieldName>
+                <primaryFieldName>rule_id</primaryFieldName>
+            </settings>
+        </dataProvider>
+    </dataSource>
+    <fieldset name="general" sortOrder="10">
+        <settings>
+            <label translate="true">Rule Information</label>
+            <collapsible>true</collapsible>
+            <opened>true</opened>
+        </settings>
+        <field name="rule_id" formElement="input">
+            <settings>
+                <dataType>text</dataType>
+                <visible>false</visible>
+            </settings>
+        </field>
+        <field name="name" sortOrder="10" formElement="input">
+            <settings>
+                <label translate="true">Rule Name</label>
+                <dataType>text</dataType>
+                <dataScope>name</dataScope>
+                <validation>
+                    <rule name="required-entry" xsi:type="boolean">true</rule>
+                </validation>
+            </settings>
+        </field>
+        <field name="description" sortOrder="20" formElement="textarea">
+            <settings>
+                <label translate="true">Description</label>
+                <dataType>text</dataType>
+                <dataScope>description</dataScope>
+            </settings>
+        </field>
+        <field name="is_active" sortOrder="30" formElement="select">
+            <settings>
+                <label translate="true">Status</label>
+                <dataType>select</dataType>
+                <dataScope>is_active</dataScope>
+            </settings>
+            <formElements>
+                <select>
+                    <settings>
+                        <options class="Magento\Config\Model\Config\Source\Yesno"/>
+                    </settings>
+                </select>
+            </formElements>
+        </field>
+        <field name="website_ids" sortOrder="40" formElement="multiselect">
+            <settings>
+                <label translate="true">Websites</label>
+                <dataType>text</dataType>
+                <dataScope>website_ids</dataScope>
+                <validation>
+                    <rule name="required-entry" xsi:type="boolean">true</rule>
+                </validation>
+            </settings>
+            <formElements>
+                <multiselect>
+                    <settings>
+                        <options class="Meetanshi\RewardPoints\Model\Source\Website"/>
+                    </settings>
+                </multiselect>
+            </formElements>
+        </field>
+        <field name="customer_group_ids" sortOrder="50" formElement="multiselect">
+            <settings>
+                <label translate="true">Customer Groups</label>
+                <dataType>text</dataType>
+                <dataScope>customer_group_ids</dataScope>
+                <validation>
+                    <rule name="required-entry" xsi:type="boolean">true</rule>
+                </validation>
+            </settings>
+            <formElements>
+                <multiselect>
+                    <settings>
+                        <options class="Magento\Customer\Model\ResourceModel\Group\Collection"/>
+                    </settings>
+                </multiselect>
+            </formElements>
+        </field>
+        <field name="from_date" sortOrder="60" formElement="date">
+            <settings>
+                <label translate="true">From Date</label>
+                <dataType>text</dataType>
+                <dataScope>from_date</dataScope>
+            </settings>
+        </field>
+        <field name="to_date" sortOrder="70" formElement="date">
+            <settings>
+                <label translate="true">To Date</label>
+                <dataType>text</dataType>
+                <dataScope>to_date</dataScope>
+            </settings>
+        </field>
+        <field name="priority" sortOrder="80" formElement="input">
+            <settings>
+                <label translate="true">Priority</label>
+                <dataType>number</dataType>
+                <dataScope>priority</dataScope>
+                <validation>
+                    <rule name="validate-digits" xsi:type="boolean">true</rule>
+                </validation>
+            </settings>
+        </field>
+        <field name="stop_rules_processing" sortOrder="90" formElement="select">
+            <settings>
+                <label translate="true">Discard Subsequent Rules</label>
+                <dataType>select</dataType>
+                <dataScope>stop_rules_processing</dataScope>
+            </settings>
+            <formElements>
+                <select>
+                    <settings>
+                        <options class="Magento\Config\Model\Config\Source\Yesno"/>
+                    </settings>
+                </select>
+            </formElements>
+        </field>
+    </fieldset>
+    <fieldset name="conditions" sortOrder="20">
+        <settings>
+            <collapsible>true</collapsible>
+            <opened>true</opened>
+            <label translate="true">Conditions</label>
+        </settings>
+        <container name="conditions_apply_to" sortOrder="10">
+            <htmlContent name="html_content">
+                <block class="Meetanshi\RewardPoints\Block\Adminhtml\SpendingRule\Edit\Tab\Conditions"
+                       name="spending_rule_conditions"/>
+            </htmlContent>
+        </container>
+    </fieldset>
+
+    <fieldset name="actions_fieldset" sortOrder="30">
+        <settings>
+            <label translate="true">Actions</label>
+            <collapsible>true</collapsible>
+            <opened>true</opened>
+        </settings>
+        <field name="spending_style" sortOrder="10" formElement="select">
+            <settings>
+                <label translate="true">Spending Style</label>
+                <dataType>select</dataType>
+                <dataScope>spending_style</dataScope>
+                <validation>
+                    <rule name="required-entry" xsi:type="boolean">true</rule>
+                </validation>
+            </settings>
+            <formElements>
+                <select>
+                    <settings>
+                        <options class="Meetanshi\RewardPoints\Model\Source\SpendingStyle"/>
+                    </settings>
+                </select>
+            </formElements>
+        </field>
+        <field name="spending_action" sortOrder="20" formElement="select">
+            <settings>
+                <label translate="true">Spending Action</label>
+                <dataType>select</dataType>
+                <dataScope>spending_action</dataScope>
+                <validation>
+                    <rule name="required-entry" xsi:type="boolean">true</rule>
+                </validation>
+            </settings>
+            <formElements>
+                <select>
+                    <settings>
+                        <options class="Meetanshi\RewardPoints\Model\Source\SpendingAction"/>
+                    </settings>
+                </select>
+            </formElements>
+        </field>
+        <field name="points_step" sortOrder="30" formElement="input">
+            <settings>
+                <label translate="true">Points Step (X)</label>
+                <dataType>number</dataType>
+                <dataScope>points_step</dataScope>
+                <validation>
+                    <rule name="required-entry" xsi:type="boolean">true</rule>
+                    <rule name="validate-digits" xsi:type="boolean">true</rule>
+                    <rule name="validate-greater-than-zero" xsi:type="boolean">true</rule>
+                </validation>
+            </settings>
+        </field>
+        <field name="discount_action" sortOrder="40" formElement="select">
+            <settings>
+                <label translate="true">Discount Action</label>
+                <dataType>select</dataType>
+                <dataScope>discount_action</dataScope>
+                <validation>
+                    <rule name="required-entry" xsi:type="boolean">true</rule>
+                </validation>
+            </settings>
+            <formElements>
+                <select>
+                    <settings>
+                        <options class="Meetanshi\RewardPoints\Model\Source\DiscountAction"/>
+                    </settings>
+                </select>
+            </formElements>
+        </field>
+        <field name="discount_amount" sortOrder="50" formElement="input">
+            <settings>
+                <label translate="true">Discount Amount</label>
+                <dataType>number</dataType>
+                <dataScope>discount_amount</dataScope>
+                <validation>
+                    <rule name="required-entry" xsi:type="boolean">true</rule>
+                    <rule name="validate-number" xsi:type="boolean">true</rule>
+                </validation>
+            </settings>
+        </field>
+        <field name="min_points" sortOrder="60" formElement="input">
+            <settings>
+                <label translate="true">Minimum Points to Spend</label>
+                <dataType>number</dataType>
+                <dataScope>min_points</dataScope>
+                <validation>
+                    <rule name="validate-digits" xsi:type="boolean">true</rule>
+                </validation>
+            </settings>
+        </field>
+        <field name="max_points" sortOrder="70" formElement="input">
+            <settings>
+                <label translate="true">Maximum Points to Spend (0 = Unlimited)</label>
+                <dataType>number</dataType>
+                <dataScope>max_points</dataScope>
+                <validation>
+                    <rule name="validate-digits" xsi:type="boolean">true</rule>
+                </validation>
+            </settings>
+        </field>
+        <field name="apply_to_shipping" sortOrder="80" formElement="select">
+            <settings>
+                <label translate="true">Apply to Shipping</label>
+                <dataType>select</dataType>
+                <dataScope>apply_to_shipping</dataScope>
+            </settings>
+            <formElements>
+                <select>
+                    <settings>
+                        <options class="Magento\Config\Model\Config\Source\Yesno"/>
+                    </settings>
+                </select>
+            </formElements>
+        </field>
+    </fieldset>
+    <fieldset name="labels_fieldset" sortOrder="40">
+        <settings>
+            <label translate="true">Labels</label>
+            <collapsible>true</collapsible>
+            <opened>false</opened>
+        </settings>
+        <field name="store_label_default" sortOrder="10" formElement="input">
+            <settings>
+                <label translate="true">Default Rule Label (All Store Views)</label>
+                <dataType>text</dataType>
+                <dataScope>store_label_default</dataScope>
+            </settings>
+        </field>
+    </fieldset>
+</form>

@@ -1,0 +1,281 @@
+<?php
+/**
+ * @var \Meetanshi\RewardPoints\Block\Frontend\Account\Dashboard $block
+ * @var \Meetanshi\RewardPoints\ViewModel\Account\Dashboard $viewModel
+ */
+$viewModel = $block->getData('view_model');
+$account = $viewModel->getAccount();
+$currentTier = $viewModel->getCurrentTier();
+$nextTier = $viewModel->getNextTier();
+$tierProgress = $viewModel->getTierProgress();
+$recentTransactions = $viewModel->getRecentTransactions();
+$saveSettingsUrl = $block->getUrl('rewardpoints/account/saveSettings');
+$transactionsUrl = $block->getUrl('rewardpoints/account/transactions');
+?>
+<style>
+.rp-dashboard { font-family: inherit; color: #1a1a1a; font-size: 1rem; }
+
+/* Balance Card */
+.rp-balance-card { background: linear-gradient(135deg, #1e3a5f 0%, #2d5f8e 100%); border-radius: 12px; padding: 2rem 2.25rem; color: #fff; margin-bottom: 1.75rem; }
+.rp-balance-label { font-size: 1rem; font-weight: 500; text-transform: uppercase; letter-spacing: 0.08em; opacity: 0.8; margin-bottom: 0.5rem; }
+.rp-balance-value { font-size: 3.25rem; font-weight: 800; line-height: 1; margin-bottom: 1.5rem; }
+.rp-balance-stats { display: flex; gap: 2.5rem; flex-wrap: wrap; padding-top: 1.25rem; border-top: 1px solid rgba(255,255,255,0.2); }
+.rp-stat-label { font-size: 0.95rem; opacity: 0.75; display: block; margin-bottom: 0.25rem; }
+.rp-stat-value { font-size: 1.3rem; font-weight: 700; }
+.rp-earn-note { font-size: 1rem; opacity: 0.75; margin-top: 1rem; }
+
+/* Tier Banner */
+.rp-tier-card { background: #fffbeb; border: 1px solid #fde68a; border-radius: 10px; padding: 1.25rem 1.5rem; margin-bottom: 1.75rem; }
+.rp-tier-header { display: flex; align-items: center; gap: 0.75rem; margin-bottom: 0.875rem; }
+.rp-tier-chip { background: #f59e0b; color: #fff; font-size: 0.9rem; font-weight: 700; text-transform: uppercase; letter-spacing: 0.06em; padding: 0.25rem 0.75rem; border-radius: 99px; }
+.rp-tier-name { font-size: 1.2rem; font-weight: 700; color: #92400e; }
+.rp-progress-bar { background: #fde68a; border-radius: 99px; height: 12px; overflow: hidden; margin-bottom: 0.6rem; }
+.rp-progress-fill { height: 100%; background: #f59e0b; border-radius: 99px; transition: width 0.4s ease; }
+.rp-progress-label { font-size: 1rem; color: #78350f; }
+
+/* Section headings */
+.rp-section-title { font-size: 1.3rem; font-weight: 700; color: #1f2937; margin: 0 0 1rem; padding-bottom: 0.6rem; border-bottom: 2px solid #f3f4f6; }
+
+/* Recent Transactions Table */
+.rp-table-wrap { border: 1px solid #e5e7eb; border-radius: 10px; overflow: hidden; margin-bottom: 1rem; }
+.rp-table { width: 100%; border-collapse: collapse; font-size: 1rem; }
+.rp-table thead { background: #f9fafb; }
+.rp-table thead th { padding: 0.875rem 1rem; text-align: left; font-size: 0.9rem; font-weight: 700; text-transform: uppercase; letter-spacing: 0.06em; color: #6b7280; border-bottom: 1px solid #e5e7eb; }
+.rp-table tbody tr { border-bottom: 1px solid #f3f4f6; }
+.rp-table tbody tr:last-child { border-bottom: none; }
+.rp-table tbody tr:hover { background: #fafafa; }
+.rp-table td { padding: 1rem 1rem; color: #374151; vertical-align: middle; font-size: 1rem; }
+.rp-delta { font-weight: 700; font-size: 1.1rem; }
+.rp-delta--pos { color: #059669; }
+.rp-delta--neg { color: #dc2626; }
+.rp-action-comment { font-size: 0.9rem; color: #9ca3af; margin-top: 0.2rem; }
+.rp-view-all { display: inline-block; margin-top: 0.5rem; font-size: 1rem; font-weight: 600; color: #2d5f8e; text-decoration: none; }
+.rp-view-all:hover { text-decoration: underline; }
+.rp-no-txn { font-size: 1rem; color: #6b7280; padding: 1.25rem 0; }
+
+/* Notification Settings */
+.rp-settings-card { background: #f9fafb; border: 1px solid #e5e7eb; border-radius: 10px; padding: 1.5rem; margin-bottom: 0.5rem; }
+.rp-field-choice { display: flex; align-items: center; gap: 0.75rem; margin-bottom: 1rem; }
+.rp-field-choice input[type="checkbox"] { width: 20px; height: 20px; accent-color: #2d5f8e; cursor: pointer; flex-shrink: 0; }
+.rp-field-choice label { font-size: 1.05rem; color: #374151; cursor: pointer; }
+.rp-save-btn { margin-top: 0.5rem; background: #1e3a5f; color: #fff; border: none; border-radius: 8px; padding: 0.65rem 1.75rem; font-size: 1rem; font-weight: 600; cursor: pointer; transition: background 0.2s; }
+.rp-save-btn:hover { background: #2d5f8e; }
+.rp-message { padding: 0.75rem 1rem; border-radius: 8px; font-size: 0.95rem; margin-bottom: 1rem; }
+.rp-message--success { background: #d1fae5; color: #065f46; border: 1px solid #6ee7b7; }
+.rp-message--error { background: #fee2e2; color: #991b1b; border: 1px solid #fca5a5; }
+
+@media (max-width: 640px) {
+    .rp-balance-value { font-size: 2rem; }
+    .rp-balance-stats { gap: 1.5rem; }
+    .rp-table thead { display: none; }
+    .rp-table td { display: flex; justify-content: space-between; align-items: center; padding: 0.6rem 1rem; border-bottom: 1px solid #f0f0f0; font-size: 0.9rem; }
+    .rp-table td::before { content: attr(data-th); font-weight: 600; font-size: 0.8rem; color: #9ca3af; text-transform: uppercase; }
+    .rp-table tr { display: block; border-bottom: 2px solid #f0f0f0; }
+}
+</style>
+
+<div class="rp-dashboard">
+
+    <!-- Balance Card -->
+    <div class="rp-balance-card">
+        <div class="rp-balance-label"><?= $block->escapeHtml(__('Available Balance')) ?></div>
+        <div class="rp-balance-value"><?= $block->escapeHtml($viewModel->formatPoints($viewModel->getPointsBalance())) ?></div>
+        <div class="rp-balance-stats">
+            <div>
+                <span class="rp-stat-label"><?= $block->escapeHtml(__('Total Earned')) ?></span>
+                <span class="rp-stat-value"><?= $block->escapeHtml($viewModel->formatPoints($viewModel->getTotalEarned())) ?></span>
+            </div>
+            <div>
+                <span class="rp-stat-label"><?= $block->escapeHtml(__('Total Spent')) ?></span>
+                <span class="rp-stat-value"><?= $block->escapeHtml($viewModel->formatPoints($viewModel->getTotalSpent())) ?></span>
+            </div>
+        </div>
+        <div class="rp-earn-note"><?= $block->escapeHtml($viewModel->getEarningRateDisplay()) ?></div>
+    </div>
+
+    <?php if ($currentTier || $nextTier): ?>
+    <!-- Tier Progress -->
+    <div class="rp-tier-card">
+        <div class="rp-tier-header">
+            <span class="rp-tier-chip"><?= $block->escapeHtml(__('Tier')) ?></span>
+            <?php if ($currentTier): ?>
+                <span class="rp-tier-name"><?= $block->escapeHtml($currentTier->getName()) ?></span>
+            <?php else: ?>
+                <span class="rp-tier-name"><?= $block->escapeHtml(__('Start earning to unlock tiers!')) ?></span>
+            <?php endif; ?>
+        </div>
+        <?php if ($nextTier): ?>
+        <div class="rp-progress-bar">
+            <div class="rp-progress-fill" style="width:<?= $block->escapeHtmlAttr((string) round($tierProgress * 100)) ?>%"></div>
+        </div>
+        <p class="rp-progress-label">
+            <?= $block->escapeHtml(__('Earn %1 more points to reach %2',
+                $viewModel->formatPoints(max(0, $nextTier->getMinPoints() - $viewModel->getPointsBalance())),
+                $nextTier->getName()
+            )) ?>
+        </p>
+        <?php else: ?>
+        <p class="rp-progress-label"><?= $block->escapeHtml(__('You have reached the highest tier!')) ?></p>
+        <?php endif; ?>
+    </div>
+    <?php endif; ?>
+
+    <!-- Recent Activity -->
+    <h3 class="rp-section-title"><?= $block->escapeHtml(__('Recent Activity')) ?></h3>
+    <?php if (!empty($recentTransactions)): ?>
+    <div class="rp-table-wrap">
+        <table class="rp-table">
+            <thead>
+                <tr>
+                    <th><?= $block->escapeHtml(__('Date')) ?></th>
+                    <th><?= $block->escapeHtml(__('Action')) ?></th>
+                    <th><?= $block->escapeHtml(__('Points')) ?></th>
+                    <th><?= $block->escapeHtml(__('Balance')) ?></th>
+                </tr>
+            </thead>
+            <tbody>
+                <?php
+                $actionLabels = [
+                    'earn_order'   => __('Order Earning'),
+                    'spend_order'  => __('Order Spending'),
+                    'refund_earn'  => __('Refund'),
+                    'refund_spend' => __('Refund Restore'),
+                    'expire'       => __('Expired'),
+                    'admin'        => __('Admin Adjustment'),
+                    'signup'       => __('Sign-Up Bonus'),
+                    'birthday'     => __('Birthday Bonus'),
+                    'review'       => __('Product Review'),
+                    'newsletter'   => __('Newsletter'),
+                    'refer_signup' => __('Referral'),
+                    'refer_order'  => __('Referral Order'),
+                    'tier_up'      => __('Tier Upgrade'),
+                    'tier_down'    => __('Tier Downgrade'),
+                ];
+                foreach ($recentTransactions as $txn):
+                    $delta = (int) $txn->getPointsDelta();
+                ?>
+                <tr>
+                    <td data-th="<?= $block->escapeHtmlAttr(__('Date')) ?>">
+                        <?= $block->escapeHtml($txn->getCreatedAt() ? date('M d, Y', strtotime($txn->getCreatedAt())) : '—') ?>
+                    </td>
+                    <td data-th="<?= $block->escapeHtmlAttr(__('Action')) ?>">
+                        <?= $block->escapeHtml((string)($actionLabels[$txn->getActionCode()] ?? ucwords(str_replace('_', ' ', $txn->getActionCode())))) ?>
+                        <?php if ($txn->getComment()): ?>
+                        <div class="rp-action-comment"><?= $block->escapeHtml($txn->getComment()) ?></div>
+                        <?php endif; ?>
+                    </td>
+                    <td data-th="<?= $block->escapeHtmlAttr(__('Points')) ?>">
+                        <span class="rp-delta <?= /* @noEscape */ $delta >= 0 ? 'rp-delta--pos' : 'rp-delta--neg' ?>">
+                            <?= /* @noEscape */ $delta >= 0 ? '+' : '' ?><?= $block->escapeHtml((string) $delta) ?>
+                        </span>
+                    </td>
+                    <td data-th="<?= $block->escapeHtmlAttr(__('Balance')) ?>">
+                        <?= $block->escapeHtml((string) $txn->getPointsBalanceAfter()) ?>
+                    </td>
+                </tr>
+                <?php endforeach; ?>
+            </tbody>
+        </table>
+    </div>
+    <a href="<?= $block->escapeUrl($transactionsUrl) ?>" class="rp-view-all"><?= $block->escapeHtml(__('View All Transactions →')) ?></a>
+    <?php else: ?>
+    <p class="rp-no-txn"><?= $block->escapeHtml(__('You have no reward points activity yet.')) ?></p>
+    <?php endif; ?>
+
+    <!-- Social Share -->
+    <?php if ($viewModel->isSocialEnabledOnPage('account') && ($viewModel->isFacebookEnabled() || $viewModel->isTwitterEnabled() || $viewModel->isPinterestEnabled())): ?>
+    <div style="margin-bottom:1.75rem;">
+        <h3 class="rp-section-title"><?= $block->escapeHtml(__('Share Your Rewards')) ?></h3>
+        <style>
+        .rp-social-share { margin-top: 0.5rem; }
+        .rp-social-label { font-size: 0.85rem; font-weight: 600; color: #9ca3af; text-transform: uppercase; letter-spacing: 0.07em; margin-bottom: 0.6rem; }
+        .rp-social-btns  { display: flex; flex-wrap: wrap; gap: 0.5rem; }
+        .rp-social-btn   { display: inline-flex; align-items: center; gap: 0.35rem; padding: 0.45rem 1rem; border-radius: 6px; font-size: 0.9rem; font-weight: 600; text-decoration: none; transition: opacity 0.2s; }
+        .rp-social-btn:hover { opacity: 0.82; text-decoration: none; }
+        .rp-social-btn--facebook  { background: #1877f2; color: #fff; }
+        .rp-social-btn--twitter   { background: #000;    color: #fff; }
+        .rp-social-btn--pinterest { background: #e60023; color: #fff; }
+        </style>
+        <?php $shareUrl = $block->getUrl('rewardpoints/account/index'); ?>
+        <?php $shareText = (string) __('I am earning reward points! Join me and start earning too.'); ?>
+        <div class="rp-social-btns">
+            <?php if ($viewModel->isFacebookEnabled()): ?>
+            <a href="https://www.facebook.com/sharer/sharer.php?u=<?= $block->escapeUrl($shareUrl) ?>"
+               target="_blank" rel="noopener noreferrer" class="rp-social-btn rp-social-btn--facebook">
+                📘 <?= $block->escapeHtml(__('Facebook')) ?>
+            </a>
+            <?php endif; ?>
+            <?php if ($viewModel->isTwitterEnabled()): ?>
+            <a href="https://twitter.com/intent/tweet?url=<?= $block->escapeUrl($shareUrl) ?>&text=<?= $block->escapeUrl($shareText) ?>"
+               target="_blank" rel="noopener noreferrer" class="rp-social-btn rp-social-btn--twitter">
+                𝕏 <?= $block->escapeHtml(__('Twitter / X')) ?>
+            </a>
+            <?php endif; ?>
+            <?php if ($viewModel->isPinterestEnabled()): ?>
+            <a href="https://pinterest.com/pin/create/button/?url=<?= $block->escapeUrl($shareUrl) ?>&description=<?= $block->escapeUrl($shareText) ?>"
+               target="_blank" rel="noopener noreferrer" class="rp-social-btn rp-social-btn--pinterest">
+                📌 <?= $block->escapeHtml(__('Pinterest')) ?>
+            </a>
+            <?php endif; ?>
+        </div>
+    </div>
+    <?php endif; ?>
+
+    <!-- Email Notifications -->
+    <h3 class="rp-section-title" style="margin-top:2rem"><?= $block->escapeHtml(__('Email Notifications')) ?></h3>
+    <div class="rp-settings-card">
+        <div id="rp-settings-message"></div>
+        <form id="reward-points-settings-form" action="<?= $block->escapeUrl($saveSettingsUrl) ?>" method="post">
+            <?= /* @noEscape */ $block->getBlockHtml('formkey') ?>
+            <div class="rp-field-choice">
+                <input type="checkbox" name="is_subscribed_balance" id="rp-subscribe-balance" value="1"
+                    <?= /* @noEscape */ ($account && $account->isSubscribedBalance()) ? 'checked="checked"' : '' ?>>
+                <label for="rp-subscribe-balance"><?= $block->escapeHtml(__('Notify me when my points balance changes')) ?></label>
+            </div>
+            <div class="rp-field-choice">
+                <input type="checkbox" name="is_subscribed_expiration" id="rp-subscribe-expiration" value="1"
+                    <?= /* @noEscape */ ($account && $account->isSubscribedExpiration()) ? 'checked="checked"' : '' ?>>
+                <label for="rp-subscribe-expiration"><?= $block->escapeHtml(__('Notify me before my points expire')) ?></label>
+            </div>
+            <button type="submit" class="rp-save-btn"><?= $block->escapeHtml(__('Save Settings')) ?></button>
+        </form>
+    </div>
+
+</div>
+
+<script>
+(function () {
+    'use strict';
+    var form = document.getElementById('reward-points-settings-form');
+    if (!form) return;
+
+    form.addEventListener('submit', function (e) {
+        e.preventDefault();
+        var msgEl = document.getElementById('rp-settings-message');
+        var data = new URLSearchParams(new FormData(form));
+
+        fetch(form.getAttribute('action'), {
+            method: 'POST',
+            headers: {'Content-Type': 'application/x-www-form-urlencoded', 'X-Requested-With': 'XMLHttpRequest'},
+            body: data
+        })
+        .then(function (r) { return r.json(); })
+        .then(function (response) {
+            var cls = response.success ? 'rp-message--success' : 'rp-message--error';
+            var el = document.createElement('div');
+            el.className = 'rp-message ' + cls;
+            el.textContent = response.message;
+            msgEl.innerHTML = '';
+            msgEl.appendChild(el);
+            setTimeout(function () { el.style.display = 'none'; }, 3000);
+        })
+        .catch(function () {
+            var el = document.createElement('div');
+            el.className = 'rp-message rp-message--error';
+            el.textContent = 'An error occurred. Please try again.';
+            msgEl.innerHTML = '';
+            msgEl.appendChild(el);
+        });
+    });
+}());
+</script>

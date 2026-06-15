@@ -1,0 +1,33 @@
+<?php
+/**
+ * Hyvä referral code field for customer registration.
+ *
+ * Replaces Luma version which used .fieldset / .field / .label / .control / .input-text classes.
+ * This version uses Tailwind utility classes compatible with Hyvä.
+ *
+ * @var \Meetanshi\RewardPoints\Block\Frontend\Customer\ReferralField $block
+ * @var \Magento\Framework\Escaper $escaper
+ */
+?>
+<div class="referral-code-wrapper mb-4" id="fieldset-referral">
+    <div class="mb-4">
+        <p class="text-lg font-semibold text-gray-800 mb-3 pb-2 border-b border-gray-200">
+            <?= $escaper->escapeHtml(__('Referral Code')) ?>
+        </p>
+        <div class="flex flex-col gap-1">
+            <label class="block text-sm font-medium text-gray-700"
+                   for="<?= $escaper->escapeHtmlAttr($block->getFieldId()) ?>">
+                <?= $escaper->escapeHtml($block->getFieldLabel()) ?>
+            </label>
+            <input type="text"
+                   name="<?= $escaper->escapeHtmlAttr($block->getFieldName()) ?>"
+                   id="<?= $escaper->escapeHtmlAttr($block->getFieldId()) ?>"
+                   class="form-input w-full rounded border border-gray-300 px-3 py-2 text-sm focus:border-blue-500 focus:ring-2 focus:ring-blue-500 focus:outline-none"
+                   placeholder="<?= $escaper->escapeHtmlAttr($block->getPlaceholder()) ?>"
+                   autocomplete="off"/>
+            <p class="text-xs text-gray-500 mt-1">
+                <?= $escaper->escapeHtml(__('If a friend referred you, enter their referral code here to earn bonus rewards.')) ?>
+            </p>
+        </div>
+    </div>
+</div>

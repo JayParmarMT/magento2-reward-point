@@ -1,0 +1,74 @@
+<?php
+/**
+ * @var \Meetanshi\RewardPoints\Block\Adminhtml\Order\Creditmemo\RewardPoints $block
+ */
+if (!$block->isEnabled()): ?>
+<?php return; ?>
+<?php endif; ?>
+
+<?php
+$spentPoints = $block->getSpentPoints();
+$isRestoreEnabled = $block->isRestoreSpentEnabled();
+$isCancelEnabled = $block->isCancelEarnedEnabled();
+?>
+
+<?php if ($isCancelEnabled || ($isRestoreEnabled && $spentPoints > 0)): ?>
+<section class="admin__page-section">
+    <div class="admin__page-section-title">
+        <span class="title"><?= $block->escapeHtml(__('Reward Points')) ?></span>
+    </div>
+    <div class="admin__page-section-content">
+        <div class="admin__field-group">
+
+            <?php if ($isCancelEnabled): ?>
+            <div class="admin__field admin__field-option">
+                <input type="checkbox"
+                       name="creditmemo[cancel_reward_points]"
+                       id="creditmemo_cancel_reward_points"
+                       value="1"
+                       class="admin__control-checkbox"
+                       checked="checked">
+                <label for="creditmemo_cancel_reward_points" class="admin__field-label">
+                    <?= $block->escapeHtml(__('Return earned reward points to customer balance? (Points will be cancelled)')) ?>
+                </label>
+            </div>
+            <?php endif; ?>
+
+            <?php if ($isRestoreEnabled && $spentPoints > 0): ?>
+            <div class="admin__field admin__field-option">
+                <input type="checkbox"
+                       name="creditmemo[restore_reward_points]"
+                       id="creditmemo_restore_reward_points"
+                       value="1"
+                       class="admin__control-checkbox">
+                <label for="creditmemo_restore_reward_points" class="admin__field-label">
+                    <?= $block->escapeHtml(
+                        __('Restore %1 spent reward points to customer?', $spentPoints)
+                    ) ?>
+                </label>
+            </div>
+            <div class="admin__field">
+                <label class="admin__field-label" for="creditmemo_reward_point_refund">
+                    <?= $block->escapeHtml(__('Reward Points Refund (max %1)', $spentPoints)) ?>
+                </label>
+                <div class="admin__field-control">
+                    <input type="number"
+                           name="creditmemo[reward_point_refund]"
+                           id="creditmemo_reward_point_refund"
+                           class="admin__control-text"
+                           min="0"
+                           max="<?= /* @noEscape */ (int) $spentPoints ?>"
+                           value="0">
+                    <p class="admin__field-note">
+                        <span><?= $block->escapeHtml(
+                            __('Maximum %1 points (points spent on original order)', $spentPoints)
+                        ) ?></span>
+                    </p>
+                </div>
+            </div>
+            <?php endif; ?>
+
+        </div>
+    </div>
+</section>
+<?php endif; ?>

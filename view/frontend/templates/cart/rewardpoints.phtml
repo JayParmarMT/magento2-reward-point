@@ -1,0 +1,181 @@
+<?php
+/**
+ * Reward Points Cart Block
+ *
+ * @var \Meetanshi\RewardPoints\Block\Frontend\Cart\RewardPoints $block
+ * @var \Magento\Framework\Escaper $escaper
+ */
+
+if (!$block->isEnabled()) {
+    return;
+}
+?>
+<div class="block reward-points-cart-block" id="reward-points-cart-block">
+    <div class="block-title" id="reward-points-cart-title" role="button" tabindex="0"
+         aria-expanded="true" aria-controls="reward-points-cart-content">
+        <strong><?= $block->escapeHtml(__('Use Reward Points')) ?></strong>
+        <span class="toggle-icon">&#9660;</span>
+    </div>
+    <div class="block-content" id="reward-points-cart-content">
+
+        <?php if (!$block->isLoggedIn()): ?>
+
+        <p class="reward-points-login-notice message message-notice notice">
+            <?= $block->escapeHtml(__('Please log in to use your reward points.')) ?>
+        </p>
+
+        <?php else: ?>
+
+        <?php
+        $balance            = $block->getCustomerBalance();
+        $minPoints          = $block->getMinPoints();
+        $maxPoints          = $block->getMaxPoints();
+        $pointsApplied      = $block->getPointsApplied();
+        $discountAmount     = $block->getDiscountAmount();
+        $spendingRateDisplay = $block->getSpendingRateDisplay();
+        $isSliderEnabled    = $block->isSliderEnabled();
+        $useMaxDefault      = $block->isUseMaxByDefault();
+        $applyUrl           = $block->getApplyUrl();
+        $removeUrl          = $block->getRemoveUrl();
+        ?>
+
+        <?php if ($balance > 0 && $isSliderEnabled): ?>
+
+        <div class="reward-points-cart-inner">
+            <p class="reward-points-balance-display">
+                <?= $block->escapeHtml(__('Your Balance:')) ?>
+                <strong><?= $block->escapeHtml($block->formatBalance($balance)) ?></strong>
+                <?php if ($block->isShowAsCurrency()): ?>
+                    <?php $currencyEquiv = $block->getCurrencyEquivalent($balance); ?>
+                    <?php if ($currencyEquiv): ?>
+                        &mdash; <span class="reward-points-currency-equiv"><?= $block->escapeHtml(__('≈ %1', $currencyEquiv)) ?></span>
+                    <?php endif; ?>
+                <?php elseif ($spendingRateDisplay): ?>
+                    &mdash; <span class="spending-rate"><?= $block->escapeHtml($spendingRateDisplay) ?></span>
+                <?php endif; ?>
+            </p>
+
+            <?php if ($pointsApplied > 0): ?>
+            <div class="reward-points-applied-notice message message-success success">
+                <p>
+                    <?= $block->escapeHtml(__('%1 points applied. Discount: $%2', $pointsApplied, number_format($discountAmount, 2))) ?>
+                </p>
+            </div>
+            <?php endif; ?>
+
+            <div class="reward-points-form" id="reward-points-form-widget">
+
+                <div class="field reward-points-slider-field">
+                    <label class="label" for="reward-points-slider">
+                        <?= $block->escapeHtml(__('Points to Use')) ?>
+                    </label>
+                    <div class="control">
+                        <input type="range"
+                               id="reward-points-slider"
+                               class="reward-points-range-input"
+                               min="<?= /* @noEscape */ (int) $minPoints ?>"
+                               max="<?= /* @noEscape */ (int) $maxPoints ?>"
+                               step="1"
+                               value="<?= $block->escapeHtmlAttr((string) ($pointsApplied > 0 ? (int) $pointsApplied : (int) $minPoints)) ?>">
+                    </div>
+                </div>
+
+                <div class="field reward-points-input-field">
+                    <div class="control">
+                        <input type="number"
+                               id="reward-points-amount"
+                               class="reward-points-text-input input-text"
+                               min="<?= /* @noEscape */ (int) $minPoints ?>"
+                               max="<?= /* @noEscape */ (int) $maxPoints ?>"
+                               value="<?= $block->escapeHtmlAttr((string) ($pointsApplied > 0 ? (int) $pointsApplied : (int) $minPoints)) ?>"
+                               placeholder="<?= $block->escapeHtmlAttr(__('Enter points')) ?>">
+                        <span class="reward-points-discount-preview"></span>
+                    </div>
+                </div>
+
+                <div class="field choice reward-points-max-checkbox">
+                    <input type="checkbox"
+                           id="reward-points-use-max"
+                           class="checkbox"
+                           <?= /* @noEscape */ ($useMaxDefault || ($pointsApplied > 0 && $pointsApplied >= $maxPoints)) ? 'checked="checked"' : '' ?>>
+                    <label for="reward-points-use-max" class="label">
+                        <?= $block->escapeHtml(__('Maximize my discount (%1 pts)', $maxPoints)) ?>
+                    </label>
+                </div>
+
+                <div class="reward-points-messages"></div>
+
+                <div class="actions-toolbar">
+                    <button type="button" class="action apply primary reward-points-apply-btn">
+                        <?= $block->escapeHtml(__('Apply Points')) ?>
+                    </button>
+                    <?php if ($pointsApplied > 0): ?>
+                    <button type="button" class="action remove secondary reward-points-remove-btn">
+                        <?= $block->escapeHtml(__('Remove Points')) ?>
+                    </button>
+                    <?php endif; ?>
+                </div>
+
+            </div>
+        </div>
+
+        <?php elseif ($balance > 0 && !$isSliderEnabled): ?>
+
+        <p class="reward-points-min-notice message message-notice notice">
+            <?= $block->escapeHtml(__('You need at least %1 points to redeem. Your balance: %2', $minPoints, $balance)) ?>
+        </p>
+
+        <?php else: ?>
+
+        <p class="reward-points-zero-notice message message-notice notice">
+            <?= $block->escapeHtml(__('You have no reward points available.')) ?>
+        </p>
+
+        <?php endif; ?>
+
+        <?php endif; ?>
+
+    </div>
+</div>
+
+<script type="text/javascript">
+require(['jquery', 'Meetanshi_RewardPoints/js/view/cart/reward-points'], function ($) {
+    'use strict';
+
+    // Collapsible title toggle
+    $('#reward-points-cart-title').on('click keypress', function (e) {
+        if (e.type === 'click' || e.which === 13) {
+            var content = $('#reward-points-cart-content');
+            content.toggle();
+            $(this).attr('aria-expanded', content.is(':visible') ? 'true' : 'false');
+        }
+    });
+
+    <?php if ($block->isLoggedIn()): ?>
+    <?php
+    $jsBalance      = $block->getCustomerBalance();
+    $jsMin          = $block->getMinPoints();
+    $jsMax          = $block->getMaxPoints();
+    $jsApplied      = $block->getPointsApplied();
+    $jsDiscount     = $block->getDiscountAmount();
+    $jsUseMax       = $block->isUseMaxByDefault();
+    $jsSlider       = $block->isSliderEnabled();
+    $jsApplyUrl     = $block->getApplyUrl();
+    $jsRemoveUrl    = $block->getRemoveUrl();
+    ?>
+    <?php if ($jsBalance > 0 && $jsSlider): ?>
+    // Initialise the reward points widget on the form element
+    $('#reward-points-form-widget').rewardPoints({
+        applyUrl:      '<?= $block->escapeJs($jsApplyUrl) ?>',
+        removeUrl:     '<?= $block->escapeJs($jsRemoveUrl) ?>',
+        balance:       <?= /* @noEscape */ (int) $jsBalance ?>,
+        minPoints:     <?= /* @noEscape */ (int) $jsMin ?>,
+        maxPoints:     <?= /* @noEscape */ (int) $jsMax ?>,
+        pointsApplied: <?= /* @noEscape */ (int) $jsApplied ?>,
+        discountAmount:<?= /* @noEscape */ round((float) $jsDiscount, 4) ?>,
+        useMaxDefault: <?= /* @noEscape */ $jsUseMax ? 'true' : 'false' ?>
+    });
+    <?php endif; ?>
+    <?php endif; ?>
+});
+</script>

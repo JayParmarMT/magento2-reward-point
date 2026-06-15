@@ -1,0 +1,148 @@
+<?xml version="1.0"?>
+<config xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+        xsi:noNamespaceSchemaLocation="urn:magento:module:Magento_Backend:etc/menu.xsd">
+    <menu>
+        <add id="Meetanshi_RewardPoints::reward_points"
+             title="Reward Points"
+             module="Meetanshi_RewardPoints"
+             sortOrder="100"
+             parent="Magento_Backend::marketing"
+             resource="Meetanshi_RewardPoints::reward_points"/>
+
+        <add id="Meetanshi_RewardPoints::transactions"
+             title="Transactions"
+             module="Meetanshi_RewardPoints"
+             sortOrder="10"
+             parent="Meetanshi_RewardPoints::reward_points"
+             action="meetanshi_rewardpoints/transaction/index"
+             resource="Meetanshi_RewardPoints::transactions"/>
+
+        <!-- Earning parent node -->
+        <add id="Meetanshi_RewardPoints::earning"
+             title="Earning"
+             module="Meetanshi_RewardPoints"
+             sortOrder="20"
+             parent="Meetanshi_RewardPoints::reward_points"
+             resource="Meetanshi_RewardPoints::earning"/>
+
+        <add id="Meetanshi_RewardPoints::earning_rate"
+             title="Earning Rate"
+             module="Meetanshi_RewardPoints"
+             sortOrder="10"
+             parent="Meetanshi_RewardPoints::earning"
+             action="meetanshi_rewardpoints/earningrate/index"
+             resource="Meetanshi_RewardPoints::earning_rate"/>
+
+        <add id="Meetanshi_RewardPoints::catalog_rule"
+             title="Catalog Rules"
+             module="Meetanshi_RewardPoints"
+             sortOrder="20"
+             parent="Meetanshi_RewardPoints::earning"
+             action="meetanshi_rewardpoints/catalogrule/index"
+             resource="Meetanshi_RewardPoints::catalog_rule"/>
+
+        <add id="Meetanshi_RewardPoints::cart_rule"
+             title="Shopping Cart Rules"
+             module="Meetanshi_RewardPoints"
+             sortOrder="30"
+             parent="Meetanshi_RewardPoints::earning"
+             action="meetanshi_rewardpoints/cartrule/index"
+             resource="Meetanshi_RewardPoints::cart_rule"/>
+
+        <add id="Meetanshi_RewardPoints::behavior_rule"
+             title="Behavior Rules"
+             module="Meetanshi_RewardPoints"
+             sortOrder="40"
+             parent="Meetanshi_RewardPoints::earning"
+             action="meetanshi_rewardpoints/behaviorrule/index"
+             resource="Meetanshi_RewardPoints::behavior_rule"/>
+
+        <!-- Spending parent node -->
+        <add id="Meetanshi_RewardPoints::spending"
+             title="Spending"
+             module="Meetanshi_RewardPoints"
+             sortOrder="30"
+             parent="Meetanshi_RewardPoints::reward_points"
+             resource="Meetanshi_RewardPoints::spending"/>
+
+        <add id="Meetanshi_RewardPoints::spending_rate"
+             title="Spending Rate"
+             module="Meetanshi_RewardPoints"
+             sortOrder="10"
+             parent="Meetanshi_RewardPoints::spending"
+             action="meetanshi_rewardpoints/spendingrate/index"
+             resource="Meetanshi_RewardPoints::spending_rate"/>
+
+        <add id="Meetanshi_RewardPoints::spending_rule"
+             title="Shopping Cart Rules"
+             module="Meetanshi_RewardPoints"
+             sortOrder="20"
+             parent="Meetanshi_RewardPoints::spending"
+             action="meetanshi_rewardpoints/spendingrule/index"
+             resource="Meetanshi_RewardPoints::spending_rule"/>
+
+        <add id="Meetanshi_RewardPoints::referral_rule"
+             title="Referral Rules"
+             module="Meetanshi_RewardPoints"
+             sortOrder="40"
+             parent="Meetanshi_RewardPoints::reward_points"
+             action="meetanshi_rewardpoints/referralrule/index"
+             resource="Meetanshi_RewardPoints::referral_rule"/>
+
+        <add id="Meetanshi_RewardPoints::referral_invitation"
+             title="Referral Invitations"
+             module="Meetanshi_RewardPoints"
+             sortOrder="50"
+             parent="Meetanshi_RewardPoints::reward_points"
+             action="meetanshi_rewardpoints/referralinvitation/index"
+             resource="Meetanshi_RewardPoints::referral_invitation"/>
+
+        <add id="Meetanshi_RewardPoints::tier"
+             title="Tiers"
+             module="Meetanshi_RewardPoints"
+             sortOrder="60"
+             parent="Meetanshi_RewardPoints::reward_points"
+             action="meetanshi_rewardpoints/tier/index"
+             resource="Meetanshi_RewardPoints::tier"/>
+
+        <add id="Meetanshi_RewardPoints::report_earned"
+             title="Points Earned"
+             module="Meetanshi_RewardPoints"
+             sortOrder="70"
+             parent="Meetanshi_RewardPoints::reward_points"
+             action="meetanshi_rewardpoints/report/earned"
+             resource="Meetanshi_RewardPoints::report"/>
+
+        <add id="Meetanshi_RewardPoints::report_spent"
+             title="Points Spent"
+             module="Meetanshi_RewardPoints"
+             sortOrder="80"
+             parent="Meetanshi_RewardPoints::reward_points"
+             action="meetanshi_rewardpoints/report/spent"
+             resource="Meetanshi_RewardPoints::report"/>
+
+        <add id="Meetanshi_RewardPoints::import"
+             title="Import"
+             module="Meetanshi_RewardPoints"
+             sortOrder="90"
+             parent="Meetanshi_RewardPoints::reward_points"
+             action="meetanshi_rewardpoints/import/index"
+             resource="Meetanshi_RewardPoints::import"/>
+
+        <add id="Meetanshi_RewardPoints::export"
+             title="Export"
+             module="Meetanshi_RewardPoints"
+             sortOrder="100"
+             parent="Meetanshi_RewardPoints::reward_points"
+             action="meetanshi_rewardpoints/export/index"
+             resource="Meetanshi_RewardPoints::export"/>
+
+        <add id="Meetanshi_RewardPoints::configuration"
+             title="Configuration"
+             module="Meetanshi_RewardPoints"
+             sortOrder="110"
+             parent="Meetanshi_RewardPoints::reward_points"
+             action="adminhtml/system_config/edit/section/meetanshi_rewardpoints"
+             resource="Meetanshi_RewardPoints::config"/>
+    </menu>
+</config>

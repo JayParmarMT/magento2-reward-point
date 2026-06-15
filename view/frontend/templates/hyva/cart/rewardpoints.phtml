@@ -1,0 +1,322 @@
+<?php
+/**
+ * Hyvä reward points cart apply block.
+ * Uses Tailwind CSS + Alpine.js — Hyvä coding standard.
+ * Matches the coupon block design: <details>/<summary> with lucide chevron-down (20×20).
+ *
+ * @var \Meetanshi\RewardPoints\Block\Frontend\Cart\RewardPoints $block
+ * @var \Magento\Framework\Escaper $escaper
+ */
+
+if (!$block->isEnabled()) {
+    return;
+}
+
+$balance             = $block->getCustomerBalance();
+$minPoints           = $block->getMinPoints();
+$maxPoints           = $block->getMaxPoints();
+$pointsApplied       = $block->getPointsApplied();
+$spendingRateDisplay = $block->getSpendingRateDisplay();
+$isSliderEnabled     = $block->isSliderEnabled();
+$useMaxDefault       = $block->isUseMaxByDefault();
+$applyUrl            = $block->getApplyUrl();
+$removeUrl           = $block->getRemoveUrl();
+$isLoggedIn          = $block->isLoggedIn();
+
+$initialPoints = $pointsApplied > 0
+    ? $pointsApplied
+    : ($useMaxDefault ? $maxPoints : $minPoints);
+?>
+<details
+    class="reward-points-cart-form group"
+    x-data="rewardPointsCart()"
+    x-init="init()"
+    <?= /* @noEscape */ $pointsApplied > 0 ? 'open' : '' ?>>
+
+    <summary
+        class="list-none flex justify-between items-center gap-2 py-2 font-semibold cursor-pointer"
+        @click.prevent="open = !open; $el.closest('details').open = open">
+        <span class="inline-flex items-center gap-2">
+            <?= $escaper->escapeHtml(__('Use Reward Points')) ?>
+        </span>
+        <!-- Lucide chevron-down 20×20 — same as coupon block -->
+        <svg xmlns="http://www.w3.org/2000/svg"
+             width="20" height="20"
+             fill="none"
+             stroke="currentColor"
+             stroke-linecap="round"
+             stroke-linejoin="round"
+             stroke-width="1.5"
+             viewBox="0 0 24 24"
+             aria-hidden="true"
+             class="transform group-open:rotate-180 transition-transform duration-200">
+            <path d="m6 9 6 6 6-6"/>
+        </svg>
+    </summary>
+
+    <div class="mt-2 mb-4" x-show="open" x-transition>
+
+        <?php if (!$isLoggedIn): ?>
+        <p class="text-sm text-yellow-700 bg-yellow-50 border border-yellow-200 rounded px-3 py-2">
+            <?= $escaper->escapeHtml(__('Please log in to use your reward points.')) ?>
+        </p>
+
+        <?php elseif ($balance <= 0): ?>
+        <p class="text-sm text-secondary">
+            <?= $escaper->escapeHtml(__('You have no reward points available.')) ?>
+        </p>
+
+        <?php elseif (!$isSliderEnabled): ?>
+        <p class="text-sm text-yellow-700 bg-yellow-50 border border-yellow-200 rounded px-3 py-2">
+            <?= $escaper->escapeHtml(
+                __('You need at least %1 points to redeem. Your balance: %2', $minPoints, $balance)
+            ) ?>
+        </p>
+
+        <?php else: ?>
+
+        <!-- Balance -->
+        <p class="text-sm text-primary mb-3">
+            <?= $escaper->escapeHtml(__('Your Balance:')) ?>
+            <strong class="text-blue-700 font-bold"><?= $escaper->escapeHtml($block->formatBalance($balance)) ?></strong>
+            <?php if ($block->isShowAsCurrency()): ?>
+                <?php $currencyEquiv = $block->getCurrencyEquivalent($balance); ?>
+                <?php if ($currencyEquiv): ?>
+                <span class="text-secondary">&mdash; <?= $escaper->escapeHtml(__('≈ %1', $currencyEquiv)) ?></span>
+                <?php endif; ?>
+            <?php elseif ($spendingRateDisplay): ?>
+                <span class="text-secondary">&mdash; <?= $escaper->escapeHtml($spendingRateDisplay) ?></span>
+            <?php endif; ?>
+        </p>
+
+        <!-- Applied notice (PHP rendered — shown on load if points already applied) -->
+        <?php if ($pointsApplied > 0): ?>
+        <div class="text-sm text-green-700 bg-green-50 border border-green-200 rounded px-3 py-2 mb-3"
+             x-show="!message">
+            <?= $escaper->escapeHtml(
+                __('%1 points applied. Discount: %2', $pointsApplied, $block->getFormattedDiscountAmount())
+            ) ?>
+        </div>
+        <?php endif; ?>
+
+        <!-- Alpine message (AJAX feedback) -->
+        <div x-show="message"
+             class="text-sm border rounded px-3 py-2 mb-3"
+             :class="messageType === 'success'
+                 ? 'text-green-700 bg-green-50 border-green-200'
+                 : 'text-red-700 bg-red-50 border-red-200'"
+             x-text="message">
+        </div>
+
+        <!-- Slider -->
+        <label class="block text-sm font-medium text-primary mb-1" for="rp-cart-slider">
+            <?= $escaper->escapeHtml(__('Points to Use')) ?>
+        </label>
+        <input type="range"
+               id="rp-cart-slider"
+               class="w-full mb-1 accent-blue-600 cursor-pointer"
+               min="<?= /* @noEscape */ (int) $minPoints ?>"
+               max="<?= /* @noEscape */ (int) $maxPoints ?>"
+               step="1"
+               x-model.number="points"
+               @input="syncFromSlider">
+
+        <!-- Number input -->
+        <div class="flex items-center gap-2 mt-1 mb-3">
+            <input type="number"
+                   class="form-input w-24 text-center"
+                   min="<?= /* @noEscape */ (int) $minPoints ?>"
+                   max="<?= /* @noEscape */ (int) $maxPoints ?>"
+                   x-model.number="points"
+                   @change="clampPoints">
+            <span class="text-sm text-secondary"><?= $escaper->escapeHtml(__('pts')) ?></span>
+        </div>
+
+        <!-- Maximise checkbox -->
+        <label class="flex items-center gap-2 text-sm text-primary mb-4 cursor-pointer">
+            <input type="checkbox"
+                   class="rounded border-container-darker accent-blue-600 focus:ring-blue-500"
+                   x-model="useMax"
+                   @change="if (useMax) { points = maxPoints }">
+            <?= $escaper->escapeHtml(__('Maximize my discount (%1 pts)', $maxPoints)) ?>
+        </label>
+
+        <!-- Buttons -->
+        <div class="flex gap-2">
+            <button type="button"
+                    class="btn btn-primary w-full py-2 disabled:opacity-50 disabled:cursor-not-allowed"
+                    :disabled="loading"
+                    @click="applyPoints">
+                <span x-show="!loading"><?= $escaper->escapeHtml(__('Apply Points')) ?></span>
+                <span x-show="loading"><?= $escaper->escapeHtml(__('Applying…')) ?></span>
+            </button>
+            <button type="button"
+                    class="btn btn-secondary w-full py-2 disabled:opacity-50 disabled:cursor-not-allowed"
+                    x-show="applied"
+                    :disabled="loading"
+                    @click="removePoints">
+                <span x-show="!loading"><?= $escaper->escapeHtml(__('Remove')) ?></span>
+                <span x-show="loading"><?= $escaper->escapeHtml(__('Removing…')) ?></span>
+            </button>
+        </div>
+
+        <?php endif; ?>
+    </div>
+</details>
+
+<script>
+function rewardPointsCart() {
+    return {
+        open: <?= /* @noEscape */ $pointsApplied > 0 ? 'true' : 'false' ?>,
+        loading: false,
+        message: '',
+        messageType: 'success',
+        applied: <?= /* @noEscape */ $pointsApplied > 0 ? 'true' : 'false' ?>,
+        points: <?= /* @noEscape */ (int) $initialPoints ?>,
+        minPoints: <?= /* @noEscape */ (int) $minPoints ?>,
+        maxPoints: <?= /* @noEscape */ (int) $maxPoints ?>,
+        useMax: <?= /* @noEscape */ ($useMaxDefault || ($pointsApplied > 0 && $pointsApplied >= $maxPoints)) ? 'true' : 'false' ?>,
+        applyUrl: '<?= $escaper->escapeJs($applyUrl) ?>',
+        removeUrl: '<?= $escaper->escapeJs($removeUrl) ?>',
+
+        init() {
+            if (this.useMax) this.points = this.maxPoints;
+        },
+
+        syncFromSlider() {
+            this.useMax = (this.points >= this.maxPoints);
+        },
+
+        clampPoints() {
+            if (this.points < this.minPoints) this.points = this.minPoints;
+            if (this.points > this.maxPoints) this.points = this.maxPoints;
+            this.useMax = (this.points >= this.maxPoints);
+        },
+
+        getFormKey() {
+            if (typeof hyva !== 'undefined' && hyva.getFormKey) {
+                return hyva.getFormKey();
+            }
+            const meta = document.querySelector('meta[name="form_key"]');
+            if (meta) return meta.getAttribute('content');
+            const input = document.querySelector('input[name="form_key"]');
+            return input ? input.value : '';
+        },
+
+        async fetchUpdatedTotals() {
+            window.dispatchEvent(new CustomEvent('update-totals-start', { bubbles: true }));
+            try {
+                const path = '/V1/carts/mine/totals-information';
+                const url  = BASE_URL + 'rest/' + CURRENT_STORE_CODE + path
+                    + '?form_key=' + encodeURIComponent(this.getFormKey());
+
+                const resp = await fetch(url, {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json',
+                        'X-Requested-With': 'XMLHttpRequest'
+                    },
+                    body: JSON.stringify({
+                        addressInformation: {
+                            shipping_carrier_code: null,
+                            shipping_method_code: null,
+                            address: {}
+                        }
+                    })
+                });
+
+                if (!resp.ok) return;
+
+                const result = await resp.json();
+
+                // Preserve translated titles from checkoutConfig
+                if (window.checkoutConfig && window.checkoutConfig.totalsData) {
+                    const configSegments = window.checkoutConfig.totalsData.total_segments || [];
+                    (result.total_segments || []).forEach(seg => {
+                        const cfg = configSegments.find(c => c.code === seg.code);
+                        if (cfg) seg.title = cfg.title;
+                    });
+                }
+
+                window.dispatchEvent(new CustomEvent('update-totals', {
+                    detail: { data: result },
+                    bubbles: true
+                }));
+            } catch (e) {
+                // Non-fatal
+            } finally {
+                window.dispatchEvent(new CustomEvent('update-totals-end', { bubbles: true }));
+            }
+        },
+
+        async applyPoints() {
+            if (this.points < this.minPoints) {
+                this.showMessage(
+                    '<?= $escaper->escapeJs(__('Please enter at least %1 points.')) ?>'
+                        .replace('%1', this.minPoints),
+                    'error'
+                );
+                return;
+            }
+            if (this.points > this.maxPoints) this.points = this.maxPoints;
+
+            this.loading = true;
+            this.message = '';
+            try {
+                const resp = await fetch(this.applyUrl, {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/x-www-form-urlencoded',
+                        'X-Requested-With': 'XMLHttpRequest'
+                    },
+                    body: new URLSearchParams({ points: this.points, form_key: this.getFormKey() })
+                });
+                const data = await resp.json();
+                if (data.success) {
+                    this.applied = true;
+                    this.showMessage(data.message || '<?= $escaper->escapeJs(__('Points applied successfully.')) ?>', 'success');
+                    await this.fetchUpdatedTotals();
+                } else {
+                    this.showMessage(data.message || '<?= $escaper->escapeJs(__('Unable to apply points.')) ?>', 'error');
+                }
+            } catch (e) {
+                this.showMessage('<?= $escaper->escapeJs(__('An error occurred. Please try again.')) ?>', 'error');
+            } finally {
+                this.loading = false;
+            }
+        },
+
+        async removePoints() {
+            this.loading = true;
+            this.message = '';
+            try {
+                const resp = await fetch(this.removeUrl, {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/x-www-form-urlencoded',
+                        'X-Requested-With': 'XMLHttpRequest'
+                    },
+                    body: new URLSearchParams({ form_key: this.getFormKey() })
+                });
+                const data = await resp.json();
+                if (data.success) {
+                    this.applied = false;
+                    this.showMessage(data.message || '<?= $escaper->escapeJs(__('Points removed.')) ?>', 'success');
+                    await this.fetchUpdatedTotals();
+                } else {
+                    this.showMessage(data.message || '<?= $escaper->escapeJs(__('Unable to remove points.')) ?>', 'error');
+                }
+            } catch (e) {
+                this.showMessage('<?= $escaper->escapeJs(__('An error occurred. Please try again.')) ?>', 'error');
+            } finally {
+                this.loading = false;
+            }
+        },
+
+        showMessage(msg, type) {
+            this.message = msg;
+            this.messageType = type;
+        }
+    };
+}
+</script>

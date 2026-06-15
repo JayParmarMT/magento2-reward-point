@@ -1,0 +1,81 @@
+<?php
+/**
+ * Earn Points Message — Product Detail Page
+ *
+ * Shows:
+ *  1. Catalog/rate-based earn estimate  — "Earn X points by purchasing this product"
+ *  2. Cart rule promotional messages    — "Earn 15 pts for every £10 spent" (for rules
+ *     with is_shown_on_product_page = 1)
+ *
+ * @var \Meetanshi\RewardPoints\Block\Frontend\Product\EarnMessage $block
+ * @var \Magento\Framework\Escaper $escaper
+ */
+
+if (!$block->canShow()) {
+    return;
+}
+
+$catalogPoints = $block->getEstimatedPoints();
+$cartRules     = $block->getCartRulesForProductPage();
+
+if (!$catalogPoints && empty($cartRules)) {
+    return;
+}
+?>
+<div class="reward-points-earn-message">
+
+    <?php if ($catalogPoints): ?>
+        <div class="reward-points-earn-item reward-points-earn-catalog">
+            <span class="reward-points-earn-icon">🎁</span>
+            <span class="reward-points-earn-text">
+                <?= $escaper->escapeHtml(
+                    __('Earn %1 by purchasing this product', $block->formatPoints($catalogPoints))
+                ) ?>
+            </span>
+        </div>
+    <?php endif; ?>
+
+    <?php foreach ($cartRules as $rule): ?>
+        <div class="reward-points-earn-item reward-points-earn-cart-rule">
+            <span class="reward-points-earn-icon">⭐</span>
+            <span class="reward-points-earn-text">
+                <?= $escaper->escapeHtml($block->getCartRuleLabel($rule)) ?>
+            </span>
+            <?php if ($rule->getName()): ?>
+                <span class="reward-points-earn-rule-name">
+                    &mdash; <?= $escaper->escapeHtml($rule->getName()) ?>
+                </span>
+            <?php endif; ?>
+        </div>
+    <?php endforeach; ?>
+
+    <?php if ($block->isSocialEnabledOnProduct() && ($block->isFacebookEnabled() || $block->isTwitterEnabled() || $block->isPinterestEnabled())): ?>
+    <?php $shareUrl = $block->getUrl('', ['_current' => true, '_use_rewrite' => true]); ?>
+    <?php $shareText = (string) __('Earn reward points on this product!'); ?>
+    <div class="reward-points-social-share" style="margin-top:0.75rem;display:flex;flex-wrap:wrap;gap:0.4rem;align-items:center;">
+        <span style="font-size:0.8rem;font-weight:600;color:#9ca3af;text-transform:uppercase;letter-spacing:0.06em;margin-right:0.25rem;"><?= $escaper->escapeHtml(__('Share')) ?></span>
+        <?php if ($block->isFacebookEnabled()): ?>
+        <a href="https://www.facebook.com/sharer/sharer.php?u=<?= $escaper->escapeUrl($shareUrl) ?>"
+           target="_blank" rel="noopener noreferrer"
+           style="display:inline-flex;align-items:center;gap:0.3rem;padding:0.3rem 0.75rem;border-radius:5px;background:#1877f2;color:#fff;font-size:0.82rem;font-weight:600;text-decoration:none;">
+            📘 <?= $escaper->escapeHtml(__('Facebook')) ?>
+        </a>
+        <?php endif; ?>
+        <?php if ($block->isTwitterEnabled()): ?>
+        <a href="https://twitter.com/intent/tweet?url=<?= $escaper->escapeUrl($shareUrl) ?>&text=<?= $escaper->escapeUrl($shareText) ?>"
+           target="_blank" rel="noopener noreferrer"
+           style="display:inline-flex;align-items:center;gap:0.3rem;padding:0.3rem 0.75rem;border-radius:5px;background:#000;color:#fff;font-size:0.82rem;font-weight:600;text-decoration:none;">
+            𝕏 <?= $escaper->escapeHtml(__('Twitter / X')) ?>
+        </a>
+        <?php endif; ?>
+        <?php if ($block->isPinterestEnabled()): ?>
+        <a href="https://pinterest.com/pin/create/button/?url=<?= $escaper->escapeUrl($shareUrl) ?>&description=<?= $escaper->escapeUrl($shareText) ?>"
+           target="_blank" rel="noopener noreferrer"
+           style="display:inline-flex;align-items:center;gap:0.3rem;padding:0.3rem 0.75rem;border-radius:5px;background:#e60023;color:#fff;font-size:0.82rem;font-weight:600;text-decoration:none;">
+            📌 <?= $escaper->escapeHtml(__('Pinterest')) ?>
+        </a>
+        <?php endif; ?>
+    </div>
+    <?php endif; ?>
+
+</div>

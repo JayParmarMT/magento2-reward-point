@@ -1,0 +1,56 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<tests xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+       xsi:noNamespaceSchemaLocation="urn:magento:mftf:Test/etc/testSchema.xsd">
+
+    <!--
+        Test 1: The "Use Reward Points" block is visible in the cart for a logged-in customer.
+    -->
+    <test name="RewardPointsApplyBlockVisibleInCart">
+        <annotations>
+            <features value="Meetanshi Reward Points"/>
+            <stories value="Cart Integration"/>
+            <title value="Reward Points apply block is visible in the cart summary"/>
+            <description value="Verifies that the Use Reward Points block (#reward-points-cart-block) is rendered in the cart page for a logged-in customer who has added a product."/>
+            <severity value="CRITICAL"/>
+            <group value="RewardPoints"/>
+        </annotations>
+
+        <before>
+            <createData entity="CustomerWithPoints" stepKey="createCustomer"/>
+            <createData entity="SimpleProductForEarnTest" stepKey="createProduct"/>
+        </before>
+
+        <after>
+            <actionGroup ref="StorefrontCustomerLogoutActionGroup" stepKey="logoutCustomer"/>
+            <deleteData createDataKey="createCustomer" stepKey="deleteCustomer"/>
+            <deleteData createDataKey="createProduct" stepKey="deleteProduct"/>
+        </after>
+
+        <!-- Log in to storefront -->
+        <actionGroup ref="LoginToStorefrontActionGroup" stepKey="loginToStorefront">
+            <argument name="Customer" value="$$createCustomer$$"/>
+        </actionGroup>
+
+        <!-- Navigate to the product page and add it to cart -->
+        <amOnPage url="/$$createProduct.custom_attributes[url_key]$$.html" stepKey="navigateToProductPage"/>
+        <waitForPageLoad time="30" stepKey="waitForProductPageLoad"/>
+        <waitForElementClickable selector="{{StorefrontProductInfoMainSection.AddToCart}}" time="30" stepKey="waitForAddToCartButton"/>
+        <click selector="{{StorefrontProductInfoMainSection.AddToCart}}" stepKey="addProductToCart"/>
+        <waitForPageLoad time="30" stepKey="waitAfterAddToCart"/>
+        <waitForElementVisible selector="{{StorefrontCategoryMainSection.SuccessMsg}}" time="30" stepKey="waitForSuccessMessage"/>
+
+        <!-- Navigate to cart -->
+        <amOnPage url="/checkout/cart" stepKey="navigateToCart"/>
+        <waitForPageLoad time="30" stepKey="waitForCartPageLoad"/>
+
+        <!-- Assert reward points block is visible -->
+        <scrollTo selector="{{RewardPointsCartSection.applyPointsBlock}}" stepKey="scrollToRewardPointsBlock"/>
+        <waitForElementVisible selector="{{RewardPointsCartSection.applyPointsBlock}}" time="30" stepKey="waitForRewardPointsBlockVisible"/>
+        <seeElement selector="{{RewardPointsCartSection.applyPointsBlock}}" stepKey="seeRewardPointsBlock"/>
+
+        <!-- Assert the block title text -->
+        <see selector="{{RewardPointsCartSection.blockTitle}}" userInput="Use Reward Points" stepKey="seeBlockTitle"/>
+    </test>
+
+
+</tests>

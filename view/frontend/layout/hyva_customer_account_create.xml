@@ -1,0 +1,18 @@
+<?xml version="1.0"?>
+<!--
+    Hyvä-specific customer registration layout.
+
+    Swaps the Luma referral_field template (uses .fieldset/.field/.label/.control/.input-text)
+    for the Hyvä/Tailwind version.
+    form.additional.info container works on both Luma and Hyvä.
+-->
+<page xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+      xsi:noNamespaceSchemaLocation="urn:magento:framework:View/Layout/etc/page_configuration.xsd">
+    <body>
+        <referenceBlock name="rewardpoints.referral.field">
+            <action method="setTemplate">
+                <argument name="template" xsi:type="string">Meetanshi_RewardPoints::hyva/customer/referral_field.phtml</argument>
+            </action>
+        </referenceBlock>
+    </body>
+</page>

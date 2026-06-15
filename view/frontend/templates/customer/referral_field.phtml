@@ -1,0 +1,29 @@
+<?php
+/**
+ * Referral Code Field Template for Customer Registration
+ *
+ * @var \Meetanshi\RewardPoints\Block\Frontend\Customer\ReferralField $block
+ * @var \Magento\Framework\Escaper $escaper
+ */
+?>
+<fieldset class="fieldset create account referral" id="fieldset-referral">
+    <legend class="legend">
+        <span><?= $escaper->escapeHtml(__('Referral Code')) ?></span>
+    </legend>
+    <div class="field referral-code">
+        <label class="label" for="<?= $escaper->escapeHtmlAttr($block->getFieldId()) ?>">
+            <span><?= $escaper->escapeHtml($block->getFieldLabel()) ?></span>
+        </label>
+        <div class="control">
+            <input type="text"
+                   name="<?= $escaper->escapeHtmlAttr($block->getFieldName()) ?>"
+                   id="<?= $escaper->escapeHtmlAttr($block->getFieldId()) ?>"
+                   class="input-text"
+                   placeholder="<?= $escaper->escapeHtmlAttr($block->getPlaceholder()) ?>"
+                   autocomplete="off"/>
+        </div>
+        <div class="note">
+            <?= $escaper->escapeHtml(__('If a friend referred you, enter their referral code here to earn bonus rewards.')) ?>
+        </div>
+    </div>
+</fieldset>

@@ -1,0 +1,111 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<form xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+      xsi:noNamespaceSchemaLocation="urn:magento:module:Magento_Ui:etc/ui_configuration.xsd">
+    <argument name="data" xsi:type="array">
+        <item name="js_config" xsi:type="array">
+            <item name="provider" xsi:type="string">meetanshi_rewardpoints_transaction_add_form.meetanshi_rewardpoints_transaction_add_form_data_source</item>
+        </item>
+        <item name="label" xsi:type="string" translate="true">Add Reward Points Transaction</item>
+        <item name="template" xsi:type="string">templates/form/collapsible</item>
+    </argument>
+    <settings>
+        <buttons>
+            <button name="back">
+                <url path="meetanshi_rewardpoints/transaction/index"/>
+                <class>back</class>
+                <label translate="true">Back</label>
+            </button>
+            <button name="save">
+                <class>save primary</class>
+                <label translate="true">Save Transaction</label>
+            </button>
+        </buttons>
+        <namespace>meetanshi_rewardpoints_transaction_add_form</namespace>
+        <dataScope>data</dataScope>
+        <deps>
+            <dep>meetanshi_rewardpoints_transaction_add_form.meetanshi_rewardpoints_transaction_add_form_data_source</dep>
+        </deps>
+    </settings>
+    <dataSource name="meetanshi_rewardpoints_transaction_add_form_data_source">
+        <argument name="data" xsi:type="array">
+            <item name="js_config" xsi:type="array">
+                <item name="component" xsi:type="string">Magento_Ui/js/form/provider</item>
+            </item>
+        </argument>
+        <settings>
+            <submitUrl path="meetanshi_rewardpoints/transaction/save"/>
+        </settings>
+        <dataProvider class="Meetanshi\RewardPoints\Ui\DataProvider\Transaction\AddFormDataProvider"
+                      name="meetanshi_rewardpoints_transaction_add_form_data_source">
+            <settings>
+                <requestFieldName>transaction_id</requestFieldName>
+                <primaryFieldName>transaction_id</primaryFieldName>
+            </settings>
+        </dataProvider>
+    </dataSource>
+    <fieldset name="transaction_details">
+        <settings>
+            <label translate="true">Transaction Details</label>
+            <collapsible>false</collapsible>
+        </settings>
+        <field name="customer_id" sortOrder="10" formElement="input">
+            <settings>
+                <label translate="true">Customer ID</label>
+                <dataType>number</dataType>
+                <dataScope>customer_id</dataScope>
+                <validation>
+                    <rule name="required-entry" xsi:type="boolean">true</rule>
+                    <rule name="validate-digits" xsi:type="boolean">true</rule>
+                    <rule name="validate-greater-than-zero" xsi:type="boolean">true</rule>
+                </validation>
+                <notice translate="true">Enter the numeric Customer ID.</notice>
+            </settings>
+        </field>
+        <field name="points" sortOrder="20" formElement="input">
+            <settings>
+                <label translate="true">Points (positive to add, negative to deduct)</label>
+                <dataType>number</dataType>
+                <dataScope>points</dataScope>
+                <validation>
+                    <rule name="required-entry" xsi:type="boolean">true</rule>
+                    <rule name="validate-integer" xsi:type="boolean">true</rule>
+                    <rule name="validate-not-negative-number" xsi:type="boolean">false</rule>
+                </validation>
+                <notice translate="true">Enter a non-zero integer. Positive adds points; negative deducts points.</notice>
+            </settings>
+        </field>
+        <field name="comment" sortOrder="30" formElement="textarea">
+            <settings>
+                <label translate="true">Comment</label>
+                <dataType>text</dataType>
+                <dataScope>comment</dataScope>
+                <notice translate="true">Maximum 500 characters.</notice>
+            </settings>
+        </field>
+        <field name="expire_after_days" sortOrder="40" formElement="input">
+            <settings>
+                <label translate="true">Points Expire After (days)</label>
+                <dataType>number</dataType>
+                <dataScope>expire_after_days</dataScope>
+                <validation>
+                    <rule name="validate-digits" xsi:type="boolean">true</rule>
+                </validation>
+                <notice translate="true">Enter 0 to use the global default expiration setting.</notice>
+            </settings>
+        </field>
+        <field name="notify_customer" sortOrder="50" formElement="select">
+            <settings>
+                <label translate="true">Notify Customer</label>
+                <dataType>select</dataType>
+                <dataScope>notify_customer</dataScope>
+            </settings>
+            <formElements>
+                <select>
+                    <settings>
+                        <options class="Magento\Config\Model\Config\Source\Yesno"/>
+                    </settings>
+                </select>
+            </formElements>
+        </field>
+    </fieldset>
+</form>

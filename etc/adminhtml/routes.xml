@@ -1,0 +1,9 @@
+<?xml version="1.0"?>
+<config xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+        xsi:noNamespaceSchemaLocation="urn:magento:framework:App/etc/routes.xsd">
+    <router id="admin">
+        <route id="meetanshi_rewardpoints" frontName="meetanshi_rewardpoints">
+            <module name="Meetanshi_RewardPoints" before="Magento_Backend"/>
+        </route>
+    </router>
+</config>

@@ -1,0 +1,250 @@
+<?php
+/**
+ * @var \Meetanshi\RewardPoints\Block\Frontend\Account\Transactions $block
+ * @var \Meetanshi\RewardPoints\ViewModel\Account\Transactions $viewModel
+ * @var \Magento\Framework\Escaper $escaper
+ */
+$viewModel  = $block->getViewModel();
+$escaper    = $block->getData('escaper') ?? new \Magento\Framework\Escaper();
+$filterUrl  = $block->getUrl('rewardpoints/account/transactions');
+$request    = $block->getRequest();
+
+$statusFilter = (string) $request->getParam('status', '');
+$dateFrom     = $viewModel->parseLocaleDate((string) $request->getParam('date_from', ''));
+$dateTo       = $viewModel->parseLocaleDate((string) $request->getParam('date_to', ''));
+
+// Get collection (already filtered and paginated via the pager)
+$collection  = $block->getCollection();
+$transactions = $collection->getItems();
+$totalCount  = $collection->getSize();
+
+$statusClasses = [
+    'active'    => 'rph-badge rph-badge--active',
+    'pending'   => 'rph-badge rph-badge--pending',
+    'expired'   => 'rph-badge rph-badge--expired',
+    'cancelled' => 'rph-badge rph-badge--cancelled',
+];
+?>
+<style>
+.rph-page { font-family: inherit; font-size: 1rem; }
+
+/* ---- Filter card ---- */
+.rph-filter-card { background: #f9fafb; border: 1px solid #e5e7eb; border-radius: 10px; padding: 1.25rem 1.5rem; margin-bottom: 1.75rem; }
+.rph-filter-grid { display: flex; flex-wrap: wrap; gap: 0.85rem; align-items: flex-end; }
+.rph-filter-group { display: flex; flex-direction: column; gap: 0.35rem; flex: 1 1 160px; min-width: 140px; }
+.rph-filter-group label { font-size: 0.85rem; font-weight: 600; color: #374151; white-space: nowrap; }
+.rph-filter-group select,
+.rph-filter-group input[type="date"] {
+    border: 1px solid #d1d5db; border-radius: 6px; padding: 0 0.75rem;
+    font-size: 0.95rem; color: #1f2937; background: #fff; height: 40px;
+    width: 100%; box-sizing: border-box; cursor: pointer;
+}
+.rph-filter-group select:focus,
+.rph-filter-group input[type="date"]:focus { border-color: #1e3a5f; outline: none; box-shadow: 0 0 0 3px rgba(30,58,95,.12); }
+.rph-filter-actions { display: flex; gap: 0.5rem; align-items: flex-end; flex-shrink: 0; }
+.rph-btn {
+    display: inline-flex; align-items: center; justify-content: center;
+    padding: 0 1.25rem; border-radius: 6px; font-size: 0.9rem; font-weight: 600;
+    cursor: pointer; text-decoration: none; border: none; height: 40px;
+    transition: background 0.18s, color 0.18s; white-space: nowrap;
+}
+.rph-btn--primary { background: #1e3a5f; color: #fff; }
+.rph-btn--primary:hover { background: #2d5f8e; color: #fff; }
+.rph-btn--ghost { background: #fff; color: #6b7280; border: 1px solid #d1d5db; }
+.rph-btn--ghost:hover { background: #f3f4f6; color: #374151; }
+
+/* ---- Meta ---- */
+.rph-meta { font-size: 0.9rem; color: #6b7280; margin-bottom: 0.75rem; }
+
+/* ---- Table ---- */
+.rph-table-wrap { border: 1px solid #e5e7eb; border-radius: 10px; overflow: hidden; }
+.rph-table { width: 100%; border-collapse: collapse; font-size: 0.95rem; }
+.rph-table thead { background: #f9fafb; }
+.rph-table thead th { padding: 0.85rem 1rem; text-align: left; font-size: 0.78rem; font-weight: 700; text-transform: uppercase; letter-spacing: .06em; color: #6b7280; border-bottom: 1px solid #e5e7eb; white-space: nowrap; }
+.rph-table thead th.col-right { text-align: right; }
+.rph-table tbody tr { border-bottom: 1px solid #f3f4f6; transition: background .12s; }
+.rph-table tbody tr:last-child { border-bottom: none; }
+.rph-table tbody tr:hover { background: #fafafa; }
+.rph-table td { padding: 0.9rem 1rem; color: #374151; vertical-align: middle; }
+.rph-table td.col-right { text-align: right; }
+.rph-date { color: #6b7280; font-size: 0.9rem; white-space: nowrap; }
+.rph-desc { font-weight: 500; color: #1f2937; }
+.rph-comment { font-size: 0.85rem; color: #9ca3af; margin-top: 0.15rem; }
+.rph-delta { font-weight: 700; font-size: 1rem; }
+.rph-delta--pos { color: #059669; }
+.rph-delta--neg { color: #dc2626; }
+.rph-badge { display: inline-flex; align-items: center; padding: 0.25rem 0.7rem; border-radius: 99px; font-size: 0.8rem; font-weight: 600; white-space: nowrap; }
+.rph-badge--active    { background: #d1fae5; color: #065f46; }
+.rph-badge--pending   { background: #fef3c7; color: #92400e; }
+.rph-badge--expired   { background: #f3f4f6; color: #6b7280; }
+.rph-badge--cancelled { background: #fee2e2; color: #991b1b; }
+.rph-empty { text-align: center; padding: 3rem 1.5rem; }
+.rph-empty-icon { font-size: 2.5rem; margin-bottom: 0.75rem; }
+.rph-empty p { font-size: 1rem; color: #6b7280; margin: 0; }
+
+/* ---- Pager (rph-pager class used by account/pager.phtml) ---- */
+.rph-pager { display: flex; justify-content: center; align-items: center; gap: 0.35rem; margin-top: 1.5rem; flex-wrap: wrap; }
+.rph-pager a,
+.rph-pager span { display: inline-flex; align-items: center; justify-content: center; min-width: 38px; height: 38px; padding: 0 0.6rem; border-radius: 6px; font-size: 1rem; font-weight: 500; text-decoration: none; border: 1px solid #e5e7eb; color: #374151; transition: all .12s; }
+.rph-pager a[aria-label="Previous"],
+.rph-pager a[aria-label="Next"] { font-size: 1.5rem; line-height: 1; }
+.rph-pager a:hover { background: #f3f4f6; border-color: #d1d5db; }
+.rph-pager span.current { background: #1e3a5f; border-color: #1e3a5f; color: #fff; font-weight: 700; }
+.rph-pager span.dots { border: none; color: #9ca3af; min-width: auto; }
+
+/* ---- Responsive ---- */
+@media (max-width: 640px) {
+    .rph-filter-grid { flex-direction: column; }
+    .rph-filter-group { flex: 1 1 auto; min-width: 0; }
+    .rph-filter-actions { width: 100%; }
+    .rph-filter-actions .rph-btn { flex: 1; }
+    .rph-table thead { display: none; }
+    .rph-table td { display: flex; justify-content: space-between; align-items: center; padding: 0.6rem 1rem; border-bottom: 1px solid #f0f0f0; }
+    .rph-table td::before { content: attr(data-th); font-weight: 600; font-size: 0.8rem; color: #9ca3af; text-transform: uppercase; margin-right: 0.5rem; }
+    .rph-table tr { display: block; border-bottom: 2px solid #f0f0f0; }
+}
+</style>
+
+<div class="rph-page">
+
+    <!-- ── Filters ── -->
+    <div class="rph-filter-card">
+        <form id="rph-filter-form"
+              method="get"
+              action="<?= $escaper->escapeUrl($filterUrl) ?>"
+              data-turbo="false"
+              data-ajax="false">
+            <div class="rph-filter-grid">
+
+                <div class="rph-filter-group">
+                    <label for="rph-status"><?= $escaper->escapeHtml(__('Status')) ?></label>
+                    <select id="rph-status" name="status">
+                        <option value=""><?= $escaper->escapeHtml(__('All Statuses')) ?></option>
+                        <option value="active"<?= $statusFilter === 'active' ? ' selected' : '' ?>><?= $escaper->escapeHtml(__('Active')) ?></option>
+                        <option value="pending"<?= $statusFilter === 'pending' ? ' selected' : '' ?>><?= $escaper->escapeHtml(__('Pending')) ?></option>
+                        <option value="expired"<?= $statusFilter === 'expired' ? ' selected' : '' ?>><?= $escaper->escapeHtml(__('Expired')) ?></option>
+                        <option value="cancelled"<?= $statusFilter === 'cancelled' ? ' selected' : '' ?>><?= $escaper->escapeHtml(__('Cancelled')) ?></option>
+                    </select>
+                </div>
+
+                <div class="rph-filter-group">
+                    <label for="rph-date-from"><?= $escaper->escapeHtml(__('From')) ?></label>
+                    <input type="date"
+                           id="rph-date-from"
+                           name="date_from"
+                           value="<?= $escaper->escapeHtmlAttr($dateFrom) ?>">
+                </div>
+
+                <div class="rph-filter-group">
+                    <label for="rph-date-to"><?= $escaper->escapeHtml(__('To')) ?></label>
+                    <input type="date"
+                           id="rph-date-to"
+                           name="date_to"
+                           value="<?= $escaper->escapeHtmlAttr($dateTo) ?>">
+                </div>
+
+                <div class="rph-filter-actions">
+                    <button type="submit" class="rph-btn rph-btn--primary"><?= $escaper->escapeHtml(__('Filter')) ?></button>
+                    <a href="<?= $escaper->escapeUrl($filterUrl) ?>" class="rph-btn rph-btn--ghost"><?= $escaper->escapeHtml(__('Reset')) ?></a>
+                </div>
+
+            </div>
+        </form>
+    </div>
+
+    <?php if (!empty($transactions)): ?>
+
+    <!-- ── Meta ── -->
+    <p class="rph-meta">
+        <?= $escaper->escapeHtml(__('%1 transactions found', $totalCount)) ?>
+    </p>
+
+    <!-- ── Table ── -->
+    <div class="rph-table-wrap">
+        <table class="rph-table">
+            <thead>
+                <tr>
+                    <th><?= $escaper->escapeHtml(__('Date')) ?></th>
+                    <th><?= $escaper->escapeHtml(__('Description')) ?></th>
+                    <th class="col-right"><?= $escaper->escapeHtml(__('Points')) ?></th>
+                    <th class="col-right"><?= $escaper->escapeHtml(__('Balance After')) ?></th>
+                    <th><?= $escaper->escapeHtml(__('Status')) ?></th>
+                    <th><?= $escaper->escapeHtml(__('Expires')) ?></th>
+                </tr>
+            </thead>
+            <tbody>
+                <?php foreach ($transactions as $txn): ?>
+                <?php
+                    $delta      = (int) $txn->getPointsDelta();
+                    $deltaClass = $delta >= 0 ? 'rph-delta rph-delta--pos' : 'rph-delta rph-delta--neg';
+                    $status     = (string) $txn->getStatus();
+                    $badgeClass = $statusClasses[$status] ?? 'rph-badge rph-badge--pending';
+                ?>
+                <tr>
+                    <td data-th="<?= $escaper->escapeHtmlAttr(__('Date')) ?>">
+                        <span class="rph-date"><?= $escaper->escapeHtml($viewModel->formatDate($txn->getCreatedAt())) ?></span>
+                    </td>
+                    <td data-th="<?= $escaper->escapeHtmlAttr(__('Description')) ?>">
+                        <div class="rph-desc"><?= $escaper->escapeHtml($viewModel->getActionLabel($txn->getActionCode())) ?></div>
+                        <?php if ($txn->getComment()): ?>
+                        <div class="rph-comment"><?= $escaper->escapeHtml($txn->getComment()) ?></div>
+                        <?php endif; ?>
+                    </td>
+                    <td class="col-right" data-th="<?= $escaper->escapeHtmlAttr(__('Points')) ?>">
+                        <span class="<?= $escaper->escapeHtmlAttr($deltaClass) ?>">
+                            <?= $escaper->escapeHtml(($delta >= 0 ? '+' : '') . $delta) ?>
+                        </span>
+                    </td>
+                    <td class="col-right" data-th="<?= $escaper->escapeHtmlAttr(__('Balance After')) ?>">
+                        <?= $escaper->escapeHtml((string) $txn->getPointsBalanceAfter()) ?>
+                    </td>
+                    <td data-th="<?= $escaper->escapeHtmlAttr(__('Status')) ?>">
+                        <span class="<?= $escaper->escapeHtmlAttr($badgeClass) ?>">
+                            <?= $escaper->escapeHtml($viewModel->getStatusLabel($status)) ?>
+                        </span>
+                    </td>
+                    <td data-th="<?= $escaper->escapeHtmlAttr(__('Expires')) ?>">
+                        <span class="rph-date"><?= $escaper->escapeHtml($viewModel->formatDate($txn->getExpiresAt())) ?></span>
+                    </td>
+                </tr>
+                <?php endforeach; ?>
+            </tbody>
+        </table>
+    </div>
+
+    <!-- ── Magento default pager ── -->
+    <?= /* @noEscape */ $block->getPagerHtml() ?>
+
+    <?php else: ?>
+    <div class="rph-empty">
+        <div class="rph-empty-icon">🪙</div>
+        <p><?= $escaper->escapeHtml(__('No transactions found. Start earning points by placing orders!')) ?></p>
+    </div>
+    <?php endif; ?>
+
+</div>
+
+<script>
+(function () {
+    /* Intercept the filter form submit — bypass the SPA router */
+    var form = document.getElementById('rph-filter-form');
+    if (form) {
+        form.addEventListener('submit', function (e) {
+            e.preventDefault();
+            e.stopImmediatePropagation();
+            var base = form.action.split('?')[0].replace(/\/+$/, '');
+            var params = {};
+            var s  = document.getElementById('rph-status').value;
+            var df = document.getElementById('rph-date-from').value;
+            var dt = document.getElementById('rph-date-to').value;
+            if (s)  params.status    = s;
+            if (df) params.date_from = df;
+            if (dt) params.date_to   = dt;
+            var qs = Object.keys(params).map(function (k) {
+                return encodeURIComponent(k) + '=' + encodeURIComponent(params[k]);
+            }).join('&');
+            window.location.href = base + (qs ? '?' + qs : '');
+        });
+    }
+}());
+</script>

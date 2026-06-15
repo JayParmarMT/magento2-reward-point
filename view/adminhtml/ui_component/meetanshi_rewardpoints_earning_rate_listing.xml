@@ -1,0 +1,147 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<listing xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+         xsi:noNamespaceSchemaLocation="urn:magento:module:Magento_Ui:etc/ui_configuration.xsd">
+
+    <argument name="data" xsi:type="array">
+        <item name="js_config" xsi:type="array">
+            <item name="provider" xsi:type="string">meetanshi_rewardpoints_earning_rate_listing.meetanshi_rewardpoints_earning_rate_listing_data_source</item>
+        </item>
+    </argument>
+
+    <settings>
+        <buttons>
+            <button name="add">
+                <url path="meetanshi_rewardpoints/earningrate/new"/>
+                <class>primary</class>
+                <label translate="true">Add New Earning Rate</label>
+            </button>
+        </buttons>
+        <spinner>meetanshi_rewardpoints_earning_rate_listing_columns</spinner>
+        <deps>
+            <dep>meetanshi_rewardpoints_earning_rate_listing.meetanshi_rewardpoints_earning_rate_listing_data_source</dep>
+        </deps>
+    </settings>
+
+    <dataSource name="meetanshi_rewardpoints_earning_rate_listing_data_source" component="Magento_Ui/js/grid/provider">
+        <settings>
+            <storageConfig>
+                <param name="indexField" xsi:type="string">rate_id</param>
+            </storageConfig>
+            <updateUrl path="mui/index/render"/>
+        </settings>
+        <aclResource>Meetanshi_RewardPoints::earning_rate</aclResource>
+        <dataProvider class="Magento\Framework\View\Element\UiComponent\DataProvider\DataProvider" name="meetanshi_rewardpoints_earning_rate_listing_data_source">
+            <settings>
+                <requestFieldName>rate_id</requestFieldName>
+                <primaryFieldName>rate_id</primaryFieldName>
+            </settings>
+        </dataProvider>
+    </dataSource>
+
+    <listingToolbar name="listing_top">
+        <settings>
+            <sticky>true</sticky>
+        </settings>
+        <bookmark name="bookmarks"/>
+        <columnsControls name="columns_controls"/>
+        <filterSearch name="fulltext"/>
+        <filters name="listing_filters"/>
+        <massaction name="listing_massaction">
+            <action name="delete">
+                <settings>
+                    <confirm>
+                        <message translate="true">Are you sure you want to delete the selected earning rates?</message>
+                        <title translate="true">Delete Earning Rates</title>
+                    </confirm>
+                    <url path="meetanshi_rewardpoints/earningrate/massDelete"/>
+                    <type>delete</type>
+                    <label translate="true">Delete</label>
+                </settings>
+            </action>
+        </massaction>
+        <paging name="listing_paging"/>
+    </listingToolbar>
+
+    <columns name="meetanshi_rewardpoints_earning_rate_listing_columns">
+        <settings>
+            <editorConfig>
+                <param name="selectProvider" xsi:type="string">meetanshi_rewardpoints_earning_rate_listing.meetanshi_rewardpoints_earning_rate_listing.meetanshi_rewardpoints_earning_rate_listing_columns.ids</param>
+                <param name="enabled" xsi:type="boolean">true</param>
+                <param name="indexField" xsi:type="string">rate_id</param>
+            </editorConfig>
+            <childDefaults>
+                <param name="fieldAction" xsi:type="array">
+                    <item name="provider" xsi:type="string">meetanshi_rewardpoints_earning_rate_listing.meetanshi_rewardpoints_earning_rate_listing.meetanshi_rewardpoints_earning_rate_listing_columns_editor</item>
+                    <item name="target" xsi:type="string">startEdit</item>
+                    <item name="params" xsi:type="array">
+                        <item name="0" xsi:type="string">${ $.$data.rowIndex }</item>
+                        <item name="1" xsi:type="boolean">true</item>
+                    </item>
+                </param>
+            </childDefaults>
+        </settings>
+        <selectionsColumn name="ids">
+            <settings>
+                <indexField>rate_id</indexField>
+            </settings>
+        </selectionsColumn>
+        <column name="rate_id">
+            <settings>
+                <filter>textRange</filter>
+                <label translate="true">ID</label>
+                <sorting>asc</sorting>
+            </settings>
+        </column>
+        <column name="websites">
+            <settings>
+                <options class="Meetanshi\RewardPoints\Model\Source\WebsiteFilter"/>
+                <filter>select</filter>
+                <dataType>select</dataType>
+                <label translate="true">Websites</label>
+                <sortable>false</sortable>
+            </settings>
+        </column>
+        <column name="customer_groups">
+            <settings>
+                <options class="Meetanshi\RewardPoints\Model\Source\CustomerGroupFilter"/>
+                <filter>select</filter>
+                <dataType>select</dataType>
+                <label translate="true">Customer Groups</label>
+                <sortable>false</sortable>
+            </settings>
+        </column>
+        <column name="money_step">
+            <settings>
+                <filter>textRange</filter>
+                <label translate="true">Money Step ($)</label>
+            </settings>
+        </column>
+        <column name="points">
+            <settings>
+                <filter>textRange</filter>
+                <label translate="true">Earning Points</label>
+            </settings>
+        </column>
+        <column name="priority">
+            <settings>
+                <filter>textRange</filter>
+                <label translate="true">Priority</label>
+            </settings>
+        </column>
+        <column name="is_active" component="Meetanshi_RewardPoints/js/grid/columns/status">
+            <settings>
+                <options class="Meetanshi\RewardPoints\Model\Source\IsActive"/>
+                <filter>select</filter>
+                <dataType>select</dataType>
+                <label translate="true">Status</label>
+            </settings>
+        </column>
+        <actionsColumn name="actions" class="Meetanshi\RewardPoints\Ui\Component\Listing\Column\EarningRateActions">
+            <settings>
+                <indexField>rate_id</indexField>
+                <label translate="true">Actions</label>
+            </settings>
+        </actionsColumn>
+    </columns>
+
+</listing>

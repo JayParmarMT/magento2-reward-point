@@ -1,0 +1,58 @@
+<?php
+/**
+ * Reward Points Import Template
+ *
+ * @var \Magento\Backend\Block\Template $block
+ * @var \Magento\Framework\Escaper $escaper
+ */
+?>
+<div class="admin__page-nav-title">
+    <h1 class="page-title"><?= $escaper->escapeHtml(__('Import Reward Points')) ?></h1>
+</div>
+
+<div class="admin__data-grid-outer-wrap">
+    <div style="padding:20px; background:#fff; border:1px solid #d6d6d6; margin-bottom:20px;">
+        <h3><?= $escaper->escapeHtml(__('Import Instructions')) ?></h3>
+        <p><?= $escaper->escapeHtml(__('Use the standard Magento ImportExport tool to import reward points data.')) ?></p>
+        <p><?= $escaper->escapeHtml(__('Navigate to: System > Data Transfer > Import, then select one of the following entity types:')) ?></p>
+        <ul style="list-style:disc; padding-left:20px;">
+            <li>
+                <strong><?= $escaper->escapeHtml(__('Reward Points Account')) ?></strong>
+                <?= $escaper->escapeHtml(__(': Entity code meetanshi_rewardpoints_account')) ?>
+                <br/>
+                <?= $escaper->escapeHtml(__('Required columns: customer_email, website_code, points_balance, is_enabled')) ?>
+                <br/>
+                <?= $escaper->escapeHtml(__('Behaviors: add_update (adjusts balance), delete (disables account)')) ?>
+            </li>
+            <li style="margin-top:10px;">
+                <strong><?= $escaper->escapeHtml(__('Reward Points Transaction')) ?></strong>
+                <?= $escaper->escapeHtml(__(': Entity code meetanshi_rewardpoints_transaction')) ?>
+                <br/>
+                <?= $escaper->escapeHtml(__('Required columns: customer_email, website_code, points, action_code')) ?>
+                <br/>
+                <?= $escaper->escapeHtml(__('Optional columns: comment, expire_after_days')) ?>
+                <br/>
+                <?= $escaper->escapeHtml(__('Behavior: add only')) ?>
+            </li>
+        </ul>
+
+        <p>
+            <a href="<?= $escaper->escapeUrl($block->getUrl('adminhtml/import/index')) ?>"
+               class="action-default scalable">
+                <?= $escaper->escapeHtml(__('Go to Import Tool')) ?>
+            </a>
+        </p>
+    </div>
+
+    <div style="padding:20px; background:#fff; border:1px solid #d6d6d6;">
+        <h3><?= $escaper->escapeHtml(__('CSV Format Example — Account')) ?></h3>
+        <pre style="background:#f5f5f5; padding:10px; font-size:12px; overflow:auto;">customer_email,website_code,points_balance,is_enabled
+john@example.com,base,500,1
+jane@example.com,base,0,0</pre>
+
+        <h3 style="margin-top:20px;"><?= $escaper->escapeHtml(__('CSV Format Example — Transaction')) ?></h3>
+        <pre style="background:#f5f5f5; padding:10px; font-size:12px; overflow:auto;">customer_email,website_code,points,action_code,comment,expire_after_days
+john@example.com,base,100,import_add,Manual import credit,365
+jane@example.com,base,-50,import_deduct,Manual import deduction,</pre>
+    </div>
+</div>

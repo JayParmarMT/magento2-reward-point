@@ -1,0 +1,36 @@
+<?php
+/**
+ * Earn Points Message — Category / Product Listing Page
+ *
+ * Rendered as a child of category.product.type.details.renderers.default.
+ * The parent renderer receives setProduct($product) from AbstractProduct::getProductDetailsHtml(),
+ * so we retrieve the product via $block->getParentBlock()->getProduct().
+ *
+ * @var \Meetanshi\RewardPoints\Block\Frontend\Catalog\EarnMessageListing $block
+ * @var \Magento\Framework\Escaper $escaper
+ */
+
+if (!$block->isEnabled()) {
+    return;
+}
+
+/** @var \Magento\Catalog\Model\Product|null $product */
+$product = $block->getParentBlock() ? $block->getParentBlock()->getProduct() : null;
+
+if (!$product) {
+    return;
+}
+
+$points = $block->getEstimatedPoints($product);
+
+if (!$points) {
+    return;
+}
+?>
+<div class="reward-points-earn-message">
+    <span class="reward-points-earn-text">
+        <?= $escaper->escapeHtml(
+            __('Earn %1', $block->formatPoints($points))
+        ) ?>
+    </span>
+</div>

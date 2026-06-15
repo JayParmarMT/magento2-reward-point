@@ -1,0 +1,39 @@
+<!--@subject Your Reward Points Are Expiring Soon @-->
+<!--@vars {
+"var customer.name":"Customer Name",
+"var points_expiring":"Points Expiring",
+"var expires_in_days":"Days Until Expiry",
+"var expires_date":"Expiry Date",
+"var store_name":"Store Name"
+} @-->
+
+{{template config_path="design/email/header_template"}}
+
+<table>
+    <tr>
+        <td>
+            <p>{{trans "Dear %name," name=$customer.name}}</p>
+            <p>{{trans "This is a reminder that some of your reward points at %store_name are about to expire." store_name=$store_name}}</p>
+
+            <table cellspacing="0" cellpadding="5" border="0" width="100%">
+                <tr>
+                    <td><strong>{{trans "Points Expiring"}}</strong></td>
+                    <td>{{var points_expiring}} {{trans "points"}}</td>
+                </tr>
+                <tr>
+                    <td><strong>{{trans "Expires In"}}</strong></td>
+                    <td>{{var expires_in_days}} {{trans "day(s)"}}</td>
+                </tr>
+                <tr>
+                    <td><strong>{{trans "Expiry Date"}}</strong></td>
+                    <td>{{var expires_date}}</td>
+                </tr>
+            </table>
+
+            <p>{{trans "Use your points before they expire to enjoy exclusive discounts and rewards."}}</p>
+            <p>{{trans "Thank you for shopping with %store_name." store_name=$store_name}}</p>
+        </td>
+    </tr>
+</table>
+
+{{template config_path="design/email/footer_template"}}

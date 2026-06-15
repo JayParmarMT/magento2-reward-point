@@ -1,0 +1,33 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<actionGroups xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+              xsi:noNamespaceSchemaLocation="urn:magento:mftf:Test/etc/actionGroupSchema.xsd">
+    <actionGroup name="NavigateToRewardPointsDashboardActionGroup">
+        <annotations>
+            <description>
+                Logs in as the given customer on the storefront, then navigates to the
+                Reward Points account dashboard (rewardpoints/account/index) and verifies
+                the page has loaded by checking the balance card is visible.
+            </description>
+        </annotations>
+        <arguments>
+            <argument name="Customer"/>
+        </arguments>
+
+        <!-- Log in to storefront -->
+        <amOnPage url="{{StorefrontCustomerSignInPage.url}}" stepKey="navigateToSignInPage"/>
+        <waitForPageLoad time="30" stepKey="waitForSignInPageLoad"/>
+        <waitForElementVisible selector="{{StorefrontCustomerSignInFormSection.emailField}}" time="30" stepKey="waitForEmailFieldVisible"/>
+        <fillField selector="{{StorefrontCustomerSignInFormSection.emailField}}" userInput="{{Customer.email}}" stepKey="fillEmail"/>
+        <fillField selector="{{StorefrontCustomerSignInFormSection.passwordField}}" userInput="{{Customer.password}}" stepKey="fillPassword"/>
+        <click selector="{{StorefrontCustomerSignInFormSection.signInAccountButton}}" stepKey="clickSignIn"/>
+        <waitForPageLoad time="30" stepKey="waitForLoginComplete"/>
+
+        <!-- Navigate to reward points dashboard -->
+        <amOnPage url="/rewardpoints/account/index" stepKey="navigateToRewardPointsDashboard"/>
+        <waitForPageLoad time="30" stepKey="waitForDashboardPageLoad"/>
+
+        <!-- Verify page loaded by asserting the balance card is present -->
+        <waitForElementVisible selector="{{RewardPointsDashboardSection.dashboardWrapper}}" time="30" stepKey="waitForDashboardWrapperVisible"/>
+        <seeElement selector="{{RewardPointsDashboardSection.balanceCard}}" stepKey="assertBalanceCardPresent"/>
+    </actionGroup>
+</actionGroups>

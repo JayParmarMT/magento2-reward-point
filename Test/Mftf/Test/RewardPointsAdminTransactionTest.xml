@@ -1,0 +1,38 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<tests xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+       xsi:noNamespaceSchemaLocation="urn:magento:mftf:Test/etc/testSchema.xsd">
+
+    <!--
+        Test 1: Admin can navigate to Marketing > Reward Points > Transactions and see the grid.
+    -->
+    <test name="AdminCanViewTransactionGrid">
+        <annotations>
+            <features value="Meetanshi Reward Points"/>
+            <stories value="Admin Transaction Management"/>
+            <title value="Admin can view the Reward Points Transactions grid"/>
+            <description value="Verifies that an admin user can navigate to Marketing > Reward Points > Transactions and see the transactions grid rendered on the page."/>
+            <severity value="CRITICAL"/>
+            <group value="RewardPoints"/>
+        </annotations>
+
+        <before>
+            <actionGroup ref="AdminLoginActionGroup" stepKey="loginAsAdmin"/>
+        </before>
+
+        <after>
+            <actionGroup ref="AdminLogoutActionGroup" stepKey="logoutAdmin"/>
+        </after>
+
+        <!-- Navigate directly to the transactions index URL -->
+        <amOnPage url="{{AdminTransactionIndexPage.url}}" stepKey="navigateToTransactionGrid"/>
+        <waitForPageLoad time="30" stepKey="waitForTransactionGridLoad"/>
+
+        <!-- Verify the page title contains "Transactions" -->
+        <see selector="h1.page-title" userInput="Transactions" stepKey="seeTransactionsPageTitle"/>
+
+        <!-- Verify the listing UI component container is present -->
+        <seeElement selector="[data-component='meetanshi_rewardpoints_transaction_listing']" stepKey="seeTransactionListingComponent"/>
+    </test>
+
+
+</tests>

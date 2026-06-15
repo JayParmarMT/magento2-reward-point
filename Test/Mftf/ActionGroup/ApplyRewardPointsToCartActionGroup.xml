@@ -1,0 +1,41 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<actionGroups xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+              xsi:noNamespaceSchemaLocation="urn:magento:mftf:Test/etc/actionGroupSchema.xsd">
+    <actionGroup name="ApplyRewardPointsToCartActionGroup">
+        <annotations>
+            <description>
+                Navigates to the shopping cart page, waits for the Reward Points block to appear,
+                enters the specified number of points in the text input, clicks Apply Points,
+                and waits for the applied-notice confirmation to appear.
+            </description>
+        </annotations>
+        <arguments>
+            <argument name="pointsAmount" type="string" defaultValue="100"/>
+        </arguments>
+
+        <!-- Navigate to cart -->
+        <amOnPage url="/checkout/cart" stepKey="navigateToCart"/>
+        <waitForPageLoad time="30" stepKey="waitForCartPageLoad"/>
+
+        <!-- Wait for the reward points block to be visible -->
+        <waitForElementVisible selector="{{RewardPointsCartSection.applyPointsBlock}}" time="30" stepKey="waitForRewardPointsBlock"/>
+
+        <!-- Scroll to the block to ensure it is in view -->
+        <scrollTo selector="{{RewardPointsCartSection.applyPointsBlock}}" stepKey="scrollToRewardPointsBlock"/>
+
+        <!-- Ensure the block content is expanded (click title if collapsed) -->
+        <conditionalClick selector="{{RewardPointsCartSection.blockTitle}}" dependentSelector="{{RewardPointsCartSection.formWidget}}" visible="false" stepKey="expandBlockIfCollapsed"/>
+        <waitForElementVisible selector="{{RewardPointsCartSection.pointsInput}}" time="15" stepKey="waitForPointsInputVisible"/>
+
+        <!-- Clear any existing value and enter the desired points amount -->
+        <clearField selector="{{RewardPointsCartSection.pointsInput}}" stepKey="clearPointsInput"/>
+        <fillField selector="{{RewardPointsCartSection.pointsInput}}" userInput="{{pointsAmount}}" stepKey="fillPointsAmount"/>
+
+        <!-- Click the Apply Points button -->
+        <click selector="{{RewardPointsCartSection.applyButton}}" stepKey="clickApplyPointsButton"/>
+        <waitForPageLoad time="30" stepKey="waitAfterApply"/>
+
+        <!-- Wait for the applied-notice confirmation to appear -->
+        <waitForElementVisible selector="{{RewardPointsCartSection.appliedNotice}}" time="30" stepKey="waitForAppliedNotice"/>
+    </actionGroup>
+</actionGroups>

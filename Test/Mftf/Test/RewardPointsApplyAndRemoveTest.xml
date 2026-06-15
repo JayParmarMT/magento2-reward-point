@@ -1,0 +1,55 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<tests xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+       xsi:noNamespaceSchemaLocation="urn:magento:mftf:Test/etc/testSchema.xsd">
+
+    <test name="RewardPointsApplyAndRemovePoints">
+        <annotations>
+            <features value="Meetanshi Reward Points"/>
+            <stories value="Cart Integration"/>
+            <title value="Customer can apply and then remove reward points in the cart"/>
+            <description value="Verifies the full apply/remove cycle: enter points amount, click Apply, confirm the applied-notice appears, click Remove, confirm the notice is gone."/>
+            <severity value="CRITICAL"/>
+            <group value="RewardPoints"/>
+        </annotations>
+
+        <before>
+            <createData entity="CustomerWithPoints" stepKey="createCustomer"/>
+            <createData entity="SimpleProductForEarnTest" stepKey="createProduct"/>
+        </before>
+
+        <after>
+            <actionGroup ref="StorefrontCustomerLogoutActionGroup" stepKey="logoutCustomer"/>
+            <deleteData createDataKey="createCustomer" stepKey="deleteCustomer"/>
+            <deleteData createDataKey="createProduct" stepKey="deleteProduct"/>
+        </after>
+
+        <!-- Log in -->
+        <actionGroup ref="LoginToStorefrontActionGroup" stepKey="loginToStorefront">
+            <argument name="Customer" value="$$createCustomer$$"/>
+        </actionGroup>
+
+        <!-- Add product to cart -->
+        <amOnPage url="/$$createProduct.custom_attributes[url_key]$$.html" stepKey="navigateToProductPage"/>
+        <waitForPageLoad time="30" stepKey="waitForProductPage"/>
+        <waitForElementClickable selector="{{StorefrontProductInfoMainSection.AddToCart}}" time="30" stepKey="waitForAddToCartBtn"/>
+        <click selector="{{StorefrontProductInfoMainSection.AddToCart}}" stepKey="clickAddToCart"/>
+        <waitForPageLoad time="30" stepKey="waitAfterAddToCart"/>
+        <waitForElementVisible selector="{{StorefrontCategoryMainSection.SuccessMsg}}" time="30" stepKey="waitForCartSuccessMsg"/>
+
+        <!-- Apply reward points via action group (defaults to 100 points) -->
+        <actionGroup ref="ApplyRewardPointsToCartActionGroup" stepKey="applyRewardPoints">
+            <argument name="pointsAmount" value="100"/>
+        </actionGroup>
+
+        <!-- Verify applied notice is visible with points-applied content -->
+        <seeElement selector="{{RewardPointsCartSection.appliedNotice}}" stepKey="verifyAppliedNoticeVisible"/>
+        <see selector="{{RewardPointsCartSection.appliedNotice}}" userInput="points applied" stepKey="verifyAppliedNoticeText"/>
+
+        <!-- Remove the applied points -->
+        <actionGroup ref="RemoveRewardPointsFromCartActionGroup" stepKey="removeRewardPoints"/>
+
+        <!-- Verify the applied-notice is gone after removal -->
+        <dontSeeElement selector="{{RewardPointsCartSection.appliedNotice}}" stepKey="verifyAppliedNoticeRemoved"/>
+    </test>
+
+</tests>

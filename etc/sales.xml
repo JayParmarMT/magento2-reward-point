@@ -1,0 +1,38 @@
+<?xml version="1.0"?>
+<config xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+        xsi:noNamespaceSchemaLocation="urn:magento:module:Magento_Sales:etc/sales.xsd">
+    <section name="quote">
+        <group name="totals">
+            <item name="reward_points"
+                  instance="Meetanshi\RewardPoints\Model\Total\Quote\Discount"
+                  sort_order="400"/>
+        </group>
+    </section>
+
+    <!--
+        Register reward-points total collector for invoices.
+        sort_order 125 — after discount (100), before shipping (150).
+        Subtracts reward_points_discount from the invoice grand total so the
+        displayed total matches what the customer actually paid.
+    -->
+    <section name="order_invoice">
+        <group name="totals">
+            <item name="meetanshi_rewardpoints"
+                  instance="Meetanshi\RewardPoints\Model\Order\Invoice\Total\RewardPoints"
+                  sort_order="125"/>
+        </group>
+    </section>
+
+    <!--
+        Register reward-points total collector for creditmemos.
+        sort_order 175 — after discount (150), before tax (250).
+    -->
+    <section name="order_creditmemo">
+        <group name="totals">
+            <item name="meetanshi_rewardpoints"
+                  instance="Meetanshi\RewardPoints\Model\Order\Creditmemo\Total\RewardPoints"
+                  sort_order="175"/>
+        </group>
+    </section>
+
+</config>

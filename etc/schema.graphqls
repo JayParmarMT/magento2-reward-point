@@ -1,0 +1,47 @@
+type Query {
+    meetanshiRewardPoints: MeetanshiRewardPointsAccount
+        @resolver(class: "Meetanshi\\RewardPoints\\Model\\Resolver\\Account")
+        @doc(description: "Get reward points account for current customer")
+        @cache(cacheable: false)
+    meetanshiRewardTiers: [MeetanshiRewardTier]
+        @resolver(class: "Meetanshi\\RewardPoints\\Model\\Resolver\\Tiers")
+        @doc(description: "Get all active reward tiers")
+        @cache(cacheIdentity: "Meetanshi\\RewardPoints\\Model\\Resolver\\TiersCacheIdentity")
+}
+
+type Mutation {
+    applyRewardPointsToCart(input: ApplyRewardPointsInput!): ApplyRewardPointsOutput
+        @resolver(class: "Meetanshi\\RewardPoints\\Model\\Resolver\\ApplyRewardPoints")
+        @doc(description: "Apply reward points to a cart")
+    removeRewardPointsFromCart(cartId: String!): Boolean
+        @resolver(class: "Meetanshi\\RewardPoints\\Model\\Resolver\\RemoveRewardPoints")
+        @doc(description: "Remove reward points from a cart")
+}
+
+type MeetanshiRewardPointsAccount {
+    balance: Int @doc(description: "Available points balance")
+    total_earned: Int @doc(description: "Total points ever earned")
+    total_spent: Int @doc(description: "Total points ever spent")
+    current_tier: MeetanshiRewardTier @doc(description: "Current loyalty tier")
+}
+
+type MeetanshiRewardTier {
+    tier_id: Int @doc(description: "Tier ID")
+    name: String @doc(description: "Tier name")
+    min_points: Int @doc(description: "Minimum points required for this tier")
+    earning_bonus_percent: Float @doc(description: "Earning bonus percentage")
+    spending_discount_percent: Float @doc(description: "Spending discount percentage")
+    free_shipping: Boolean @doc(description: "Whether this tier includes free shipping")
+}
+
+input ApplyRewardPointsInput {
+    cart_id: String! @doc(description: "Cart ID")
+    points: Int! @doc(description: "Number of points to apply")
+}
+
+type ApplyRewardPointsOutput {
+    success: Boolean @doc(description: "Whether points were successfully applied")
+    discount_amount: Float @doc(description: "Discount amount resulting from the applied points")
+    points_applied: Int @doc(description: "Number of points actually applied")
+    message: String @doc(description: "Status message")
+}

@@ -1,0 +1,16 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<listing xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+         xsi:noNamespaceSchemaLocation="urn:magento:module:Magento_Ui:etc/ui_configuration.xsd">
+    <columns name="customer_columns">
+        <column name="reward_points_balance"
+                class="Magento\Ui\Component\Listing\Columns\Column">
+            <settings>
+                <label translate="true">Reward Points</label>
+                <sortable>true</sortable>
+                <filter>textRange</filter>
+                <dataType>number</dataType>
+                <visible>true</visible>
+            </settings>
+        </column>
+    </columns>
+</listing>

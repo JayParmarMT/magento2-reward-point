@@ -1,0 +1,37 @@
+<?php
+/**
+ * Reward Points Export Template
+ *
+ * @var \Magento\Backend\Block\Template $block
+ * @var \Magento\Framework\Escaper $escaper
+ */
+?>
+<div class="admin__page-nav-title">
+    <h1 class="page-title"><?= $escaper->escapeHtml(__('Export Reward Points')) ?></h1>
+</div>
+
+<div class="admin__data-grid-outer-wrap">
+    <div style="padding:20px; background:#fff; border:1px solid #d6d6d6; margin-bottom:20px;">
+        <h3><?= $escaper->escapeHtml(__('Export Accounts')) ?></h3>
+        <p><?= $escaper->escapeHtml(__('Download a CSV file containing all customer reward point account balances.')) ?></p>
+        <p><?= $escaper->escapeHtml(__('Columns included: customer_email, website_code, points_balance, is_enabled')) ?></p>
+        <p>
+            <a href="<?= $escaper->escapeUrl($block->getUrl('meetanshi_rewardpoints/export/download', ['type' => 'accounts'])) ?>"
+               class="action-default scalable">
+                <?= $escaper->escapeHtml(__('Download Accounts CSV')) ?>
+            </a>
+        </p>
+    </div>
+
+    <div style="padding:20px; background:#fff; border:1px solid #d6d6d6;">
+        <h3><?= $escaper->escapeHtml(__('Export Transactions')) ?></h3>
+        <p><?= $escaper->escapeHtml(__('Download a CSV file containing all reward point transaction history.')) ?></p>
+        <p><?= $escaper->escapeHtml(__('Columns included: customer_email, website_code, points, action_code, comment, status, created_at')) ?></p>
+        <p>
+            <a href="<?= $escaper->escapeUrl($block->getUrl('meetanshi_rewardpoints/export/download', ['type' => 'transactions'])) ?>"
+               class="action-default scalable">
+                <?= $escaper->escapeHtml(__('Download Transactions CSV')) ?>
+            </a>
+        </p>
+    </div>
+</div>

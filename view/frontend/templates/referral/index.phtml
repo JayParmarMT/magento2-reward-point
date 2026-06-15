@@ -1,0 +1,382 @@
+<?php
+/**
+ * Referral Program Dashboard Template
+ *
+ * @var \Magento\Framework\View\Element\Template $block
+ * @var \Meetanshi\RewardPoints\ViewModel\Referral\Dashboard $viewModel
+ * @var \Magento\Framework\Escaper $escaper
+ */
+$viewModel = $block->getData('view_model');
+$escaper = $block->getData('escaper') ?? new \Magento\Framework\Escaper();
+$referralCode = $viewModel->getReferralCode();
+$referralUrl  = $viewModel->getReferralUrl();
+$invitations  = $viewModel->getInvitations();
+
+$statusLabels = [
+    'pending'   => __('Pending'),
+    'signed_up' => __('Signed Up'),
+    'completed' => __('Completed'),
+    'expired'   => __('Expired'),
+];
+$statusClasses = [
+    'pending'   => 'rref-badge rref-badge--pending',
+    'signed_up' => 'rref-badge rref-badge--signed',
+    'completed' => 'rref-badge rref-badge--completed',
+    'expired'   => 'rref-badge rref-badge--expired',
+];
+?>
+<style>
+.rref-page { font-family: inherit; font-size: 1rem; }
+
+/* Stats row */
+.rref-stats { display: grid; grid-template-columns: repeat(4, 1fr); gap: 1rem; margin-bottom: 1.75rem; }
+@media (max-width: 640px) { .rref-stats { grid-template-columns: repeat(2, 1fr); } }
+.rref-stat { background: #fff; border: 1px solid #e5e7eb; border-radius: 10px; padding: 1.25rem 1rem; text-align: center; }
+.rref-stat-value { display: block; font-size: 2rem; font-weight: 800; color: #1e3a5f; line-height: 1.1; }
+.rref-stat-label { display: block; font-size: 0.9rem; color: #6b7280; margin-top: 0.35rem; font-weight: 500; text-transform: uppercase; letter-spacing: 0.05em; }
+
+/* Card sections */
+.rref-card { background: #fff; border: 1px solid #e5e7eb; border-radius: 10px; padding: 1.75rem; margin-bottom: 1.5rem; }
+.rref-card-title { font-size: 1.2rem; font-weight: 700; color: #1f2937; margin: 0 0 1.25rem; display: flex; align-items: center; gap: 0.5rem; }
+.rref-card-title .rref-icon { font-size: 1.2rem; }
+
+/* Referral code box */
+.rref-code-box { display: flex; align-items: center; gap: 0.75rem; background: #f0f4ff; border: 1px solid #c7d2fe; border-radius: 8px; padding: 1rem 1.25rem; margin-bottom: 1.25rem; }
+.rref-code-value { font-size: 1.75rem; font-weight: 800; letter-spacing: 0.15em; color: #1e3a5f; flex: 1; }
+.rref-copy-code { background: #1e3a5f; color: #fff; border: none; border-radius: 6px; padding: 0.6rem 1.25rem; font-size: 1rem; font-weight: 600; cursor: pointer; transition: background 0.2s; white-space: nowrap; }
+.rref-copy-code:hover { background: #2d5f8e; }
+
+/* Share link */
+.rref-share-intro { font-size: 1rem; color: #6b7280; margin: 0 0 0.6rem; }
+.rref-link-wrap { display: flex; gap: 0.5rem; margin-bottom: 1.25rem; }
+.rref-link-input { flex: 1; border: 1px solid #d1d5db; border-radius: 6px; padding: 0.6rem 0.875rem; font-size: 1rem; color: #374151; background: #f9fafb; outline: none; min-width: 0; }
+.rref-copy-link { background: #f3f4f6; color: #374151; border: 1px solid #d1d5db; border-radius: 6px; padding: 0.6rem 1.1rem; font-size: 1rem; font-weight: 600; cursor: pointer; white-space: nowrap; transition: all 0.2s; }
+.rref-copy-link:hover { background: #e5e7eb; }
+.rref-copy-feedback { font-size: 0.95rem; color: #059669; margin-left: 0.25rem; display: none; align-self: center; }
+
+/* Social share */
+.rref-share-label { font-size: 0.9rem; font-weight: 600; color: #9ca3af; text-transform: uppercase; letter-spacing: 0.07em; margin-bottom: 0.75rem; }
+.rref-share-btns { display: flex; flex-wrap: wrap; gap: 0.6rem; }
+.rref-share-btn { display: inline-flex; align-items: center; gap: 0.4rem; padding: 0.55rem 1.1rem; border-radius: 6px; font-size: 0.975rem; font-weight: 600; text-decoration: none; transition: opacity 0.2s; }
+.rref-share-btn:hover { opacity: 0.85; text-decoration: none; }
+.rref-share-btn--facebook { background: #1877f2; color: #fff; }
+.rref-share-btn--twitter  { background: #000; color: #fff; }
+.rref-share-btn--email    { background: #6b7280; color: #fff; }
+.rref-share-btn--whatsapp  { background: #25d366; color: #fff; }
+.rref-share-btn--pinterest { background: #e60023; color: #fff; }
+
+/* Invite form */
+.rref-field { margin-bottom: 1.1rem; }
+.rref-label { display: block; font-size: 1rem; font-weight: 600; color: #374151; margin-bottom: 0.45rem; }
+.rref-label sup { color: #ef4444; }
+.rref-textarea { width: 100%; border: 1px solid #d1d5db; border-radius: 6px; padding: 0.7rem 0.875rem; font-size: 1rem; color: #1f2937; resize: vertical; min-height: 90px; outline: none; transition: border-color 0.2s; box-sizing: border-box; }
+.rref-textarea:focus { border-color: #1e3a5f; box-shadow: 0 0 0 3px rgba(30,58,95,0.12); }
+.rref-hint { font-size: 0.9rem; color: #9ca3af; margin-top: 0.3rem; }
+.rref-submit { background: #1e3a5f; color: #fff; border: none; border-radius: 6px; padding: 0.7rem 1.6rem; font-size: 1.05rem; font-weight: 600; cursor: pointer; transition: background 0.2s; }
+.rref-submit:hover { background: #2d5f8e; }
+.rref-submit:disabled { opacity: 0.6; cursor: not-allowed; }
+.rref-msg { margin-top: 0.875rem; padding: 0.7rem 1rem; border-radius: 6px; font-size: 1rem; font-weight: 500; display: none; }
+.rref-msg--success { background: #d1fae5; color: #065f46; }
+.rref-msg--error   { background: #fee2e2; color: #991b1b; }
+
+/* History table */
+.rref-table-wrap { border: 1px solid #e5e7eb; border-radius: 8px; overflow: hidden; }
+.rref-table { width: 100%; border-collapse: collapse; font-size: 1.05rem; }
+.rref-table thead { background: #f9fafb; }
+.rref-table thead th { padding: 0.9rem 1rem; text-align: left; font-size: 0.875rem; font-weight: 700; text-transform: uppercase; letter-spacing: 0.06em; color: #6b7280; border-bottom: 1px solid #e5e7eb; white-space: nowrap; }
+.rref-table tbody tr { border-bottom: 1px solid #f3f4f6; transition: background 0.15s; }
+.rref-table tbody tr:last-child { border-bottom: none; }
+.rref-table tbody tr:hover { background: #fafafa; }
+.rref-table td { padding: 0.95rem 1rem; color: #374151; vertical-align: middle; font-size: 1.05rem; }
+.rref-badge { display: inline-flex; align-items: center; padding: 0.28rem 0.75rem; border-radius: 99px; font-size: 0.875rem; font-weight: 600; }
+.rref-badge--pending   { background: #fef3c7; color: #92400e; }
+.rref-badge--signed    { background: #dbeafe; color: #1e40af; }
+.rref-badge--completed { background: #d1fae5; color: #065f46; }
+.rref-badge--expired   { background: #f3f4f6; color: #6b7280; }
+.rref-pts { font-weight: 700; color: #059669; font-size: 1.05rem; }
+.rref-date { font-size: 0.95rem; color: #9ca3af; }
+.rref-empty { text-align: center; padding: 2.5rem 1.5rem; }
+.rref-empty-icon { font-size: 2.5rem; margin-bottom: 0.75rem; }
+.rref-empty p { color: #9ca3af; font-size: 1.05rem; margin: 0; }
+
+@media (max-width: 640px) {
+    .rref-table thead { display: none; }
+    .rref-table td { display: flex; justify-content: space-between; padding: 0.55rem 1rem; border-bottom: 1px solid #f0f0f0; }
+    .rref-table td::before { content: attr(data-th); font-weight: 600; font-size: 0.875rem; color: #9ca3af; text-transform: uppercase; }
+    .rref-table tr { display: block; border-bottom: 2px solid #f0f0f0; padding: 0.25rem 0; }
+    .rref-code-value { font-size: 1.4rem; }
+}
+</style>
+
+<div class="rref-page">
+
+    <!-- Stats -->
+    <div class="rref-stats">
+        <div class="rref-stat">
+            <span class="rref-stat-value"><?= $escaper->escapeHtml((string) $viewModel->getSentCount()) ?></span>
+            <span class="rref-stat-label"><?= $escaper->escapeHtml(__('Invites Sent')) ?></span>
+        </div>
+        <div class="rref-stat">
+            <span class="rref-stat-value"><?= $escaper->escapeHtml((string) $viewModel->getSignedUpCount()) ?></span>
+            <span class="rref-stat-label"><?= $escaper->escapeHtml(__('Signed Up')) ?></span>
+        </div>
+        <div class="rref-stat">
+            <span class="rref-stat-value"><?= $escaper->escapeHtml((string) $viewModel->getOrderedCount()) ?></span>
+            <span class="rref-stat-label"><?= $escaper->escapeHtml(__('Ordered')) ?></span>
+        </div>
+        <div class="rref-stat">
+            <span class="rref-stat-value"><?= $escaper->escapeHtml((string) $viewModel->getTotalReferrerPointsEarned()) ?></span>
+            <span class="rref-stat-label"><?= $escaper->escapeHtml(__('Points Earned')) ?></span>
+        </div>
+    </div>
+
+    <?php if (!empty($referralCode)): ?>
+    <!-- Your Referral Code -->
+    <div class="rref-card">
+        <h3 class="rref-card-title">
+            <span class="rref-icon">🎁</span>
+            <?= $escaper->escapeHtml(__('Your Referral Code')) ?>
+        </h3>
+        <div class="rref-code-box">
+            <span class="rref-code-value" id="rref-code-text"><?= $escaper->escapeHtml($referralCode) ?></span>
+            <button type="button" class="rref-copy-code" id="rref-copy-code-btn">
+                <?= $escaper->escapeHtml(__('Copy Code')) ?>
+            </button>
+        </div>
+
+        <?php if (!empty($referralUrl)): ?>
+        <p class="rref-share-intro"><?= $escaper->escapeHtml(__('Or share your referral link:')) ?></p>
+        <div class="rref-link-wrap">
+            <input type="text" id="rref-url-input" class="rref-link-input"
+                   value="<?= $escaper->escapeHtmlAttr($referralUrl) ?>" readonly>
+            <button type="button" class="rref-copy-link" id="rref-copy-link-btn">
+                <?= $escaper->escapeHtml(__('Copy Link')) ?>
+            </button>
+            <span class="rref-copy-feedback" id="rref-copy-feedback">✓ <?= $escaper->escapeHtml(__('Copied!')) ?></span>
+        </div>
+
+        <p class="rref-share-label"><?= $escaper->escapeHtml(__('Share via')) ?></p>
+        <div class="rref-share-btns">
+            <?php if ($viewModel->isFacebookEnabled()): ?>
+            <a href="https://www.facebook.com/sharer/sharer.php?u=<?= $escaper->escapeUrl($referralUrl) ?>"
+               target="_blank" rel="noopener noreferrer" class="rref-share-btn rref-share-btn--facebook">
+                📘 <?= $escaper->escapeHtml(__('Facebook')) ?>
+            </a>
+            <?php endif; ?>
+            <?php if ($viewModel->isTwitterEnabled()): ?>
+            <a href="https://twitter.com/intent/tweet?url=<?= $escaper->escapeUrl($referralUrl) ?>&text=<?= $escaper->escapeUrl(__('Sign up and earn rewards with my referral link!')) ?>"
+               target="_blank" rel="noopener noreferrer" class="rref-share-btn rref-share-btn--twitter">
+                𝕏 <?= $escaper->escapeHtml(__('Twitter / X')) ?>
+            </a>
+            <?php endif; ?>
+            <?php if ($viewModel->isPinterestEnabled()): ?>
+            <a href="https://pinterest.com/pin/create/button/?url=<?= $escaper->escapeUrl($referralUrl) ?>&description=<?= $escaper->escapeUrl(__('Sign up and earn rewards with my referral link!')) ?>"
+               target="_blank" rel="noopener noreferrer" class="rref-share-btn rref-share-btn--pinterest">
+                📌 <?= $escaper->escapeHtml(__('Pinterest')) ?>
+            </a>
+            <?php endif; ?>
+            <a href="https://wa.me/?text=<?= $escaper->escapeUrl(__('Sign up and earn rewards! ') . $referralUrl) ?>"
+               target="_blank" rel="noopener noreferrer" class="rref-share-btn rref-share-btn--whatsapp">
+                💬 <?= $escaper->escapeHtml(__('WhatsApp')) ?>
+            </a>
+            <a href="mailto:?subject=<?= $escaper->escapeUrl(__('Join me and earn rewards!')) ?>&body=<?= $escaper->escapeUrl(__('Use my referral link to sign up: ') . $referralUrl) ?>"
+               class="rref-share-btn rref-share-btn--email">
+                ✉️ <?= $escaper->escapeHtml(__('Email')) ?>
+            </a>
+        </div>
+        <?php endif; ?>
+    </div>
+    <?php endif; ?>
+
+    <!-- Send Invitation -->
+    <div class="rref-card">
+        <h3 class="rref-card-title">
+            <span class="rref-icon">📨</span>
+            <?= $escaper->escapeHtml(__('Invite Friends')) ?>
+        </h3>
+        <form id="rref-invite-form"
+              action="<?= $escaper->escapeUrl($block->getUrl('rewardpoints/referral/sendInvitation')) ?>"
+              method="post">
+            <?= /* @noEscape */ $block->getBlockHtml('formkey') ?>
+            <div class="rref-field">
+                <label class="rref-label" for="rref-emails">
+                    <?= $escaper->escapeHtml(__('Email Addresses')) ?> <sup>*</sup>
+                </label>
+                <textarea id="rref-emails" name="emails" class="rref-textarea"
+                          placeholder="<?= $escaper->escapeHtmlAttr(__('friend@example.com, another@example.com')) ?>"></textarea>
+                <p class="rref-hint"><?= $escaper->escapeHtml(__('Separate multiple addresses with commas or new lines.')) ?></p>
+            </div>
+            <div class="rref-field">
+                <label class="rref-label" for="rref-message">
+                    <?= $escaper->escapeHtml(__('Personal Message')) ?>
+                    <span style="font-weight:400;color:#9ca3af;font-size:0.95rem;"><?= $escaper->escapeHtml(__('(optional)')) ?></span>
+                </label>
+                <textarea id="rref-message" name="message" class="rref-textarea" rows="3"
+                          placeholder="<?= $escaper->escapeHtmlAttr(__('Add a personal note to your invitation...')) ?>"></textarea>
+            </div>
+            <button type="submit" class="rref-submit" id="rref-submit-btn">
+                <?= $escaper->escapeHtml(__('Send Invitations')) ?>
+            </button>
+            <div class="rref-msg rref-msg--success" id="rref-msg-success"></div>
+            <div class="rref-msg rref-msg--error" id="rref-msg-error"></div>
+        </form>
+    </div>
+
+    <!-- Invitation History -->
+    <div class="rref-card">
+        <h3 class="rref-card-title">
+            <span class="rref-icon">📋</span>
+            <?= $escaper->escapeHtml(__('Invitation History')) ?>
+        </h3>
+        <?php if (!empty($invitations)): ?>
+        <div class="rref-table-wrap">
+            <table class="rref-table">
+                <thead>
+                    <tr>
+                        <th><?= $escaper->escapeHtml(__('Email')) ?></th>
+                        <th><?= $escaper->escapeHtml(__('Status')) ?></th>
+                        <th><?= $escaper->escapeHtml(__('Points Earned')) ?></th>
+                        <th><?= $escaper->escapeHtml(__('Date Sent')) ?></th>
+                    </tr>
+                </thead>
+                <tbody>
+                    <?php foreach ($invitations as $invitation): ?>
+                    <?php
+                        $invStatus = (string) $invitation->getStatus();
+                        $invBadge  = $statusClasses[$invStatus] ?? 'rref-badge rref-badge--pending';
+                        $invLabel  = (string) ($statusLabels[$invStatus] ?? ucfirst($invStatus));
+                    ?>
+                    <tr>
+                        <td data-th="<?= $escaper->escapeHtmlAttr(__('Email')) ?>">
+                            <?= $escaper->escapeHtml((string) $invitation->getRefereeEmail()) ?>
+                        </td>
+                        <td data-th="<?= $escaper->escapeHtmlAttr(__('Status')) ?>">
+                            <span class="<?= $escaper->escapeHtmlAttr($invBadge) ?>"><?= $escaper->escapeHtml($invLabel) ?></span>
+                        </td>
+                        <td data-th="<?= $escaper->escapeHtmlAttr(__('Points Earned')) ?>">
+                            <?php $pts = (int) $invitation->getReferrerPointsEarned(); ?>
+                            <?php if ($pts > 0): ?>
+                            <span class="rref-pts">+<?= $escaper->escapeHtml((string) $pts) ?></span>
+                            <?php else: ?>
+                            <span style="color:#9ca3af;">—</span>
+                            <?php endif; ?>
+                        </td>
+                        <td data-th="<?= $escaper->escapeHtmlAttr(__('Date Sent')) ?>">
+                            <span class="rref-date">
+                                <?= $escaper->escapeHtml(
+                                    $invitation->getCreatedAt()
+                                        ? date('M d, Y', strtotime((string) $invitation->getCreatedAt()))
+                                        : '—'
+                                ) ?>
+                            </span>
+                        </td>
+                    </tr>
+                    <?php endforeach; ?>
+                </tbody>
+            </table>
+        </div>
+        <?php else: ?>
+        <div class="rref-empty">
+            <div class="rref-empty-icon">👥</div>
+            <p><?= $escaper->escapeHtml(__("You haven't sent any invitations yet. Start inviting friends to earn points!")) ?></p>
+        </div>
+        <?php endif; ?>
+    </div>
+
+</div>
+
+<script>
+(function () {
+    'use strict';
+
+    function copyToClipboard(text, btn, successText) {
+        var original = btn.textContent;
+        var done = function () {
+            btn.textContent = successText;
+            setTimeout(function () { btn.textContent = original; }, 2000);
+        };
+        if (navigator.clipboard) {
+            navigator.clipboard.writeText(text).then(done);
+        } else {
+            var el = document.createElement('textarea');
+            el.value = text;
+            document.body.appendChild(el);
+            el.select();
+            document.execCommand('copy');
+            document.body.removeChild(el);
+            done();
+        }
+    }
+
+    var copyCodeBtn = document.getElementById('rref-copy-code-btn');
+    if (copyCodeBtn) {
+        copyCodeBtn.addEventListener('click', function () {
+            var codeEl = document.getElementById('rref-code-text');
+            if (codeEl) {
+                copyToClipboard(codeEl.textContent.trim(), copyCodeBtn, '<?= $escaper->escapeJs(__('Code Copied!')) ?>');
+            }
+        });
+    }
+
+    var copyLinkBtn = document.getElementById('rref-copy-link-btn');
+    if (copyLinkBtn) {
+        copyLinkBtn.addEventListener('click', function () {
+            var urlInput = document.getElementById('rref-url-input');
+            var feedback = document.getElementById('rref-copy-feedback');
+            if (urlInput) {
+                copyToClipboard(urlInput.value, copyLinkBtn, '<?= $escaper->escapeJs(__('Link Copied!')) ?>');
+            }
+            if (feedback) {
+                feedback.style.display = 'inline';
+                setTimeout(function () { feedback.style.display = 'none'; }, 2000);
+            }
+        });
+    }
+
+    var form = document.getElementById('rref-invite-form');
+    if (form) {
+        form.addEventListener('submit', function (e) {
+            e.preventDefault();
+            var btn     = document.getElementById('rref-submit-btn');
+            var success = document.getElementById('rref-msg-success');
+            var error   = document.getElementById('rref-msg-error');
+
+            success.style.display = 'none';
+            error.style.display   = 'none';
+            btn.disabled = true;
+            btn.textContent = '<?= $escaper->escapeJs(__('Sending…')) ?>';
+
+            var data = new URLSearchParams(new FormData(form));
+
+            fetch(form.getAttribute('action'), {
+                method: 'POST',
+                headers: {'Content-Type': 'application/x-www-form-urlencoded', 'X-Requested-With': 'XMLHttpRequest'},
+                body: data
+            })
+            .then(function (r) { return r.json(); })
+            .then(function (res) {
+                var extra = (res.errors && res.errors.length) ? ' ' + res.errors.join(' ') : '';
+                if (res.success) {
+                    success.textContent = res.message + extra;
+                    success.style.display = 'block';
+                    var emails  = document.getElementById('rref-emails');
+                    var message = document.getElementById('rref-message');
+                    if (emails)  { emails.value  = ''; }
+                    if (message) { message.value = ''; }
+                } else {
+                    error.textContent = res.message + extra;
+                    error.style.display = 'block';
+                }
+            })
+            .catch(function () {
+                error.textContent = '<?= $escaper->escapeJs(__('An error occurred. Please try again.')) ?>';
+                error.style.display = 'block';
+            })
+            .finally(function () {
+                btn.disabled = false;
+                btn.textContent = '<?= $escaper->escapeJs(__('Send Invitations')) ?>';
+            });
+        });
+    }
+}());
+</script>

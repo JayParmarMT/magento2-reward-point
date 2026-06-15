@@ -1,0 +1,19 @@
+<?xml version="1.0"?>
+<!--
+    Hyvä-specific category listing earn message placement.
+
+    On Hyvä, category.product.type.details.renderers.default does not exist.
+    The earn message is injected after the product price via the
+    catalog.product.type.details block, which Hyvä does render.
+-->
+<page xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+      xsi:noNamespaceSchemaLocation="urn:magento:framework:View/Layout/etc/page_configuration.xsd">
+    <body>
+        <referenceBlock name="catalog.product.type.details">
+            <block class="Meetanshi\RewardPoints\Block\Frontend\Catalog\EarnMessageListing"
+                   name="rewardpoints.earn.message.listing.hyva"
+                   template="Meetanshi_RewardPoints::catalog/earn_message.phtml"
+                   after="product.price.final"/>
+        </referenceBlock>
+    </body>
+</page>

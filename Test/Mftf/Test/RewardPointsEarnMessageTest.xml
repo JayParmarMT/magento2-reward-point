@@ -1,0 +1,50 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<tests xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+       xsi:noNamespaceSchemaLocation="urn:magento:mftf:Test/etc/testSchema.xsd">
+
+    <!--
+        Test 1: The earn-message block (.reward-points-earn-message) is visible on a product page
+        for a logged-in customer when the extension is enabled and the earning rate is configured.
+    -->
+    <test name="RewardPointsEarnMessageVisibleOnProductPage">
+        <annotations>
+            <features value="Meetanshi Reward Points"/>
+            <stories value="Product Page Earn Message"/>
+            <title value="Earn points message is visible on the product detail page"/>
+            <description value="Verifies that the .reward-points-earn-message container is rendered and visible on a product page when a logged-in customer views it. Requires the extension to be enabled and an earning rate to be configured in admin."/>
+            <severity value="MAJOR"/>
+            <group value="RewardPoints"/>
+        </annotations>
+
+        <before>
+            <createData entity="CustomerWithPoints" stepKey="createCustomer"/>
+            <createData entity="SimpleProductForEarnTest" stepKey="createProduct"/>
+        </before>
+
+        <after>
+            <actionGroup ref="StorefrontCustomerLogoutActionGroup" stepKey="logoutCustomer"/>
+            <deleteData createDataKey="createCustomer" stepKey="deleteCustomer"/>
+            <deleteData createDataKey="createProduct" stepKey="deleteProduct"/>
+        </after>
+
+        <!-- Log in to storefront -->
+        <actionGroup ref="LoginToStorefrontActionGroup" stepKey="loginToStorefront">
+            <argument name="Customer" value="$$createCustomer$$"/>
+        </actionGroup>
+
+        <!-- Navigate to the product detail page -->
+        <amOnPage url="/$$createProduct.custom_attributes[url_key]$$.html" stepKey="navigateToProductPage"/>
+        <waitForPageLoad time="30" stepKey="waitForProductPageLoad"/>
+
+        <!-- Scroll to where the earn message renders (below the add-to-cart area) -->
+        <scrollTo selector="{{RewardPointsEarnMessageSection.earnMessage}}" stepKey="scrollToEarnMessage"/>
+
+        <!-- Assert the earn message container is visible -->
+        <waitForElementVisible selector="{{RewardPointsEarnMessageSection.earnMessage}}" time="15" stepKey="waitForEarnMessageVisible"/>
+        <seeElement selector="{{RewardPointsEarnMessageSection.earnMessage}}" stepKey="seeEarnMessageContainer"/>
+
+        <!-- Assert at least one earn item is present inside the container -->
+        <seeElement selector="{{RewardPointsEarnMessageSection.earnItem}}" stepKey="seeAtLeastOneEarnItem"/>
+    </test>
+
+</tests>

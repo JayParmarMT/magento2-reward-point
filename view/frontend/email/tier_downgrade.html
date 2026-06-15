@@ -1,0 +1,39 @@
+<!--@subject Your Reward Tier Has Been Updated @-->
+<!--@vars {
+"var customer.name":"Customer Name",
+"var old_tier":"Previous Tier Name",
+"var new_tier":"New Tier Name",
+"var new_balance":"New Balance",
+"var store_name":"Store Name"
+} @-->
+
+{{template config_path="design/email/header_template"}}
+
+<table>
+    <tr>
+        <td>
+            <p>{{trans "Dear %name," name=$customer.name}}</p>
+            <p>{{trans "We wanted to let you know that your reward tier at %store_name has been updated." store_name=$store_name}}</p>
+
+            <table cellspacing="0" cellpadding="5" border="0" width="100%">
+                <tr>
+                    <td><strong>{{trans "Previous Tier"}}</strong></td>
+                    <td>{{var old_tier}}</td>
+                </tr>
+                <tr>
+                    <td><strong>{{trans "Current Tier"}}</strong></td>
+                    <td>{{var new_tier}}</td>
+                </tr>
+                <tr>
+                    <td><strong>{{trans "Current Balance"}}</strong></td>
+                    <td>{{var new_balance}} {{trans "points"}}</td>
+                </tr>
+            </table>
+
+            <p>{{trans "Keep shopping and earning points to regain your previous tier and unlock exclusive benefits!"}}</p>
+            <p>{{trans "Thank you for your continued support of %store_name." store_name=$store_name}}</p>
+        </td>
+    </tr>
+</table>
+
+{{template config_path="design/email/footer_template"}}

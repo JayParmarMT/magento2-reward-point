@@ -1,0 +1,131 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<listing xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+         xsi:noNamespaceSchemaLocation="urn:magento:module:Magento_Ui:etc/ui_configuration.xsd">
+
+    <argument name="data" xsi:type="array">
+        <item name="js_config" xsi:type="array">
+            <item name="provider" xsi:type="string">meetanshi_rewardpoints_referral_invitation_listing.meetanshi_rewardpoints_referral_invitation_listing_data_source</item>
+        </item>
+    </argument>
+
+    <settings>
+        <spinner>meetanshi_rewardpoints_referral_invitation_listing_columns</spinner>
+        <deps>
+            <dep>meetanshi_rewardpoints_referral_invitation_listing.meetanshi_rewardpoints_referral_invitation_listing_data_source</dep>
+        </deps>
+    </settings>
+
+    <dataSource name="meetanshi_rewardpoints_referral_invitation_listing_data_source" component="Magento_Ui/js/grid/provider">
+        <settings>
+            <storageConfig>
+                <param name="indexField" xsi:type="string">invitation_id</param>
+            </storageConfig>
+            <updateUrl path="mui/index/render"/>
+        </settings>
+        <aclResource>Meetanshi_RewardPoints::referral_invitation</aclResource>
+        <dataProvider class="Meetanshi\RewardPoints\Ui\DataProvider\ReferralInvitation\ListingDataProvider"
+                      name="meetanshi_rewardpoints_referral_invitation_listing_data_source">
+            <settings>
+                <requestFieldName>invitation_id</requestFieldName>
+                <primaryFieldName>invitation_id</primaryFieldName>
+            </settings>
+        </dataProvider>
+    </dataSource>
+
+    <listingToolbar name="listing_top">
+        <settings>
+            <sticky>true</sticky>
+        </settings>
+        <bookmark name="bookmarks"/>
+        <columnsControls name="columns_controls"/>
+        <filterSearch name="fulltext"/>
+        <filters name="listing_filters"/>
+        <paging name="listing_paging"/>
+    </listingToolbar>
+
+    <columns name="meetanshi_rewardpoints_referral_invitation_listing_columns">
+        <selectionsColumn name="ids">
+            <settings>
+                <indexField>invitation_id</indexField>
+            </settings>
+        </selectionsColumn>
+
+        <column name="invitation_id">
+            <settings>
+                <filter>textRange</filter>
+                <label translate="true">ID</label>
+                <sorting>asc</sorting>
+            </settings>
+        </column>
+
+        <column name="referrer_email">
+            <settings>
+                <filter>text</filter>
+                <label translate="true">Referrer Email</label>
+            </settings>
+        </column>
+
+        <column name="referee_email">
+            <settings>
+                <filter>text</filter>
+                <label translate="true">Referee Email</label>
+            </settings>
+        </column>
+
+        <column name="referral_code">
+            <settings>
+                <filter>text</filter>
+                <label translate="true">Referral Code</label>
+            </settings>
+        </column>
+
+        <column name="status" component="Meetanshi_RewardPoints/js/grid/columns/invitation-status">
+            <settings>
+                <filter>select</filter>
+                <dataType>select</dataType>
+                <label translate="true">Status</label>
+                <options class="Meetanshi\RewardPoints\Model\Source\InvitationStatus"/>
+            </settings>
+        </column>
+
+        <column name="referrer_points_earned">
+            <settings>
+                <filter>textRange</filter>
+                <label translate="true">Referrer Points Earned</label>
+            </settings>
+        </column>
+
+        <column name="referee_points_earned">
+            <settings>
+                <filter>textRange</filter>
+                <label translate="true">Referee Points Earned</label>
+            </settings>
+        </column>
+
+        <column name="referee_discount_earned">
+            <settings>
+                <filter>textRange</filter>
+                <label translate="true">Referee Discount Earned</label>
+            </settings>
+        </column>
+
+        <column name="website_id">
+            <settings>
+                <filter>textRange</filter>
+                <label translate="true">Website ID</label>
+            </settings>
+        </column>
+
+        <column name="created_at" class="Magento\Ui\Component\Listing\Columns\Date"
+                component="Magento_Ui/js/grid/columns/date">
+            <settings>
+                <filter>dateRange</filter>
+                <dataType>date</dataType>
+                <dateFormat>MMM d, YYYY h:mm:ss A</dateFormat>
+                <label translate="true">Created At</label>
+            </settings>
+        </column>
+
+    </columns>
+
+</listing>

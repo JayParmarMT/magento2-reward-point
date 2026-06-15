@@ -1,0 +1,316 @@
+<?php
+/**
+ * Reward Points Report Chart Template
+ *
+ * @var \Magento\Backend\Block\Template $block
+ * @var \Magento\Framework\Escaper $escaper
+ */
+
+$reportType   = $block->getData('report_type');
+$period       = $block->getRequest()->getParam('period', 'day');
+$chartData    = $block->getChartData($period);
+$isEarned     = ($reportType === 'earned');
+$total        = $isEarned ? $block->getTotalEarned() : $block->getTotalSpent();
+$accentColor  = $isEarned ? '#1979c3' : '#e22626';
+$accentLight  = $isEarned ? 'rgba(25,121,195,0.15)' : 'rgba(226,38,38,0.15)';
+$accentBorder = $isEarned ? 'rgba(25,121,195,0.9)'  : 'rgba(226,38,38,0.9)';
+$chartLabel   = $isEarned ? __('Points Earned') : __('Points Spent');
+$icon         = $isEarned ? '⬆' : '⬇';
+
+$periodLabels = ['day' => __('Day'), 'week' => __('Week'), 'month' => __('Month')];
+$avgPoints    = count($chartData) > 0 ? (int) round($total / count($chartData)) : 0;
+$peakRow      = !empty($chartData)
+    ? array_reduce($chartData, fn($c, $r) => ($r['points'] > ($c['points'] ?? 0)) ? $r : $c, [])
+    : null;
+?>
+
+<style>
+.rp-report-wrap{font-family:-apple-system,BlinkMacSystemFont,"Segoe UI",Roboto,sans-serif;padding:0 0 30px}
+.rp-toolbar{display:flex;align-items:center;gap:8px;background:#fff;border:1px solid #e3e3e3;border-radius:6px;padding:14px 20px;margin-bottom:20px;box-shadow:0 1px 3px rgba(0,0,0,.05)}
+.rp-toolbar strong{color:#333;margin-right:4px;font-size:13px}
+.rp-period-btn{display:inline-block;padding:6px 18px;border-radius:4px;border:1px solid #d0d0d0;background:#fff;color:#555;font-size:13px;text-decoration:none;transition:all .15s;font-weight:500}
+.rp-period-btn:hover{background:#f5f5f5;border-color:#b0b0b0;color:#222;text-decoration:none}
+.rp-period-btn.active{background:#404040;border-color:#404040;color:#fff;font-weight:600;box-shadow:0 1px 3px rgba(0,0,0,.18)}
+.rp-stats{display:grid;grid-template-columns:repeat(3,1fr);gap:16px;margin-bottom:20px}
+.rp-stat-card{background:#fff;border:1px solid #e3e3e3;border-radius:8px;padding:20px 24px;box-shadow:0 1px 3px rgba(0,0,0,.05);display:flex;align-items:center;gap:16px}
+.rp-stat-icon{width:48px;height:48px;border-radius:50%;background:<?= $escaper->escapeHtmlAttr($accentLight) ?>;display:flex;align-items:center;justify-content:center;font-size:22px;flex-shrink:0}
+.rp-stat-value{font-size:28px;font-weight:700;color:#333;line-height:1.1}
+.rp-stat-label{font-size:12px;color:#888;margin-top:3px;text-transform:uppercase;letter-spacing:.5px}
+.rp-stat-sub{font-size:11px;color:#aaa;margin-top:2px}
+.rp-chart-card{background:#fff;border:1px solid #e3e3e3;border-radius:8px;padding:24px;margin-bottom:20px;box-shadow:0 1px 3px rgba(0,0,0,.05)}
+.rp-chart-card h3{font-size:13px;font-weight:600;color:#666;margin:0 0 16px;text-transform:uppercase;letter-spacing:.5px}
+.rp-table-card{background:#fff;border:1px solid #e3e3e3;border-radius:8px;overflow:hidden;box-shadow:0 1px 3px rgba(0,0,0,.05)}
+.rp-table-card h3{font-size:13px;font-weight:600;color:#666;margin:0;padding:14px 20px;border-bottom:1px solid #e3e3e3;text-transform:uppercase;letter-spacing:.5px;background:#fafafa}
+.rp-table{width:100%;border-collapse:collapse;font-size:13px}
+.rp-table thead th{background:#fafafa;padding:10px 20px;text-align:left;font-weight:600;color:#555;font-size:12px;text-transform:uppercase;letter-spacing:.4px;border-bottom:2px solid #e3e3e3}
+.rp-table thead th:last-child{text-align:right}
+.rp-table tbody tr{border-bottom:1px solid #f0f0f0;transition:background .1s}
+.rp-table tbody tr:hover{background:#f9f9f9}
+.rp-table tbody td{padding:10px 20px;color:#444}
+.rp-table tbody td:last-child{text-align:right;font-weight:500}
+.rp-table tfoot td{padding:10px 20px;font-weight:700;background:#fafafa;border-top:2px solid #e3e3e3;color:#333}
+.rp-table tfoot td:last-child{text-align:right;color:<?= $escaper->escapeHtmlAttr($accentColor) ?>}
+.rp-badge{display:inline-block;padding:3px 10px;border-radius:12px;font-size:12px;font-weight:600;background:<?= $escaper->escapeHtmlAttr($accentLight) ?>;color:<?= $escaper->escapeHtmlAttr($accentColor) ?>}
+.rp-empty{text-align:center;padding:40px 20px;color:#aaa;font-size:14px}
+.rp-empty-icon{font-size:40px;display:block;margin-bottom:10px}
+#rpChartTooltip{position:fixed;background:rgba(30,30,30,.88);color:#fff;padding:7px 12px;border-radius:5px;font-size:12px;pointer-events:none;display:none;white-space:nowrap;z-index:9999}
+</style>
+
+<div class="rp-report-wrap">
+
+    <!-- Period toolbar -->
+    <div class="rp-toolbar">
+        <strong><?= $escaper->escapeHtml(__('Group By:')) ?></strong>
+        <?php foreach ($periodLabels as $p => $label): ?>
+            <a href="?period=<?= $escaper->escapeUrl($p) ?>"
+               class="rp-period-btn<?= /* @noEscape */ $period === $p ? ' active' : '' ?>">
+                <?= $escaper->escapeHtml($label) ?>
+            </a>
+        <?php endforeach; ?>
+    </div>
+
+    <!-- Stat cards -->
+    <div class="rp-stats">
+        <div class="rp-stat-card">
+            <div class="rp-stat-icon"><?= /* @noEscape */ $icon ?></div>
+            <div>
+                <div class="rp-stat-value"><?= /* @noEscape */ number_format($total) ?></div>
+                <div class="rp-stat-label"><?= $escaper->escapeHtml(__('Total Points')) ?></div>
+            </div>
+        </div>
+        <div class="rp-stat-card">
+            <div class="rp-stat-icon">📅</div>
+            <div>
+                <div class="rp-stat-value"><?= /* @noEscape */ number_format($avgPoints) ?></div>
+                <div class="rp-stat-label"><?= $escaper->escapeHtml(__('Avg per Period')) ?></div>
+            </div>
+        </div>
+        <div class="rp-stat-card">
+            <div class="rp-stat-icon">🏆</div>
+            <div>
+                <div class="rp-stat-value"><?= /* @noEscape */ $peakRow ? number_format((int) $peakRow['points']) : 0 ?></div>
+                <div class="rp-stat-label"><?= $escaper->escapeHtml(__('Peak Period')) ?></div>
+                <?php if ($peakRow): ?>
+                    <div class="rp-stat-sub"><?= $escaper->escapeHtml($peakRow['date']) ?></div>
+                <?php endif; ?>
+            </div>
+        </div>
+    </div>
+
+    <!-- Chart -->
+    <div class="rp-chart-card">
+        <h3><?= $escaper->escapeHtml($chartLabel) ?> &mdash; <?= $escaper->escapeHtml($periodLabels[$period]) ?></h3>
+        <?php if (empty($chartData)): ?>
+            <div class="rp-empty">
+                <span class="rp-empty-icon">📊</span>
+                <?= $escaper->escapeHtml(__('No data available for the selected period.')) ?>
+            </div>
+        <?php else: ?>
+            <canvas id="rpChart" style="display:block;width:100%;"></canvas>
+        <?php endif; ?>
+    </div>
+
+    <!-- Data table -->
+    <div class="rp-table-card">
+        <h3><?= $escaper->escapeHtml(__('Breakdown')) ?></h3>
+        <?php if (empty($chartData)): ?>
+            <div class="rp-empty">
+                <span class="rp-empty-icon">📋</span>
+                <?= $escaper->escapeHtml(__('No records found.')) ?>
+            </div>
+        <?php else: ?>
+            <table class="rp-table">
+                <thead>
+                    <tr>
+                        <th><?= $escaper->escapeHtml(__('Period')) ?></th>
+                        <th><?= $escaper->escapeHtml($chartLabel) ?></th>
+                    </tr>
+                </thead>
+                <tbody>
+                    <?php foreach ($chartData as $row): ?>
+                        <tr>
+                            <td><?= $escaper->escapeHtml($row['date']) ?></td>
+                            <td><span class="rp-badge"><?= /* @noEscape */ number_format((int) $row['points']) ?> pts</span></td>
+                        </tr>
+                    <?php endforeach; ?>
+                </tbody>
+                <tfoot>
+                    <tr>
+                        <td><?= $escaper->escapeHtml(__('Total')) ?></td>
+                        <td><?= /* @noEscape */ number_format((int) $total) ?> pts</td>
+                    </tr>
+                </tfoot>
+            </table>
+        <?php endif; ?>
+    </div>
+
+</div>
+
+<div id="rpChartTooltip"></div>
+
+<?php if (!empty($chartData)): ?>
+<script>
+require(['jquery'], function ($) {
+    'use strict';
+
+    var RAW         = <?= /* @noEscape */ json_encode(array_values($chartData)) ?>;
+    var FILL_COLOR  = '<?= $escaper->escapeJs($accentLight) ?>';
+    var BAR_COLOR   = '<?= $escaper->escapeJs($accentBorder) ?>';
+    var labels      = RAW.map(function(r){ return r.date; });
+    var values      = RAW.map(function(r){ return parseInt(r.points, 10); });
+    var maxVal      = Math.max.apply(null, values) || 1;
+
+    var canvas      = document.getElementById('rpChart');
+    if (!canvas) { return; }
+
+    var DPR    = window.devicePixelRatio || 1;
+    var W      = canvas.parentElement.clientWidth || 800;
+    var H      = 300;
+    var PAD    = { top: 24, right: 20, bottom: 52, left: 64 };
+    var PLOT_W = W - PAD.left - PAD.right;
+    var PLOT_H = H - PAD.top - PAD.bottom;
+    var RADIUS = 4;
+    var N      = values.length;
+
+    canvas.width  = W * DPR;
+    canvas.height = H * DPR;
+    canvas.style.height = H + 'px';
+
+    var ctx = canvas.getContext('2d');
+    ctx.scale(DPR, DPR);
+
+    /* ── helpers ── */
+    function yPos(v) { return PAD.top + PLOT_H - (v / maxVal) * PLOT_H; }
+    function xPos(i) { return PAD.left + (i + 0.5) * (PLOT_W / N); }
+
+    function niceMax(v) {
+        var exp = Math.pow(10, Math.floor(Math.log10(v || 1)));
+        return Math.ceil(v / exp) * exp;
+    }
+
+    function fmtNum(v) {
+        if (v >= 1000000) return (v / 1000000).toFixed(1) + 'M';
+        if (v >= 1000)    return (v / 1000).toFixed(1) + 'k';
+        return v.toString();
+    }
+
+    var nMax    = niceMax(maxVal);
+    var GRID_N  = 5;
+    var barW    = Math.max(4, Math.min(40, PLOT_W / N - 6));
+
+    /* ── background ── */
+    ctx.fillStyle = '#fff';
+    ctx.fillRect(0, 0, W, H);
+
+    /* ── grid lines + Y labels ── */
+    ctx.textAlign    = 'right';
+    ctx.textBaseline = 'middle';
+    ctx.font         = '11px -apple-system,BlinkMacSystemFont,"Segoe UI",sans-serif';
+
+    for (var g = 0; g <= GRID_N; g++) {
+        var gv  = (nMax / GRID_N) * g;
+        var gy  = PAD.top + PLOT_H - (gv / nMax) * PLOT_H;
+
+        ctx.strokeStyle = g === 0 ? '#ccc' : '#ececec';
+        ctx.lineWidth   = g === 0 ? 1.5 : 1;
+        ctx.beginPath();
+        ctx.moveTo(PAD.left, gy);
+        ctx.lineTo(PAD.left + PLOT_W, gy);
+        ctx.stroke();
+
+        ctx.fillStyle = '#999';
+        ctx.fillText(fmtNum(Math.round(gv)), PAD.left - 8, gy);
+    }
+
+    /* ── bars with rounded tops ── */
+    values.forEach(function (v, i) {
+        var x  = xPos(i) - barW / 2;
+        var bh = Math.max(2, (v / nMax) * PLOT_H);
+        var y  = PAD.top + PLOT_H - bh;
+
+        ctx.fillStyle = FILL_COLOR;
+        ctx.beginPath();
+        ctx.moveTo(x + RADIUS, y);
+        ctx.lineTo(x + barW - RADIUS, y);
+        ctx.quadraticCurveTo(x + barW, y, x + barW, y + RADIUS);
+        ctx.lineTo(x + barW, y + bh);
+        ctx.lineTo(x, y + bh);
+        ctx.lineTo(x, y + RADIUS);
+        ctx.quadraticCurveTo(x, y, x + RADIUS, y);
+        ctx.closePath();
+        ctx.fill();
+
+        ctx.strokeStyle = BAR_COLOR;
+        ctx.lineWidth   = 1.5;
+        ctx.stroke();
+    });
+
+    /* ── X axis labels (show up to 12, evenly spaced) ── */
+    var step = Math.max(1, Math.ceil(N / 12));
+    ctx.fillStyle    = '#888';
+    ctx.textAlign    = 'center';
+    ctx.textBaseline = 'top';
+    ctx.font         = '10px -apple-system,BlinkMacSystemFont,"Segoe UI",sans-serif';
+
+    labels.forEach(function (lbl, i) {
+        if (i % step !== 0 && i !== N - 1) { return; }
+        var x = xPos(i);
+        ctx.save();
+        ctx.translate(x, PAD.top + PLOT_H + 8);
+        ctx.rotate(-0.45);
+        ctx.fillText(lbl, 0, 0);
+        ctx.restore();
+    });
+
+    /* ── tooltip on hover ── */
+    var tooltip = document.getElementById('rpChartTooltip');
+    var rect;
+
+    canvas.addEventListener('mousemove', function (e) {
+        rect = canvas.getBoundingClientRect();
+        var mx = (e.clientX - rect.left);
+        var my = (e.clientY - rect.top);
+
+        var hit = -1;
+        values.forEach(function (v, i) {
+            var x  = xPos(i) - barW / 2;
+            var bh = Math.max(2, (v / nMax) * PLOT_H);
+            var y  = PAD.top + PLOT_H - bh;
+            if (mx >= x && mx <= x + barW && my >= y && my <= PAD.top + PLOT_H) {
+                hit = i;
+            }
+        });
+
+        if (hit >= 0) {
+            tooltip.style.display = 'block';
+            tooltip.style.left    = (e.clientX + 12) + 'px';
+            tooltip.style.top     = (e.clientY - 28) + 'px';
+            tooltip.textContent   = labels[hit] + ' — ' + values[hit].toLocaleString() + ' pts';
+            canvas.style.cursor   = 'crosshair';
+        } else {
+            tooltip.style.display = 'none';
+            canvas.style.cursor   = 'default';
+        }
+    });
+
+    canvas.addEventListener('mouseleave', function () {
+        tooltip.style.display = 'none';
+    });
+
+    /* ── redraw on resize ── */
+    var resizeTimer;
+    window.addEventListener('resize', function () {
+        clearTimeout(resizeTimer);
+        resizeTimer = setTimeout(function () {
+            W       = canvas.parentElement.clientWidth || 800;
+            PLOT_W  = W - PAD.left - PAD.right;
+            canvas.width        = W * DPR;
+            canvas.style.width  = W + 'px';
+            ctx.scale(DPR, DPR);
+            // re-run draw by reloading — simple and reliable
+            window.location.reload();
+        }, 400);
+    });
+});
+</script>
+<?php endif; ?>

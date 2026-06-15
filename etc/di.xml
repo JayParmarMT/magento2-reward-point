@@ -1,0 +1,354 @@
+<?xml version="1.0"?>
+<config xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+        xsi:noNamespaceSchemaLocation="urn:magento:framework:ObjectManager/etc/config.xsd">
+
+    <!-- ===================== Service Contract Preferences ===================== -->
+    <preference for="Meetanshi\RewardPoints\Api\SpendingRuleRepositoryInterface"
+                type="Meetanshi\RewardPoints\Model\Rule\SpendingRuleRepository"/>
+
+    <preference for="Meetanshi\RewardPoints\Api\AccountRepositoryInterface"
+                type="Meetanshi\RewardPoints\Model\AccountRepository"/>
+
+    <preference for="Meetanshi\RewardPoints\Api\TransactionRepositoryInterface"
+                type="Meetanshi\RewardPoints\Model\TransactionRepository"/>
+
+    <preference for="Meetanshi\RewardPoints\Api\BalanceManagementInterface"
+                type="Meetanshi\RewardPoints\Model\BalanceManagement"/>
+
+    <preference for="Meetanshi\RewardPoints\Api\TierRepositoryInterface"
+                type="Meetanshi\RewardPoints\Model\TierRepository"/>
+
+    <preference for="Meetanshi\RewardPoints\Api\EarningRateRepositoryInterface"
+                type="Meetanshi\RewardPoints\Model\EarningRateRepository"/>
+
+    <preference for="Meetanshi\RewardPoints\Api\SpendingRateRepositoryInterface"
+                type="Meetanshi\RewardPoints\Model\SpendingRateRepository"/>
+
+    <preference for="Meetanshi\RewardPoints\Api\CatalogRuleRepositoryInterface"
+                type="Meetanshi\RewardPoints\Model\Rule\CatalogRuleRepository"/>
+
+    <preference for="Meetanshi\RewardPoints\Api\CartRuleRepositoryInterface"
+                type="Meetanshi\RewardPoints\Model\Rule\CartRuleRepository"/>
+
+    <preference for="Meetanshi\RewardPoints\Api\BehaviorRuleRepositoryInterface"
+                type="Meetanshi\RewardPoints\Model\Rule\BehaviorRuleRepository"/>
+
+    <preference for="Meetanshi\RewardPoints\Api\CartManagementInterface"
+                type="Meetanshi\RewardPoints\Model\CartManagement"/>
+
+    <preference for="Meetanshi\RewardPoints\Api\CustomerCartManagementInterface"
+                type="Meetanshi\RewardPoints\Model\CustomerCartManagement"/>
+
+    <preference for="Meetanshi\RewardPoints\Api\CustomerBalanceInterface"
+                type="Meetanshi\RewardPoints\Model\CustomerBalance"/>
+
+    <preference for="Meetanshi\RewardPoints\Api\CustomerTransactionRepositoryInterface"
+                type="Meetanshi\RewardPoints\Model\CustomerTransactionRepository"/>
+
+    <!-- ===================== Data Interface Preferences ===================== -->
+    <preference for="Meetanshi\RewardPoints\Api\Data\AccountInterface"
+                type="Meetanshi\RewardPoints\Model\Account"/>
+
+    <preference for="Meetanshi\RewardPoints\Api\Data\TransactionInterface"
+                type="Meetanshi\RewardPoints\Model\Transaction"/>
+
+    <preference for="Meetanshi\RewardPoints\Api\Data\EarningRateInterface"
+                type="Meetanshi\RewardPoints\Model\EarningRate"/>
+
+    <preference for="Meetanshi\RewardPoints\Api\Data\SpendingRateInterface"
+                type="Meetanshi\RewardPoints\Model\SpendingRate"/>
+
+    <preference for="Meetanshi\RewardPoints\Api\Data\TierInterface"
+                type="Meetanshi\RewardPoints\Model\Tier"/>
+
+    <preference for="Meetanshi\RewardPoints\Api\Data\ReferralCodeInterface"
+                type="Meetanshi\RewardPoints\Model\ReferralCode"/>
+
+    <preference for="Meetanshi\RewardPoints\Api\Data\InvitationInterface"
+                type="Meetanshi\RewardPoints\Model\Invitation"/>
+
+    <!-- ===================== Search Results Preferences ===================== -->
+    <preference for="Meetanshi\RewardPoints\Api\Data\AccountSearchResultsInterface"
+                type="Meetanshi\RewardPoints\Model\AccountSearchResults"/>
+
+    <preference for="Meetanshi\RewardPoints\Api\Data\TransactionSearchResultsInterface"
+                type="Meetanshi\RewardPoints\Model\TransactionSearchResults"/>
+
+    <preference for="Meetanshi\RewardPoints\Api\Data\TierSearchResultsInterface"
+                type="Meetanshi\RewardPoints\Model\TierSearchResults"/>
+
+    <!-- ===================== Collection Processor for Repositories ===================== -->
+    <type name="Meetanshi\RewardPoints\Model\AccountRepository">
+        <arguments>
+            <argument name="collectionProcessor"
+                      xsi:type="object">Magento\Framework\Api\SearchCriteria\CollectionProcessor\FilterProcessor</argument>
+        </arguments>
+    </type>
+
+    <type name="Meetanshi\RewardPoints\Model\TransactionRepository">
+        <arguments>
+            <argument name="collectionProcessor"
+                      xsi:type="object">Magento\Framework\Api\SearchCriteria\CollectionProcessor\FilterProcessor</argument>
+        </arguments>
+    </type>
+
+    <type name="Meetanshi\RewardPoints\Model\TierRepository">
+        <arguments>
+            <argument name="collectionProcessor"
+                      xsi:type="object">Magento\Framework\Api\SearchCriteria\CollectionProcessor\FilterProcessor</argument>
+        </arguments>
+    </type>
+
+    <type name="Meetanshi\RewardPoints\Model\EarningRateRepository">
+        <arguments>
+            <argument name="collectionProcessor"
+                      xsi:type="object">Magento\Framework\Api\SearchCriteria\CollectionProcessor\FilterProcessor</argument>
+        </arguments>
+    </type>
+
+    <type name="Meetanshi\RewardPoints\Model\SpendingRateRepository">
+        <arguments>
+            <argument name="collectionProcessor"
+                      xsi:type="object">Magento\Framework\Api\SearchCriteria\CollectionProcessor\FilterProcessor</argument>
+        </arguments>
+    </type>
+
+    <!-- ===================== Logger Virtual Type ===================== -->
+    <virtualType name="MeetanshiRewardPointsLogger" type="Magento\Framework\Logger\Monolog">
+        <arguments>
+            <argument name="name" xsi:type="string">meetanshi_rewardpoints</argument>
+            <argument name="handlers" xsi:type="array">
+                <item name="debug" xsi:type="object">MeetanshiRewardPointsLogHandler</item>
+            </argument>
+        </arguments>
+    </virtualType>
+
+    <virtualType name="MeetanshiRewardPointsLogHandler" type="Magento\Framework\Logger\Handler\Base">
+        <arguments>
+            <argument name="fileName" xsi:type="string">/var/log/meetanshi_rewardpoints.log</argument>
+        </arguments>
+    </virtualType>
+
+    <!-- Inject custom logger into BalanceManagement -->
+    <type name="Meetanshi\RewardPoints\Model\BalanceManagement">
+        <arguments>
+            <argument name="logger" xsi:type="object">MeetanshiRewardPointsLogger</argument>
+        </arguments>
+    </type>
+
+    <!-- SpendingRule Repository Collection Processor -->
+    <type name="Meetanshi\RewardPoints\Model\Rule\SpendingRuleRepository">
+        <arguments>
+            <argument name="collectionProcessor"
+                      xsi:type="object">Magento\Framework\Api\SearchCriteria\CollectionProcessor\FilterProcessor</argument>
+        </arguments>
+    </type>
+
+    <!-- ===================== Phase 15: Referral Program ===================== -->
+    <preference for="Meetanshi\RewardPoints\Api\ReferralRuleRepositoryInterface"
+                type="Meetanshi\RewardPoints\Model\Rule\ReferralRuleRepository"/>
+
+    <!-- ===================== Phase 16: Tier Earning Bonus Plugin ===================== -->
+    <type name="Meetanshi\RewardPoints\Api\BalanceManagementInterface">
+        <plugin name="meetanshi_rewardpoints_tier_earning_bonus"
+                type="Meetanshi\RewardPoints\Plugin\EarningBonus\ApplyTierEarningBonusPlugin"/>
+    </type>
+
+    <!-- ===================== Phase 17: Quote Totals Plugin for Sell By Points ===================== -->
+    <type name="Magento\Quote\Model\Quote\Address\Total\Subtotal">
+        <plugin name="meetanshi_rewardpoints_sell_by_points_totals"
+                type="Meetanshi\RewardPoints\Plugin\Quote\TotalsPlugin"/>
+    </type>
+
+    <!-- Phase 17: Sell By Points product price plugin -->
+    <type name="Magento\Catalog\Model\Product">
+        <plugin name="meetanshi_rewardpoints_sell_by_points_product"
+                type="Meetanshi\RewardPoints\Plugin\Catalog\Product\SellByPointsPlugin"/>
+    </type>
+
+    <!-- Plugin: add reward points fields to credit memo -->
+    <type name="Magento\Sales\Model\Order\Creditmemo">
+        <plugin name="meetanshi_rewardpoints_creditmemo_fields"
+                type="Meetanshi\RewardPoints\Plugin\Sales\CreditMemo\AddRewardPointsRefundFieldsPlugin"/>
+    </type>
+
+    <!-- Spend transaction on checkout handled via checkout_submit_all_after event observer -->
+
+    <!-- Customer grid: add reward points column via plugin -->
+    <type name="Magento\Customer\Model\ResourceModel\Grid\Collection">
+        <plugin name="meetanshi_rewardpoints_customer_grid_column"
+                type="Meetanshi\RewardPoints\Plugin\Customer\Grid\AddRewardPointsColumnPlugin"/>
+    </type>
+
+    <!-- CLI Commands -->
+    <type name="Magento\Framework\Console\CommandList">
+        <arguments>
+            <argument name="commands" xsi:type="array">
+                <item name="meetanshi_expire_points"
+                      xsi:type="object">Meetanshi\RewardPoints\Console\Command\ExpirePointsCommand</item>
+                <item name="meetanshi_tier_recalculate"
+                      xsi:type="object">Meetanshi\RewardPoints\Console\Command\TierRecalculateCommand</item>
+                <item name="meetanshi_send_reminders"
+                      xsi:type="object">Meetanshi\RewardPoints\Console\Command\SendRemindersCommand</item>
+                <item name="meetanshi_rebuild_index"
+                      xsi:type="object">Meetanshi\RewardPoints\Console\Command\RebuildIndexCommand</item>
+                <item name="meetanshi_repair_account"
+                      xsi:type="object">Meetanshi\RewardPoints\Console\Command\RepairAccountCommand</item>
+                <item name="meetanshi_status"
+                      xsi:type="object">Meetanshi\RewardPoints\Console\Command\StatusCommand</item>
+            </argument>
+        </arguments>
+    </type>
+
+    <!-- ===================== Grid Collection Virtual Types (global scope, following Magento_Theme pattern) ===================== -->
+
+    <virtualType name="MeetanshiRewardPointsEarningRateGridCollection"
+                 type="Meetanshi\RewardPoints\Model\ResourceModel\EarningRate\Grid\Collection">
+        <arguments>
+            <argument name="mainTable" xsi:type="string">meetanshi_rewardpoints_earning_rate</argument>
+            <argument name="eventPrefix" xsi:type="string">meetanshi_rewardpoints_earning_rate_grid_collection</argument>
+            <argument name="eventObject" xsi:type="string">meetanshi_rewardpoints_earning_rate_grid_collection</argument>
+            <argument name="resourceModel" xsi:type="string">Meetanshi\RewardPoints\Model\ResourceModel\EarningRate</argument>
+        </arguments>
+    </virtualType>
+
+    <virtualType name="MeetanshiRewardPointsSpendingRateGridCollection"
+                 type="Meetanshi\RewardPoints\Model\ResourceModel\SpendingRate\Grid\Collection">
+        <arguments>
+            <argument name="mainTable" xsi:type="string">meetanshi_rewardpoints_spending_rate</argument>
+            <argument name="eventPrefix" xsi:type="string">meetanshi_rewardpoints_spending_rate_grid_collection</argument>
+            <argument name="eventObject" xsi:type="string">meetanshi_rewardpoints_spending_rate_grid_collection</argument>
+            <argument name="resourceModel" xsi:type="string">Meetanshi\RewardPoints\Model\ResourceModel\SpendingRate</argument>
+        </arguments>
+    </virtualType>
+
+    <virtualType name="MeetanshiRewardPointsCatalogRuleGridCollection"
+                 type="Meetanshi\RewardPoints\Model\ResourceModel\Rule\CatalogRule\Grid\Collection">
+        <arguments>
+            <argument name="mainTable" xsi:type="string">meetanshi_rewardpoints_catalog_rule</argument>
+            <argument name="eventPrefix" xsi:type="string">meetanshi_rewardpoints_catalog_rule_grid_collection</argument>
+            <argument name="eventObject" xsi:type="string">meetanshi_rewardpoints_catalog_rule_grid_collection</argument>
+            <argument name="resourceModel" xsi:type="string">Meetanshi\RewardPoints\Model\ResourceModel\Rule\CatalogRule</argument>
+        </arguments>
+    </virtualType>
+
+    <virtualType name="MeetanshiRewardPointsCartRuleGridCollection"
+                 type="Meetanshi\RewardPoints\Model\ResourceModel\Rule\CartRule\Grid\Collection">
+        <arguments>
+            <argument name="mainTable" xsi:type="string">meetanshi_rewardpoints_cart_rule</argument>
+            <argument name="eventPrefix" xsi:type="string">meetanshi_rewardpoints_cart_rule_grid_collection</argument>
+            <argument name="eventObject" xsi:type="string">meetanshi_rewardpoints_cart_rule_grid_collection</argument>
+            <argument name="resourceModel" xsi:type="string">Meetanshi\RewardPoints\Model\ResourceModel\Rule\CartRule</argument>
+        </arguments>
+    </virtualType>
+
+    <virtualType name="MeetanshiRewardPointsBehaviorRuleGridCollection"
+                 type="Meetanshi\RewardPoints\Model\ResourceModel\Rule\BehaviorRule\Grid\Collection">
+        <arguments>
+            <argument name="mainTable" xsi:type="string">meetanshi_rewardpoints_behavior_rule</argument>
+            <argument name="eventPrefix" xsi:type="string">meetanshi_rewardpoints_behavior_rule_grid_collection</argument>
+            <argument name="eventObject" xsi:type="string">meetanshi_rewardpoints_behavior_rule_grid_collection</argument>
+            <argument name="resourceModel" xsi:type="string">Meetanshi\RewardPoints\Model\ResourceModel\Rule\BehaviorRule</argument>
+        </arguments>
+    </virtualType>
+
+    <virtualType name="MeetanshiRewardPointsSpendingRuleGridCollection"
+                 type="Meetanshi\RewardPoints\Model\ResourceModel\Rule\SpendingRule\Grid\Collection">
+        <arguments>
+            <argument name="mainTable" xsi:type="string">meetanshi_rewardpoints_spending_rule</argument>
+            <argument name="eventPrefix" xsi:type="string">meetanshi_rewardpoints_spending_rule_grid_collection</argument>
+            <argument name="eventObject" xsi:type="string">meetanshi_rewardpoints_spending_rule_grid_collection</argument>
+            <argument name="resourceModel" xsi:type="string">Meetanshi\RewardPoints\Model\ResourceModel\Rule\SpendingRule</argument>
+        </arguments>
+    </virtualType>
+
+    <virtualType name="MeetanshiRewardPointsTierGridCollection"
+                 type="Meetanshi\RewardPoints\Model\ResourceModel\Tier\Grid\Collection">
+        <arguments>
+            <argument name="mainTable" xsi:type="string">meetanshi_rewardpoints_tier</argument>
+            <argument name="eventPrefix" xsi:type="string">meetanshi_rewardpoints_tier_grid_collection</argument>
+            <argument name="eventObject" xsi:type="string">meetanshi_rewardpoints_tier_grid_collection</argument>
+            <argument name="resourceModel" xsi:type="string">Meetanshi\RewardPoints\Model\ResourceModel\Tier</argument>
+        </arguments>
+    </virtualType>
+
+    <virtualType name="MeetanshiRewardPointsReferralRuleGridCollection"
+                 type="Meetanshi\RewardPoints\Model\ResourceModel\Rule\ReferralRule\Grid\Collection">
+        <arguments>
+            <argument name="mainTable" xsi:type="string">meetanshi_rewardpoints_referral_rule</argument>
+            <argument name="eventPrefix" xsi:type="string">meetanshi_rewardpoints_referral_rule_grid_collection</argument>
+            <argument name="eventObject" xsi:type="string">meetanshi_rewardpoints_referral_rule_grid_collection</argument>
+            <argument name="resourceModel" xsi:type="string">Meetanshi\RewardPoints\Model\ResourceModel\Rule\ReferralRule</argument>
+        </arguments>
+    </virtualType>
+
+    <virtualType name="MeetanshiRewardPointsReferralInvitationGridCollection"
+                 type="Magento\Framework\View\Element\UiComponent\DataProvider\SearchResult">
+        <arguments>
+            <argument name="mainTable" xsi:type="string">meetanshi_rewardpoints_invitation</argument>
+            <argument name="resourceModel" xsi:type="string">Meetanshi\RewardPoints\Model\ResourceModel\Invitation</argument>
+        </arguments>
+    </virtualType>
+
+    <!-- Transaction grid uses a custom collection with customer join -->
+    <virtualType name="MeetanshiRewardPointsTransactionGridCollection"
+                 type="Meetanshi\RewardPoints\Model\ResourceModel\Transaction\Grid\Collection">
+        <arguments>
+            <argument name="mainTable" xsi:type="string">meetanshi_rewardpoints_transaction</argument>
+            <argument name="eventPrefix" xsi:type="string">meetanshi_rewardpoints_transaction_grid_collection</argument>
+            <argument name="eventObject" xsi:type="string">meetanshi_rewardpoints_transaction_grid_collection</argument>
+            <argument name="resourceModel" xsi:type="string">Meetanshi\RewardPoints\Model\ResourceModel\Transaction</argument>
+        </arguments>
+    </virtualType>
+
+    <!-- Customer-scoped transaction grid collection — filtered by customer_id from request -->
+    <virtualType name="MeetanshiRewardPointsCustomerTransactionGridCollection"
+                 type="Meetanshi\RewardPoints\Model\ResourceModel\Transaction\CustomerGrid\Collection">
+        <arguments>
+            <argument name="mainTable" xsi:type="string">meetanshi_rewardpoints_transaction</argument>
+            <argument name="eventPrefix" xsi:type="string">meetanshi_rewardpoints_customer_transaction_grid_collection</argument>
+            <argument name="eventObject" xsi:type="string">meetanshi_rewardpoints_customer_transaction_grid_collection</argument>
+            <argument name="resourceModel" xsi:type="string">Meetanshi\RewardPoints\Model\ResourceModel\Transaction</argument>
+        </arguments>
+    </virtualType>
+
+    <!-- ===================== Register grid collections with the CollectionFactory (global scope) ===================== -->
+    <!-- Placed in global di.xml (not adminhtml/di.xml) to avoid replacing other modules' array items during area merge -->
+    <type name="Magento\Framework\View\Element\UiComponent\DataProvider\CollectionFactory">
+        <arguments>
+            <argument name="collections" xsi:type="array">
+                <item name="meetanshi_rewardpoints_earning_rate_listing_data_source"
+                      xsi:type="string">MeetanshiRewardPointsEarningRateGridCollection</item>
+                <item name="meetanshi_rewardpoints_spending_rate_listing_data_source"
+                      xsi:type="string">MeetanshiRewardPointsSpendingRateGridCollection</item>
+                <item name="meetanshi_rewardpoints_catalog_rule_listing_data_source"
+                      xsi:type="string">MeetanshiRewardPointsCatalogRuleGridCollection</item>
+                <item name="meetanshi_rewardpoints_cart_rule_listing_data_source"
+                      xsi:type="string">MeetanshiRewardPointsCartRuleGridCollection</item>
+                <item name="meetanshi_rewardpoints_behavior_rule_listing_data_source"
+                      xsi:type="string">MeetanshiRewardPointsBehaviorRuleGridCollection</item>
+                <item name="meetanshi_rewardpoints_spending_rule_listing_data_source"
+                      xsi:type="string">MeetanshiRewardPointsSpendingRuleGridCollection</item>
+                <item name="meetanshi_rewardpoints_tier_listing_data_source"
+                      xsi:type="string">MeetanshiRewardPointsTierGridCollection</item>
+                <item name="meetanshi_rewardpoints_referral_rule_listing_data_source"
+                      xsi:type="string">MeetanshiRewardPointsReferralRuleGridCollection</item>
+                <item name="meetanshi_rewardpoints_referral_invitation_listing_data_source"
+                      xsi:type="string">MeetanshiRewardPointsReferralInvitationGridCollection</item>
+                <item name="meetanshi_rewardpoints_transaction_listing_data_source"
+                      xsi:type="string">MeetanshiRewardPointsTransactionGridCollection</item>
+                <item name="meetanshi_rewardpoints_customer_transaction_listing_data_source"
+                      xsi:type="string">MeetanshiRewardPointsCustomerTransactionGridCollection</item>
+            </argument>
+        </arguments>
+    </type>
+
+
+    <!-- Plugin to add selectLike filter type for GROUP_CONCAT columns -->
+    <type name="Magento\Ui\Component\Filters">
+        <plugin name="meetanshi_rewardpoints_filters_selectlike"
+                type="Meetanshi\RewardPoints\Plugin\Ui\Component\FiltersPlugin"
+                sortOrder="10"/>
+    </type>
+
+</config>

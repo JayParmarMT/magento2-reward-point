@@ -1,0 +1,32 @@
+<?xml version="1.0"?>
+<config xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+        xsi:noNamespaceSchemaLocation="urn:magento:framework:ObjectManager/etc/config.xsd">
+
+    <!-- Register checkout config provider to expose reward points data to window.checkoutConfig -->
+    <type name="Magento\Checkout\Model\CompositeConfigProvider">
+        <arguments>
+            <argument name="configProviders" xsi:type="array">
+                <item name="meetanshi_rewardpoints_checkout_config_provider"
+                      xsi:type="object">Meetanshi\RewardPoints\Model\Checkout\ConfigProvider</item>
+            </argument>
+        </arguments>
+    </type>
+
+    <!-- Append earn-points message to each product card on category/listing pages -->
+    <type name="Magento\Catalog\Block\Product\AbstractProduct">
+        <plugin name="meetanshi_rewardpoints_product_details_html"
+                type="Meetanshi\RewardPoints\Plugin\Catalog\Product\ProductDetailsHtmlPlugin"
+                sortOrder="10"/>
+    </type>
+
+    <!-- Register the "meetanshi-rewardpoints" customer section data source -->
+    <type name="Magento\Customer\CustomerData\SectionPool">
+        <arguments>
+            <argument name="sectionSourceMap" xsi:type="array">
+                <item name="meetanshi-rewardpoints"
+                      xsi:type="string">Meetanshi\RewardPoints\CustomerData\RewardPoints</item>
+            </argument>
+        </arguments>
+    </type>
+
+</config>

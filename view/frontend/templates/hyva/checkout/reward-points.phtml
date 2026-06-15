@@ -1,0 +1,262 @@
+<?php
+/**
+ * Hyvä checkout reward points apply block — Alpine.js / Tailwind.
+ *
+ * Replaces the Luma KnockoutJS uiComponent (checkout/reward-points.js)
+ * and its KO HTML template (web/template/checkout/reward-points.html).
+ *
+ * Config data is sourced from window.checkoutConfig.rewardPoints, which is
+ * populated by Meetanshi\RewardPoints\Model\CheckoutConfigProvider and
+ * injected by Magento\Checkout\Block\Onepage into the page.
+ *
+ * @var \Meetanshi\RewardPoints\Block\Frontend\Cart\RewardPoints $block
+ * @var \Magento\Framework\Escaper $escaper
+ */
+
+if (!$block->isEnabled()) {
+    return;
+}
+?>
+<div id="reward-points-checkout-block"
+     class="rp-checkout-block my-4"
+     x-data="rewardPointsCheckout()"
+     x-init="init()"
+     x-show="visible">
+
+    <!-- Collapsible header -->
+    <div class="flex items-center justify-between cursor-pointer py-3 border-b border-gray-200"
+         @click="expanded = !expanded"
+         @keypress.enter="expanded = !expanded"
+         role="button"
+         tabindex="0"
+         :aria-expanded="expanded">
+        <span class="text-sm font-semibold text-gray-800">
+            <?= $escaper->escapeHtml(__('Use Reward Points')) ?>
+        </span>
+        <svg class="w-4 h-4 text-gray-500 transition-transform duration-200"
+             :class="{'rotate-180': expanded}"
+             fill="none" stroke="currentColor" viewBox="0 0 24 24">
+            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 9l-7 7-7-7"/>
+        </svg>
+    </div>
+
+    <!-- Content -->
+    <div x-show="expanded" x-transition class="pt-3 pb-2">
+
+        <!-- Available balance -->
+        <p class="text-sm text-gray-700 mb-3">
+            <?= $escaper->escapeHtml(__('Available Balance:')) ?>
+            <strong x-text="balance + ' <?= $escaper->escapeJs(__('pts')) ?>'"></strong>
+        </p>
+
+        <!-- Message area -->
+        <div x-show="message"
+             :class="messageType === 'success'
+                ? 'text-green-700 bg-green-50 border-green-200'
+                : 'text-red-700 bg-red-50 border-red-200'"
+             class="text-sm border rounded px-3 py-2 mb-3"
+             x-text="message">
+        </div>
+
+        <!-- Not-yet-applied state -->
+        <template x-if="!applied">
+            <div>
+                <label class="block text-sm text-gray-700 mb-1">
+                    <?= $escaper->escapeHtml(__('Points to Redeem')) ?>
+                </label>
+                <input type="range"
+                       class="w-full accent-blue-600 mb-2"
+                       :min="minPoints"
+                       :max="maxPoints"
+                       step="1"
+                       x-model.number="points"
+                       @input="useMax = (points >= maxPoints)">
+                <div class="flex items-center gap-2 mb-4">
+                    <input type="number"
+                           class="w-24 border border-gray-300 rounded px-2 py-1 text-sm focus:outline-none focus:ring-2 focus:ring-blue-500"
+                           :min="minPoints"
+                           :max="maxPoints"
+                           x-model.number="points"
+                           @change="clampPoints">
+                    <span class="text-sm text-gray-500"><?= $escaper->escapeHtml(__('pts')) ?></span>
+                </div>
+
+                <button type="button"
+                        class="w-full btn btn-primary text-sm px-4 py-2 bg-blue-600 text-white rounded hover:bg-blue-700 disabled:opacity-50"
+                        :disabled="loading"
+                        @click="applyPoints">
+                    <span x-show="!loading"><?= $escaper->escapeHtml(__('Apply')) ?></span>
+                    <span x-show="loading"><?= $escaper->escapeHtml(__('Applying…')) ?></span>
+                </button>
+            </div>
+        </template>
+
+        <!-- Applied state -->
+        <template x-if="applied">
+            <div>
+                <div class="flex justify-between text-sm text-gray-700 mb-1">
+                    <span><?= $escaper->escapeHtml(__('Points Applied:')) ?></span>
+                    <strong x-text="points + ' <?= $escaper->escapeJs(__('pts')) ?>'"></strong>
+                </div>
+                <div class="flex justify-between text-sm text-gray-700 mb-4">
+                    <span><?= $escaper->escapeHtml(__('Discount:')) ?></span>
+                    <strong class="text-green-700" x-text="'-$' + parseFloat(discountAmount).toFixed(2)"></strong>
+                </div>
+
+                <button type="button"
+                        class="w-full text-sm px-4 py-2 border border-gray-300 rounded hover:bg-gray-50 disabled:opacity-50"
+                        :disabled="loading"
+                        @click="removePoints">
+                    <span x-show="!loading"><?= $escaper->escapeHtml(__('Remove')) ?></span>
+                    <span x-show="loading"><?= $escaper->escapeHtml(__('Removing…')) ?></span>
+                </button>
+            </div>
+        </template>
+
+    </div>
+</div>
+
+<script>
+function rewardPointsCheckout() {
+    return {
+        visible: false,
+        expanded: true,
+        loading: false,
+        applied: false,
+        message: '',
+        messageType: 'success',
+        balance: 0,
+        minPoints: 0,
+        maxPoints: 0,
+        points: 0,
+        discountAmount: 0,
+        useMax: false,
+        applyUrl: '',
+        removeUrl: '',
+
+        init() {
+            const cfg = (window.checkoutConfig && window.checkoutConfig.rewardPoints)
+                ? window.checkoutConfig.rewardPoints
+                : {};
+
+            const enabled    = cfg.enabled    !== undefined ? !!cfg.enabled    : false;
+            this.balance     = cfg.balance     !== undefined ? parseInt(cfg.balance, 10)    : 0;
+            this.minPoints   = cfg.minPoints   !== undefined ? parseInt(cfg.minPoints, 10)  : 0;
+            this.maxPoints   = cfg.maxPoints   !== undefined ? parseInt(cfg.maxPoints, 10)  : 0;
+            this.useMax      = cfg.useMaxDefault !== undefined ? !!cfg.useMaxDefault         : false;
+            const applied    = cfg.pointsApplied !== undefined ? parseInt(cfg.pointsApplied, 10) : 0;
+            this.discountAmount = cfg.discountAmount !== undefined ? parseFloat(cfg.discountAmount) : 0;
+            this.applyUrl    = cfg.applyUrl    || '';
+            this.removeUrl   = cfg.removeUrl   || '';
+
+            this.applied  = applied > 0;
+            this.points   = applied > 0 ? applied : (this.useMax ? this.maxPoints : this.minPoints);
+            this.visible  = enabled && this.balance > 0 && this.balance >= this.minPoints;
+        },
+
+        clampPoints() {
+            if (this.points < this.minPoints) this.points = this.minPoints;
+            if (this.points > this.maxPoints) this.points = this.maxPoints;
+            this.useMax = (this.points >= this.maxPoints);
+        },
+
+        async applyPoints() {
+            if (this.points < this.minPoints) {
+                this.showMessage(
+                    '<?= $escaper->escapeJs(__('Please enter at least %1 points.')->render()) ?>'
+                        .replace('%1', this.minPoints),
+                    'error'
+                );
+                return;
+            }
+
+            if (this.points > this.maxPoints) {
+                this.points = this.maxPoints;
+            }
+
+            this.loading = true;
+            this.message = '';
+
+            try {
+                const formData = new URLSearchParams({
+                    points: this.points,
+                    form_key: this.getFormKey()
+                });
+
+                const resp = await fetch(this.applyUrl, {
+                    method: 'POST',
+                    headers: {'Content-Type': 'application/x-www-form-urlencoded', 'X-Requested-With': 'XMLHttpRequest'},
+                    body: formData
+                });
+
+                const data = await resp.json();
+
+                if (data.success) {
+                    this.applied = true;
+                    this.discountAmount = data.discount_amount || this.discountAmount;
+                    this.showMessage(data.message, 'success');
+                    this.dispatchTotalsRefresh();
+                } else {
+                    this.showMessage(data.message, 'error');
+                }
+            } catch (e) {
+                this.showMessage('<?= $escaper->escapeJs(__('An error occurred. Please try again.')) ?>', 'error');
+            } finally {
+                this.loading = false;
+            }
+        },
+
+        async removePoints() {
+            this.loading = true;
+            this.message = '';
+
+            try {
+                const formData = new URLSearchParams({form_key: this.getFormKey()});
+
+                const resp = await fetch(this.removeUrl, {
+                    method: 'POST',
+                    headers: {'Content-Type': 'application/x-www-form-urlencoded', 'X-Requested-With': 'XMLHttpRequest'},
+                    body: formData
+                });
+
+                const data = await resp.json();
+
+                if (data.success) {
+                    this.applied = false;
+                    this.discountAmount = 0;
+                    this.points = this.minPoints;
+                    this.showMessage(data.message, 'success');
+                    this.dispatchTotalsRefresh();
+                } else {
+                    this.showMessage(data.message, 'error');
+                }
+            } catch (e) {
+                this.showMessage('<?= $escaper->escapeJs(__('An error occurred. Please try again.')) ?>', 'error');
+            } finally {
+                this.loading = false;
+            }
+        },
+
+        /**
+         * Notify Hyvä Checkout to re-render the totals summary.
+         * Fires the standard Hyvä custom event used by checkout totals sections.
+         */
+        dispatchTotalsRefresh() {
+            window.dispatchEvent(new CustomEvent('update-shipping-price'));
+            window.dispatchEvent(new CustomEvent('reload-customer-section-data'));
+        },
+
+        getFormKey() {
+            const meta = document.querySelector('meta[name="form_key"]');
+            if (meta) return meta.getAttribute('content');
+            const cookie = document.cookie.split('; ').find(r => r.startsWith('form_key='));
+            return cookie ? decodeURIComponent(cookie.split('=')[1]) : '';
+        },
+
+        showMessage(msg, type) {
+            this.message = msg;
+            this.messageType = type;
+        }
+    };
+}
+</script>

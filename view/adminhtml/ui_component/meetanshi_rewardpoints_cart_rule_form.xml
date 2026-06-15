@@ -1,0 +1,290 @@
+<?xml version="1.0"?>
+<form xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+      xsi:noNamespaceSchemaLocation="urn:magento:module:Magento_Ui:etc/ui_configuration.xsd">
+
+    <argument name="data" xsi:type="array">
+        <item name="js_config" xsi:type="array">
+            <item name="provider" xsi:type="string">meetanshi_rewardpoints_cart_rule_form.meetanshi_rewardpoints_cart_rule_form_data_source</item>
+        </item>
+        <item name="label" xsi:type="string" translate="true">Cart Earning Rule</item>
+        <item name="template" xsi:type="string">templates/form/collapsible</item>
+    </argument>
+
+    <settings>
+        <buttons>
+            <button name="back">
+                <url path="*/*/"/>
+                <class>back</class>
+                <label translate="true">Back</label>
+            </button>
+            <button name="save_and_continue" class="Meetanshi\RewardPoints\Block\Adminhtml\Rule\CartRule\Edit\SaveAndContinueButton"/>
+            <button name="save">
+                <url path="*/*/save"/>
+                <class>save primary</class>
+                <label translate="true">Save Rule</label>
+            </button>
+        </buttons>
+        <namespace>meetanshi_rewardpoints_cart_rule_form</namespace>
+        <dataScope>data</dataScope>
+        <deps>
+            <dep>meetanshi_rewardpoints_cart_rule_form.meetanshi_rewardpoints_cart_rule_form_data_source</dep>
+        </deps>
+    </settings>
+
+    <dataSource name="meetanshi_rewardpoints_cart_rule_form_data_source">
+        <argument name="data" xsi:type="array">
+            <item name="js_config" xsi:type="array">
+                <item name="component" xsi:type="string">Magento_Ui/js/form/provider</item>
+            </item>
+        </argument>
+        <settings>
+            <validateUrl path="*/*/validate"/>
+            <submitUrl path="*/*/save"/>
+        </settings>
+        <dataProvider class="Meetanshi\RewardPoints\Ui\DataProvider\CartRule\FormDataProvider"
+                      name="meetanshi_rewardpoints_cart_rule_form_data_source">
+            <settings>
+                <requestFieldName>rule_id</requestFieldName>
+                <primaryFieldName>rule_id</primaryFieldName>
+            </settings>
+        </dataProvider>
+    </dataSource>
+
+    <fieldset name="general" sortOrder="10">
+        <settings>
+            <collapsible>true</collapsible>
+            <opened>true</opened>
+            <label translate="true">Rule Information</label>
+        </settings>
+
+        <field name="rule_id">
+            <argument name="data" xsi:type="array">
+                <item name="config" xsi:type="array">
+                    <item name="dataType" xsi:type="string">text</item>
+                    <item name="formElement" xsi:type="string">input</item>
+                    <item name="visible" xsi:type="boolean">false</item>
+                    <item name="dataScope" xsi:type="string">rule_id</item>
+                </item>
+            </argument>
+        </field>
+
+        <field name="name" formElement="input">
+            <settings>
+                <validation>
+                    <rule name="required-entry" xsi:type="boolean">true</rule>
+                </validation>
+                <dataType>text</dataType>
+                <label translate="true">Rule Name</label>
+                <dataScope>name</dataScope>
+            </settings>
+        </field>
+
+        <field name="description" formElement="textarea">
+            <settings>
+                <dataType>text</dataType>
+                <label translate="true">Description</label>
+                <dataScope>description</dataScope>
+            </settings>
+        </field>
+
+        <field name="is_active" formElement="select">
+            <settings>
+                <dataType>select</dataType>
+                <label translate="true">Status</label>
+                <dataScope>is_active</dataScope>
+            </settings>
+            <formElements>
+                <select>
+                    <settings>
+                        <options class="Meetanshi\RewardPoints\Model\Source\IsActive"/>
+                    </settings>
+                </select>
+            </formElements>
+        </field>
+
+        <field name="website_ids" formElement="multiselect">
+            <settings>
+                <validation>
+                    <rule name="required-entry" xsi:type="boolean">true</rule>
+                </validation>
+                <dataType>int</dataType>
+                <label translate="true">Websites</label>
+                <dataScope>website_ids</dataScope>
+            </settings>
+            <formElements>
+                <multiselect>
+                    <settings>
+                        <options class="Meetanshi\RewardPoints\Model\Source\Website"/>
+                    </settings>
+                </multiselect>
+            </formElements>
+        </field>
+
+        <field name="customer_group_ids" formElement="multiselect">
+            <settings>
+                <validation>
+                    <rule name="required-entry" xsi:type="boolean">true</rule>
+                </validation>
+                <dataType>int</dataType>
+                <label translate="true">Customer Groups</label>
+                <dataScope>customer_group_ids</dataScope>
+            </settings>
+            <formElements>
+                <multiselect>
+                    <settings>
+                        <options class="Magento\Customer\Model\Config\Source\Group\Multiselect"/>
+                    </settings>
+                </multiselect>
+            </formElements>
+        </field>
+
+        <field name="from_date" formElement="date">
+            <settings>
+                <dataType>text</dataType>
+                <label translate="true">From Date</label>
+                <dataScope>from_date</dataScope>
+            </settings>
+        </field>
+
+        <field name="to_date" formElement="date">
+            <settings>
+                <dataType>text</dataType>
+                <label translate="true">To Date</label>
+                <dataScope>to_date</dataScope>
+            </settings>
+        </field>
+
+        <field name="priority" formElement="input">
+            <settings>
+                <dataType>text</dataType>
+                <label translate="true">Priority</label>
+                <dataScope>priority</dataScope>
+            </settings>
+        </field>
+
+        <field name="is_shown_on_product_page" formElement="select">
+            <settings>
+                <dataType>select</dataType>
+                <label translate="true">Show on Product Page</label>
+                <dataScope>is_shown_on_product_page</dataScope>
+            </settings>
+            <formElements>
+                <select>
+                    <settings>
+                        <options class="Magento\Config\Model\Config\Source\Yesno"/>
+                    </settings>
+                </select>
+            </formElements>
+        </field>
+    </fieldset>
+
+    <fieldset name="conditions" sortOrder="20">
+        <settings>
+            <collapsible>true</collapsible>
+            <opened>true</opened>
+            <label translate="true">Conditions</label>
+        </settings>
+        <container name="conditions_apply_to" sortOrder="10">
+            <htmlContent name="html_content">
+                <block class="Meetanshi\RewardPoints\Block\Adminhtml\Rule\CartRule\Edit\Tab\Conditions"
+                       name="cart_rule_conditions"/>
+            </htmlContent>
+        </container>
+    </fieldset>
+
+    <fieldset name="actions_fieldset" sortOrder="30">
+        <settings>
+            <collapsible>true</collapsible>
+            <opened>true</opened>
+            <label translate="true">Actions</label>
+        </settings>
+
+        <field name="action_type" formElement="select">
+            <settings>
+                <validation>
+                    <rule name="required-entry" xsi:type="boolean">true</rule>
+                </validation>
+                <dataType>select</dataType>
+                <label translate="true">Action Type</label>
+                <dataScope>action_type</dataScope>
+            </settings>
+            <formElements>
+                <select>
+                    <settings>
+                        <options>
+                            <option name="0" xsi:type="array">
+                                <item name="value" xsi:type="string">fixed</item>
+                                <item name="label" xsi:type="string" translate="true">Fixed Points</item>
+                            </option>
+                            <option name="1" xsi:type="array">
+                                <item name="value" xsi:type="string">per_price</item>
+                                <item name="label" xsi:type="string" translate="true">Points per Price Amount</item>
+                            </option>
+                            <option name="2" xsi:type="array">
+                                <item name="value" xsi:type="string">per_qty</item>
+                                <item name="label" xsi:type="string" translate="true">Points per Item Quantity</item>
+                            </option>
+                        </options>
+                    </settings>
+                </select>
+            </formElements>
+        </field>
+
+        <field name="points" formElement="input">
+            <settings>
+                <validation>
+                    <rule name="required-entry" xsi:type="boolean">true</rule>
+                    <rule name="validate-greater-than-zero" xsi:type="boolean">true</rule>
+                </validation>
+                <dataType>text</dataType>
+                <label translate="true">Points (X)</label>
+                <dataScope>points</dataScope>
+            </settings>
+        </field>
+
+        <field name="money_step" formElement="input">
+            <settings>
+                <dataType>text</dataType>
+                <label translate="true">Money/Qty Step (Y)</label>
+                <dataScope>money_step</dataScope>
+                <tooltip>
+                    <description translate="true">Required when Action Type is per_price or per_qty.</description>
+                </tooltip>
+            </settings>
+        </field>
+
+        <field name="max_points" formElement="input">
+            <settings>
+                <dataType>text</dataType>
+                <label translate="true">Max Points per Order (0 = unlimited)</label>
+                <dataScope>max_points</dataScope>
+            </settings>
+        </field>
+
+        <field name="stop_rules_processing" formElement="select">
+            <settings>
+                <dataType>select</dataType>
+                <label translate="true">Stop Further Rules Processing</label>
+                <dataScope>stop_rules_processing</dataScope>
+            </settings>
+            <formElements>
+                <select>
+                    <settings>
+                        <options class="Magento\Config\Model\Config\Source\Yesno"/>
+                    </settings>
+                </select>
+            </formElements>
+        </field>
+
+        <field name="notification_message" formElement="textarea">
+            <settings>
+                <dataType>text</dataType>
+                <label translate="true">Product Page Notification Message (store view)</label>
+                <dataScope>notification_message</dataScope>
+                <tooltip>
+                    <description translate="true">Displayed on product pages when this rule applies. Supports {{points}} placeholder.</description>
+                </tooltip>
+            </settings>
+        </field>
+    </fieldset>
+</form>

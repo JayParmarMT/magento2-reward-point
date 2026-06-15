@@ -1,0 +1,36 @@
+<?xml version="1.0"?>
+<page xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+      xsi:noNamespaceSchemaLocation="urn:magento:framework:View/Layout/etc/page_configuration.xsd">
+    <head>
+        <css src="Meetanshi_RewardPoints::css/reward-points.css"/>
+    </head>
+    <body>
+        <!-- Reward points balance in header top links area -->
+        <referenceBlock name="top.links">
+            <block class="Magento\Framework\View\Element\Template"
+                   name="reward.points.header.balance"
+                   template="Meetanshi_RewardPoints::header/balance.phtml"
+                   before="-">
+                <arguments>
+                    <argument name="view_model" xsi:type="object">Meetanshi\RewardPoints\ViewModel\Header\Balance</argument>
+                    <argument name="placement" xsi:type="string">top_links</argument>
+                </arguments>
+            </block>
+        </referenceBlock>
+
+        <!-- Reward points balance in minicart — rendered inside minicart.addons,
+             the only static PHP child block in minicart.phtml -->
+        <referenceBlock name="minicart.addons">
+            <block class="Magento\Framework\View\Element\Template"
+                   name="reward.points.minicart.balance"
+                   template="Meetanshi_RewardPoints::header/balance.phtml"
+                   before="-">
+                <arguments>
+                    <argument name="view_model" xsi:type="object">Meetanshi\RewardPoints\ViewModel\Header\Balance</argument>
+                    <argument name="placement" xsi:type="string">minicart</argument>
+                </arguments>
+            </block>
+        </referenceBlock>
+
+    </body>
+</page>

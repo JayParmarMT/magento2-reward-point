@@ -1,0 +1,19 @@
+<?xml version="1.0"?>
+<page xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+      xsi:noNamespaceSchemaLocation="urn:magento:framework:View/Layout/etc/page_configuration.xsd">
+    <body>
+        <referenceContainer name="product.info.price">
+            <!-- Earn points message — shown below the price -->
+            <block class="Meetanshi\RewardPoints\Block\Frontend\Product\EarnMessage"
+                   name="rewardpoints.earn.message"
+                   template="Meetanshi_RewardPoints::product/earn_message.phtml"
+                   after="product.price.final"/>
+
+            <!-- Buy with points block — shown after the earn message -->
+            <block class="Meetanshi\RewardPoints\Block\Frontend\Product\BuyWithPoints"
+                   name="rewardpoints.buy.with.points"
+                   template="Meetanshi_RewardPoints::product/buyWithPoints.phtml"
+                   after="rewardpoints.earn.message"/>
+        </referenceContainer>
+    </body>
+</page>

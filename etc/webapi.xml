@@ -1,0 +1,120 @@
+<?xml version="1.0"?>
+<routes xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+        xsi:noNamespaceSchemaLocation="urn:magento:module:Magento_Webapi:etc/webapi.xsd">
+
+    <!--
+    =========================================================================
+    CUSTOMER ENDPOINTS  (resource="self")
+    =========================================================================
+    All customer endpoints use resource ref="self", which means:
+      - The caller must be authenticated as a customer (logged-in session or customer token).
+      - Anonymous / guest access is rejected by the Magento REST framework.
+
+    The %customer_id% binding forces the framework-resolved customer ID into
+    every service method so callers cannot impersonate another customer.
+    =========================================================================
+    -->
+
+    <!-- Customer: get own reward-points balance.
+         Website is resolved from the current store context in the implementation. -->
+    <route url="/V1/meetanshi-reward-points/balance/me" method="GET">
+        <service class="Meetanshi\RewardPoints\Api\CustomerBalanceInterface" method="getMyBalance"/>
+        <resources>
+            <resource ref="self"/>
+        </resources>
+        <data>
+            <!-- Force the authenticated customer's ID; callers cannot override this. -->
+            <parameter name="customerId" force="true">%customer_id%</parameter>
+        </data>
+    </route>
+
+    <!-- Customer: list own transactions.
+         CustomerTransactionRepository forces a customer_id filter server-side,
+         ensuring no other customer's records can be returned. -->
+    <route url="/V1/meetanshi-reward-points/transactions/me" method="GET">
+        <service class="Meetanshi\RewardPoints\Api\CustomerTransactionRepositoryInterface" method="getMyTransactions"/>
+        <resources>
+            <resource ref="self"/>
+        </resources>
+        <data>
+            <!-- Force the authenticated customer's ID; callers cannot override this. -->
+            <parameter name="customerId" force="true">%customer_id%</parameter>
+        </data>
+    </route>
+
+    <!-- Customer: apply reward points to their active cart.
+         Uses CustomerCartManagementInterface which resolves the cart from the
+         authenticated customer's session — no cartId in the URL prevents IDOR. -->
+    <route url="/V1/meetanshi-reward-points/mine/apply" method="POST">
+        <service class="Meetanshi\RewardPoints\Api\CustomerCartManagementInterface" method="applyPoints"/>
+        <resources>
+            <resource ref="self"/>
+        </resources>
+        <data>
+            <!-- Force the authenticated customer's ID; callers cannot override this. -->
+            <parameter name="customerId" force="true">%customer_id%</parameter>
+        </data>
+    </route>
+
+    <!-- Customer: remove reward points from their active cart. -->
+    <route url="/V1/meetanshi-reward-points/mine/remove" method="DELETE">
+        <service class="Meetanshi\RewardPoints\Api\CustomerCartManagementInterface" method="removePoints"/>
+        <resources>
+            <resource ref="self"/>
+        </resources>
+        <data>
+            <!-- Force the authenticated customer's ID; callers cannot override this. -->
+            <parameter name="customerId" force="true">%customer_id%</parameter>
+        </data>
+    </route>
+
+    <!--
+    =========================================================================
+    ADMIN ENDPOINTS  (require explicit ACL resource)
+    =========================================================================
+    All admin endpoints require the caller to hold the named ACL permission.
+    No endpoint uses "anonymous" or leaves the resource blank.
+    =========================================================================
+    -->
+
+    <!-- Admin: manually add points to a customer account. -->
+    <route url="/V1/meetanshi-reward-points/transactions" method="POST">
+        <service class="Meetanshi\RewardPoints\Api\BalanceManagementInterface" method="addPoints"/>
+        <resources>
+            <resource ref="Meetanshi_RewardPoints::transactions"/>
+        </resources>
+    </route>
+
+    <!-- Admin: manually deduct points from a customer account. -->
+    <route url="/V1/meetanshi-reward-points/transactions/deduct" method="POST">
+        <service class="Meetanshi\RewardPoints\Api\BalanceManagementInterface" method="subtractPoints"/>
+        <resources>
+            <resource ref="Meetanshi_RewardPoints::transactions"/>
+        </resources>
+    </route>
+
+    <!-- Admin: expire specific transactions for a customer. -->
+    <route url="/V1/meetanshi-reward-points/transactions/expire" method="POST">
+        <service class="Meetanshi\RewardPoints\Api\BalanceManagementInterface" method="expirePoints"/>
+        <resources>
+            <resource ref="Meetanshi_RewardPoints::transactions"/>
+        </resources>
+    </route>
+
+    <!-- Admin: get current points balance for any customer. -->
+    <route url="/V1/meetanshi-reward-points/balance/:customerId/:websiteId" method="GET">
+        <service class="Meetanshi\RewardPoints\Api\BalanceManagementInterface" method="getBalance"/>
+        <resources>
+            <resource ref="Meetanshi_RewardPoints::transactions"/>
+        </resources>
+    </route>
+
+    <!-- Admin: recompute balance from ledger (repair tool). -->
+    <route url="/V1/meetanshi-reward-points/balance/:customerId/:websiteId/recompute" method="POST">
+        <service class="Meetanshi\RewardPoints\Api\BalanceManagementInterface" method="recomputeBalance"/>
+        <resources>
+            <resource ref="Meetanshi_RewardPoints::transactions"/>
+        </resources>
+    </route>
+
+</routes>

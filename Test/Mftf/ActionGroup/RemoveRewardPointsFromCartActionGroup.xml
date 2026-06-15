@@ -1,0 +1,24 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<actionGroups xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+              xsi:noNamespaceSchemaLocation="urn:magento:mftf:Test/etc/actionGroupSchema.xsd">
+    <actionGroup name="RemoveRewardPointsFromCartActionGroup">
+        <annotations>
+            <description>
+                Clicks the Remove Points button in the Reward Points cart block, waits for the
+                page to reload, and confirms the applied-notice is no longer present.
+                Must be called after ApplyRewardPointsToCartActionGroup has run successfully.
+            </description>
+        </annotations>
+
+        <!-- Scroll to the Remove button so it is in the viewport -->
+        <scrollTo selector="{{RewardPointsCartSection.removeButton}}" stepKey="scrollToRemoveButton"/>
+
+        <!-- Wait for the Remove Points button to be visible and click it -->
+        <waitForElementVisible selector="{{RewardPointsCartSection.removeButton}}" time="15" stepKey="waitForRemoveButtonVisible"/>
+        <click selector="{{RewardPointsCartSection.removeButton}}" stepKey="clickRemovePointsButton"/>
+        <waitForPageLoad time="30" stepKey="waitAfterRemove"/>
+
+        <!-- Confirm the applied-notice has been removed -->
+        <dontSeeElement selector="{{RewardPointsCartSection.appliedNotice}}" stepKey="assertAppliedNoticeGone"/>
+    </actionGroup>
+</actionGroups>

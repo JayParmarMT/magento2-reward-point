@@ -1,0 +1,57 @@
+<?php
+/**
+ * Social Share Buttons partial.
+ *
+ * Variables expected (set via $block->setData() before calling getChildHtml):
+ *   share_url  (string) — URL to share
+ *   show_facebook  (bool)
+ *   show_twitter   (bool)
+ *   show_pinterest (bool)
+ *
+ * @var \Magento\Framework\View\Element\Template $block
+ * @var \Magento\Framework\Escaper $escaper
+ */
+$shareUrl       = (string) $block->getData('share_url');
+$showFacebook   = (bool)   $block->getData('show_facebook');
+$showTwitter    = (bool)   $block->getData('show_twitter');
+$showPinterest  = (bool)   $block->getData('show_pinterest');
+$shareText      = (string) ($block->getData('share_text') ?: __('Check this out!'));
+
+if (!$shareUrl || (!$showFacebook && !$showTwitter && !$showPinterest)) {
+    return;
+}
+?>
+<style>
+.rp-social-share { margin-top: 1.25rem; }
+.rp-social-label { font-size: 0.85rem; font-weight: 600; color: #9ca3af; text-transform: uppercase; letter-spacing: 0.07em; margin-bottom: 0.6rem; }
+.rp-social-btns  { display: flex; flex-wrap: wrap; gap: 0.5rem; }
+.rp-social-btn   { display: inline-flex; align-items: center; gap: 0.35rem; padding: 0.45rem 1rem; border-radius: 6px; font-size: 0.9rem; font-weight: 600; text-decoration: none; transition: opacity 0.2s; }
+.rp-social-btn:hover { opacity: 0.82; text-decoration: none; }
+.rp-social-btn--facebook  { background: #1877f2; color: #fff; }
+.rp-social-btn--twitter   { background: #000;    color: #fff; }
+.rp-social-btn--pinterest { background: #e60023; color: #fff; }
+</style>
+
+<div class="rp-social-share">
+    <p class="rp-social-label"><?= $escaper->escapeHtml(__('Share')) ?></p>
+    <div class="rp-social-btns">
+        <?php if ($showFacebook): ?>
+        <a href="https://www.facebook.com/sharer/sharer.php?u=<?= $escaper->escapeUrl($shareUrl) ?>"
+           target="_blank" rel="noopener noreferrer" class="rp-social-btn rp-social-btn--facebook">
+            📘 <?= $escaper->escapeHtml(__('Facebook')) ?>
+        </a>
+        <?php endif; ?>
+        <?php if ($showTwitter): ?>
+        <a href="https://twitter.com/intent/tweet?url=<?= $escaper->escapeUrl($shareUrl) ?>&text=<?= $escaper->escapeUrl($shareText) ?>"
+           target="_blank" rel="noopener noreferrer" class="rp-social-btn rp-social-btn--twitter">
+            𝕏 <?= $escaper->escapeHtml(__('Twitter / X')) ?>
+        </a>
+        <?php endif; ?>
+        <?php if ($showPinterest): ?>
+        <a href="https://pinterest.com/pin/create/button/?url=<?= $escaper->escapeUrl($shareUrl) ?>&description=<?= $escaper->escapeUrl($shareText) ?>"
+           target="_blank" rel="noopener noreferrer" class="rp-social-btn rp-social-btn--pinterest">
+            📌 <?= $escaper->escapeHtml(__('Pinterest')) ?>
+        </a>
+        <?php endif; ?>
+    </div>
+</div>

@@ -1,0 +1,83 @@
+<?php
+
+declare(strict_types=1);
+
+namespace Meetanshi\RewardPoints\Ui\Component\Listing\Transaction\Column;
+
+use Magento\Framework\Escaper;
+use Magento\Framework\UrlInterface;
+use Magento\Framework\View\Element\UiComponent\ContextInterface;
+use Magento\Framework\View\Element\UiComponentFactory;
+use Magento\Ui\Component\Listing\Columns\Column;
+
+/**
+ * Transaction Grid Actions Column
+ */
+class Actions extends Column
+{
+    private const URL_PATH_VIEW = 'meetanshi_rewardpoints/transaction/view';
+    private const URL_PATH_CANCEL = 'meetanshi_rewardpoints/transaction/cancel';
+
+    /**
+     * @param ContextInterface $context
+     * @param UiComponentFactory $uiComponentFactory
+     * @param UrlInterface $urlBuilder
+     * @param Escaper $escaper
+     * @param array $components
+     * @param array $data
+     */
+    public function __construct(
+        ContextInterface $context,
+        UiComponentFactory $uiComponentFactory,
+        private readonly UrlInterface $urlBuilder,
+        private readonly Escaper $escaper,
+        array $components = [],
+        array $data = [],
+    ) {
+        parent::__construct($context, $uiComponentFactory, $components, $data);
+    }
+
+    /**
+     * Prepare Data Source
+     *
+     * @param array $dataSource
+     * @return array
+     */
+    public function prepareDataSource(array $dataSource): array
+    {
+        if (!isset($dataSource['data']['items'])) {
+            return $dataSource;
+        }
+
+        foreach ($dataSource['data']['items'] as &$item) {
+            if (isset($item['transaction_id'])) {
+                $item[$this->getData('name')] = [
+                    'view' => [
+                        'href' => $this->urlBuilder->getUrl(
+                            self::URL_PATH_VIEW,
+                            ['transaction_id' => $item['transaction_id']],
+                        ),
+                        'label' => __('View'),
+                    ],
+                ];
+
+                if (($item['status'] ?? '') === 'pending') {
+                    $item[$this->getData('name')]['cancel'] = [
+                        'href' => $this->urlBuilder->getUrl(
+                            self::URL_PATH_CANCEL,
+                            ['transaction_id' => $item['transaction_id']],
+                        ),
+                        'label' => __('Cancel'),
+                        'confirm' => [
+                            'title' => __('Cancel Transaction #%1', $item['transaction_id']),
+                            'message' => __('Are you sure you want to cancel this transaction?'),
+                        ],
+                        'post' => true,
+                    ];
+                }
+            }
+        }
+
+        return $dataSource;
+    }
+}

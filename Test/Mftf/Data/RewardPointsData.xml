@@ -1,0 +1,58 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<entities xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+          xsi:noNamespaceSchemaLocation="urn:magento:mftf:DataGenerator/etc/dataProfileSchema.xsd">
+
+    <!--
+        Customer fixture for reward points tests.
+        Uses a fixed email so admin-side point adjustments can reference this account by email.
+        The unique="suffix" on email ensures isolation when tests run in parallel.
+    -->
+    <entity name="CustomerWithPoints" type="customer">
+        <data key="group_id">1</data>
+        <data key="default_billing">true</data>
+        <data key="default_shipping">true</data>
+        <data key="email">rewardpoints_customer@example.com</data>
+        <data key="firstname">Rewards</data>
+        <data key="lastname">Tester</data>
+        <data key="fullname">Rewards Tester</data>
+        <data key="password">Rewards123!</data>
+        <data key="store_id">1</data>
+        <data key="website_id">1</data>
+        <requiredEntity type="address">RewardPointsCustomerAddress</requiredEntity>
+    </entity>
+
+    <!-- Billing/shipping address for CustomerWithPoints -->
+    <entity name="RewardPointsCustomerAddress" type="address">
+        <data key="firstname">Rewards</data>
+        <data key="lastname">Tester</data>
+        <data key="street">123 Test Street</data>
+        <data key="city">Austin</data>
+        <data key="country_id">US</data>
+        <data key="region_id">57</data>
+        <data key="region_code">TX</data>
+        <data key="postcode">78701</data>
+        <data key="telephone">5125550100</data>
+        <data key="default_billing">true</data>
+        <data key="default_shipping">true</data>
+    </entity>
+
+    <!--
+        Simple product for earn-message and cart tests.
+        Price is set high enough that earning rates produce a visible point estimate.
+    -->
+    <entity name="SimpleProductForEarnTest" type="product">
+        <data key="name" unique="suffix">Reward Points Test Product</data>
+        <data key="sku" unique="suffix">rp-test-product</data>
+        <data key="urlKey" unique="suffix">reward-points-test-product</data>
+        <data key="type_id">simple</data>
+        <data key="attribute_set_id">4</data>
+        <data key="visibility">4</data>
+        <data key="price">50.00</data>
+        <data key="status">1</data>
+        <data key="quantity">100</data>
+        <data key="weight">1</data>
+        <requiredEntity type="product_extension_attribute">EavStockItem</requiredEntity>
+        <requiredEntity type="custom_attribute_array">CustomAttributeCategoryIds</requiredEntity>
+    </entity>
+
+</entities>

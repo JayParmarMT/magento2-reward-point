@@ -1,0 +1,18 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<sections xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+          xsi:noNamespaceSchemaLocation="urn:magento:mftf:Page/etc/SectionObject.xsd">
+    <section name="RewardPointsEarnMessageSection">
+        <!-- Main earn message container -->
+        <element name="earnMessage" type="block" selector=".reward-points-earn-message"/>
+        <!-- Individual earn items (catalog-based or cart-rule-based) -->
+        <element name="earnItem" type="block" selector=".reward-points-earn-item"/>
+        <element name="earnCatalogItem" type="block" selector=".reward-points-earn-catalog"/>
+        <element name="earnCartRuleItem" type="block" selector=".reward-points-earn-cart-rule"/>
+        <!-- Text inside each earn item -->
+        <element name="earnText" type="text" selector=".reward-points-earn-text"/>
+        <element name="earnIcon" type="text" selector=".reward-points-earn-icon"/>
+        <element name="earnRuleName" type="text" selector=".reward-points-earn-rule-name"/>
+        <!-- Social share block (optional, may not be rendered) -->
+        <element name="socialShareBlock" type="block" selector=".reward-points-social-share"/>
+    </section>
+</sections>

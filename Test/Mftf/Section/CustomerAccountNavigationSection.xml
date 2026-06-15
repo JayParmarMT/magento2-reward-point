@@ -1,0 +1,14 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<sections xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+          xsi:noNamespaceSchemaLocation="urn:magento:mftf:Page/etc/SectionObject.xsd">
+    <section name="CustomerAccountNavigationSection">
+        <!-- Sidebar navigation wrapper -->
+        <element name="navigationWrapper" type="block" selector=".account .sidebar .block-collapsible-nav"/>
+        <!-- Reward points navigation links -->
+        <element name="rewardPointsLink" type="text" selector=".nav.items a[href*='rewardpoints/account']"/>
+        <element name="pointsHistoryLink" type="text" selector=".nav.items a[href*='rewardpoints/account/transactions']"/>
+        <element name="myReferralsLink" type="text" selector=".nav.items a[href*='rewardpoints/referral']"/>
+        <!-- Standard customer account links (for context) -->
+        <element name="accountDashboardLink" type="text" selector=".nav.items a[href*='customer/account']"/>
+    </section>
+</sections>

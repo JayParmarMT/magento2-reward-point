@@ -1,0 +1,179 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<form xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+      xsi:noNamespaceSchemaLocation="urn:magento:module:Magento_Ui:etc/ui_configuration.xsd">
+
+    <argument name="data" xsi:type="array">
+        <item name="js_config" xsi:type="array">
+            <item name="provider" xsi:type="string">meetanshi_rewardpoints_spending_rate_form.meetanshi_rewardpoints_spending_rate_form_data_source</item>
+        </item>
+        <item name="label" xsi:type="string" translate="true">Spending Rate Information</item>
+        <item name="template" xsi:type="string">templates/form/collapsible</item>
+    </argument>
+
+    <settings>
+        <buttons>
+            <button name="back">
+                <url path="meetanshi_rewardpoints/spendingrate/index"/>
+                <class>back</class>
+                <label translate="true">Back</label>
+            </button>
+            <button name="delete" class="Meetanshi\RewardPoints\Block\Adminhtml\SpendingRate\Edit\DeleteButton"/>
+            <button name="save_and_continue" class="Meetanshi\RewardPoints\Block\Adminhtml\SpendingRate\Edit\SaveAndContinueButton"/>
+            <button name="save">
+                <url path="*/*/save"/>
+                <class>save primary</class>
+                <label translate="true">Save</label>
+            </button>
+        </buttons>
+        <namespace>meetanshi_rewardpoints_spending_rate_form</namespace>
+        <dataScope>data</dataScope>
+        <deps>
+            <dep>meetanshi_rewardpoints_spending_rate_form.meetanshi_rewardpoints_spending_rate_form_data_source</dep>
+        </deps>
+    </settings>
+
+    <dataSource name="meetanshi_rewardpoints_spending_rate_form_data_source">
+        <argument name="data" xsi:type="array">
+            <item name="js_config" xsi:type="array">
+                <item name="component" xsi:type="string">Magento_Ui/js/form/provider</item>
+            </item>
+        </argument>
+        <settings>
+            <validateUrl path="meetanshi_rewardpoints/spendingrate/validate"/>
+            <submitUrl path="meetanshi_rewardpoints/spendingrate/save"/>
+        </settings>
+        <aclResource>Meetanshi_RewardPoints::spending_rate</aclResource>
+        <dataProvider class="Meetanshi\RewardPoints\Ui\DataProvider\SpendingRate\FormDataProvider" name="meetanshi_rewardpoints_spending_rate_form_data_source">
+            <settings>
+                <requestFieldName>rate_id</requestFieldName>
+                <primaryFieldName>rate_id</primaryFieldName>
+            </settings>
+        </dataProvider>
+    </dataSource>
+
+    <fieldset name="general">
+        <settings>
+            <label translate="true">General</label>
+            <collapsible>false</collapsible>
+        </settings>
+
+        <!-- Hidden ID field -->
+        <field name="rate_id" formElement="input" sortOrder="10">
+            <settings>
+                <dataType>text</dataType>
+                <visible>false</visible>
+            </settings>
+        </field>
+
+        <!-- 1. Status -->
+        <field name="is_active" formElement="select" sortOrder="20">
+            <settings>
+                <dataType>select</dataType>
+                <label translate="true">Status</label>
+                <dataScope>is_active</dataScope>
+            </settings>
+            <formElements>
+                <select>
+                    <settings>
+                        <options class="Meetanshi\RewardPoints\Model\Source\IsActive"/>
+                    </settings>
+                </select>
+            </formElements>
+        </field>
+
+        <!-- 2. Websites -->
+        <field name="website_ids" formElement="multiselect" sortOrder="30">
+            <settings>
+                <dataType>int</dataType>
+                <label translate="true">Websites</label>
+                <dataScope>website_ids</dataScope>
+                <notice translate="true">If nothing is selected, the rate applies to all websites.</notice>
+            </settings>
+            <formElements>
+                <multiselect>
+                    <settings>
+                        <options class="Meetanshi\RewardPoints\Model\Source\Website"/>
+                    </settings>
+                </multiselect>
+            </formElements>
+        </field>
+
+        <!-- 3. Customer Groups -->
+        <field name="customer_group_ids" formElement="multiselect" sortOrder="40">
+            <settings>
+                <dataType>int</dataType>
+                <label translate="true">Customer Groups</label>
+                <dataScope>customer_group_ids</dataScope>
+                <notice translate="true">If nothing is selected, the rate applies to all customer groups.</notice>
+            </settings>
+            <formElements>
+                <multiselect>
+                    <settings>
+                        <options class="Magento\Customer\Ui\Component\Listing\Column\Group\Options"/>
+                    </settings>
+                </multiselect>
+            </formElements>
+        </field>
+
+        <!-- 4. Priority -->
+        <field name="priority" formElement="input" sortOrder="50">
+            <settings>
+                <dataType>number</dataType>
+                <label translate="true">Priority</label>
+                <dataScope>priority</dataScope>
+                <validation>
+                    <rule name="required-entry" xsi:type="boolean">true</rule>
+                    <rule name="validate-zero-or-greater" xsi:type="boolean">true</rule>
+                    <rule name="validate-digits" xsi:type="boolean">true</rule>
+                </validation>
+                <notice translate="true">Lower number = higher priority. Use 0 for highest.</notice>
+            </settings>
+        </field>
+
+        <!-- 5. Points to Spend -->
+        <field name="points" formElement="input" sortOrder="60">
+            <settings>
+                <dataType>number</dataType>
+                <label translate="true">Points to Spend</label>
+                <dataScope>points</dataScope>
+                <validation>
+                    <rule name="required-entry" xsi:type="boolean">true</rule>
+                    <rule name="validate-greater-than-zero" xsi:type="boolean">true</rule>
+                    <rule name="validate-digits" xsi:type="boolean">true</rule>
+                </validation>
+                <notice translate="true">Number of points the customer needs to spend.</notice>
+            </settings>
+        </field>
+
+        <!-- 6. Currency Amount -->
+        <field name="currency_amount" formElement="input" sortOrder="70">
+            <settings>
+                <dataType>number</dataType>
+                <label translate="true">Currency Amount ($)</label>
+                <dataScope>currency_amount</dataScope>
+                <validation>
+                    <rule name="required-entry" xsi:type="boolean">true</rule>
+                    <rule name="validate-greater-than-zero" xsi:type="boolean">true</rule>
+                    <rule name="validate-number" xsi:type="boolean">true</rule>
+                </validation>
+                <notice translate="true">Discount amount awarded for spending the above points.</notice>
+            </settings>
+        </field>
+
+        <!-- 7. Min Points Per Order -->
+        <field name="min_points_per_order" formElement="input" sortOrder="80">
+            <settings>
+                <dataType>number</dataType>
+                <label translate="true">Min Points Per Order</label>
+                <dataScope>min_points_per_order</dataScope>
+                <validation>
+                    <rule name="validate-zero-or-greater" xsi:type="boolean">true</rule>
+                    <rule name="validate-digits" xsi:type="boolean">true</rule>
+                </validation>
+                <notice translate="true">Minimum points required before this rate applies. Leave 0 for no minimum.</notice>
+            </settings>
+        </field>
+
+    </fieldset>
+
+</form>

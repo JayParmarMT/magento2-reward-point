@@ -1,0 +1,31 @@
+<!--@subject Welcome! Your Referral Discount Is Ready @-->
+<!--@vars {
+"var customer.name":"Customer Name",
+"var referee_discount":"Discount Amount",
+"var store_name":"Store Name"
+} @-->
+
+{{template config_path="design/email/header_template"}}
+
+<table>
+    <tr>
+        <td>
+            <p>{{trans "Dear %name," name=$customer.name}}</p>
+            <p>{{trans "Welcome to %store_name! We are delighted to have you as a new member of our rewards community." store_name=$store_name}}</p>
+
+            <p>{{trans "As a thank you for joining through a referral, you have received a special discount on your first order:"}}</p>
+
+            <table cellspacing="0" cellpadding="5" border="0" width="100%">
+                <tr>
+                    <td><strong>{{trans "Welcome Discount"}}</strong></td>
+                    <td>{{var referee_discount}}</td>
+                </tr>
+            </table>
+
+            <p>{{trans "Start earning reward points with every purchase and unlock exclusive benefits as you climb our loyalty tiers."}}</p>
+            <p>{{trans "Thank you for joining %store_name. We look forward to rewarding your loyalty!" store_name=$store_name}}</p>
+        </td>
+    </tr>
+</table>
+
+{{template config_path="design/email/footer_template"}}

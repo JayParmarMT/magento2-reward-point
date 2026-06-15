@@ -1,0 +1,10 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<components xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+            xsi:noNamespaceSchemaLocation="urn:magento:module:Magento_Ui:view/base/ui_component/etc/definition.xsd">
+
+    <!--
+        filterSelect is extended via FiltersPlugin to apply LIKE for selectLike columns.
+        No custom component type needed here.
+    -->
+
+</components>

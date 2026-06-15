@@ -1,0 +1,315 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<form xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+      xsi:noNamespaceSchemaLocation="urn:magento:module:Magento_Ui:etc/ui_configuration.xsd">
+
+    <argument name="data" xsi:type="array">
+        <item name="js_config" xsi:type="array">
+            <item name="provider" xsi:type="string">meetanshi_rewardpoints_tier_form.meetanshi_rewardpoints_tier_form_data_source</item>
+        </item>
+        <item name="label" xsi:type="string" translate="true">Tier Information</item>
+        <item name="template" xsi:type="string">templates/form/collapsible</item>
+    </argument>
+
+    <settings>
+        <buttons>
+            <button name="back">
+                <url path="meetanshi_rewardpoints/tier/index"/>
+                <class>back</class>
+                <label translate="true">Back</label>
+            </button>
+            <button name="save_and_continue" class="Meetanshi\RewardPoints\Block\Adminhtml\Tier\Edit\SaveAndContinueButton"/>
+            <button name="save">
+                <url path="*/*/save"/>
+                <class>save primary</class>
+                <label translate="true">Save</label>
+            </button>
+        </buttons>
+        <namespace>meetanshi_rewardpoints_tier_form</namespace>
+        <dataScope>data</dataScope>
+        <deps>
+            <dep>meetanshi_rewardpoints_tier_form.meetanshi_rewardpoints_tier_form_data_source</dep>
+        </deps>
+    </settings>
+
+    <dataSource name="meetanshi_rewardpoints_tier_form_data_source">
+        <argument name="data" xsi:type="array">
+            <item name="js_config" xsi:type="array">
+                <item name="component" xsi:type="string">Magento_Ui/js/form/provider</item>
+            </item>
+        </argument>
+        <settings>
+            <validateUrl path="meetanshi_rewardpoints/tier/validate"/>
+            <submitUrl path="meetanshi_rewardpoints/tier/save"/>
+        </settings>
+        <aclResource>Meetanshi_RewardPoints::tier</aclResource>
+        <dataProvider class="Meetanshi\RewardPoints\Ui\DataProvider\Tier\FormDataProvider"
+                      name="meetanshi_rewardpoints_tier_form_data_source">
+            <settings>
+                <requestFieldName>tier_id</requestFieldName>
+                <primaryFieldName>tier_id</primaryFieldName>
+            </settings>
+        </dataProvider>
+    </dataSource>
+
+    <!-- Tab: General -->
+    <fieldset name="general">
+        <settings>
+            <label translate="true">General</label>
+            <collapsible>false</collapsible>
+        </settings>
+
+        <field name="tier_id" formElement="input">
+            <settings>
+                <dataType>text</dataType>
+                <visible>false</visible>
+            </settings>
+        </field>
+
+        <field name="name" formElement="input">
+            <settings>
+                <dataType>text</dataType>
+                <label translate="true">Tier Name</label>
+                <dataScope>name</dataScope>
+                <validation>
+                    <rule name="required-entry" xsi:type="boolean">true</rule>
+                </validation>
+            </settings>
+        </field>
+
+        <field name="description" formElement="textarea">
+            <settings>
+                <dataType>text</dataType>
+                <label translate="true">Description</label>
+                <dataScope>description</dataScope>
+            </settings>
+        </field>
+
+        <field name="is_active" formElement="select">
+            <settings>
+                <dataType>select</dataType>
+                <label translate="true">Status</label>
+                <dataScope>is_active</dataScope>
+            </settings>
+            <formElements>
+                <select>
+                    <settings>
+                        <options class="Meetanshi\RewardPoints\Model\Source\IsActive"/>
+                    </settings>
+                </select>
+            </formElements>
+        </field>
+
+        <field name="image" formElement="fileUploader">
+            <settings>
+                <label translate="true">Tier Image</label>
+                <dataScope>image</dataScope>
+                <componentType>fileUploader</componentType>
+            </settings>
+            <formElements>
+                <fileUploader>
+                    <settings>
+                        <allowedExtensions>jpg jpeg gif png svg</allowedExtensions>
+                        <maxFileSize>2097152</maxFileSize>
+                        <uploaderConfig>
+                            <param xsi:type="string" name="url">meetanshi_rewardpoints/tier/upload</param>
+                        </uploaderConfig>
+                    </settings>
+                </fileUploader>
+            </formElements>
+        </field>
+
+        <field name="min_points" formElement="input">
+            <settings>
+                <dataType>number</dataType>
+                <label translate="true">Minimum Points</label>
+                <dataScope>min_points</dataScope>
+                <validation>
+                    <rule name="required-entry" xsi:type="boolean">true</rule>
+                    <rule name="validate-zero-or-greater" xsi:type="boolean">true</rule>
+                    <rule name="validate-digits" xsi:type="boolean">true</rule>
+                </validation>
+                <notice translate="true">Customer must have at least this many points to qualify for this tier.</notice>
+            </settings>
+        </field>
+
+        <field name="min_orders" formElement="input">
+            <settings>
+                <dataType>number</dataType>
+                <label translate="true">Minimum Orders</label>
+                <dataScope>min_orders</dataScope>
+                <validation>
+                    <rule name="validate-zero-or-greater" xsi:type="boolean">true</rule>
+                    <rule name="validate-digits" xsi:type="boolean">true</rule>
+                </validation>
+            </settings>
+        </field>
+
+        <field name="sort_order" formElement="input">
+            <settings>
+                <dataType>number</dataType>
+                <label translate="true">Sort Order</label>
+                <dataScope>sort_order</dataScope>
+                <validation>
+                    <rule name="validate-digits" xsi:type="boolean">true</rule>
+                </validation>
+            </settings>
+        </field>
+
+        <field name="email_template" formElement="select">
+            <settings>
+                <dataType>text</dataType>
+                <label translate="true">Email Template</label>
+                <dataScope>email_template</dataScope>
+                <notice translate="true">Email template sent when a customer reaches this tier.</notice>
+            </settings>
+            <formElements>
+                <select>
+                    <settings>
+                        <options class="Meetanshi\RewardPoints\Model\Source\TierEmailTemplate"/>
+                    </settings>
+                </select>
+            </formElements>
+        </field>
+
+        <field name="website_ids" formElement="multiselect">
+            <settings>
+                <dataType>int</dataType>
+                <label translate="true">Websites</label>
+                <dataScope>website_ids</dataScope>
+                <notice translate="true">If nothing is selected, the tier applies to all websites.</notice>
+            </settings>
+            <formElements>
+                <multiselect>
+                    <settings>
+                        <options class="Meetanshi\RewardPoints\Model\Source\Website"/>
+                    </settings>
+                </multiselect>
+            </formElements>
+        </field>
+
+        <field name="customer_group_ids" formElement="multiselect">
+            <settings>
+                <dataType>int</dataType>
+                <label translate="true">Customer Groups</label>
+                <dataScope>customer_group_ids</dataScope>
+                <notice translate="true">If nothing is selected, the tier applies to all customer groups.</notice>
+            </settings>
+            <formElements>
+                <multiselect>
+                    <settings>
+                        <options class="Magento\Customer\Ui\Component\Listing\Column\Group\Options"/>
+                    </settings>
+                </multiselect>
+            </formElements>
+        </field>
+
+    </fieldset>
+
+    <!-- Tab: Benefits -->
+    <fieldset name="benefits">
+        <settings>
+            <label translate="true">Benefits</label>
+            <collapsible>true</collapsible>
+            <opened>true</opened>
+        </settings>
+
+        <field name="earning_bonus_percent" formElement="input">
+            <settings>
+                <dataType>number</dataType>
+                <label translate="true">Earning Bonus (%)</label>
+                <dataScope>earning_bonus_percent</dataScope>
+                <validation>
+                    <rule name="validate-zero-or-greater" xsi:type="boolean">true</rule>
+                    <rule name="validate-number" xsi:type="boolean">true</rule>
+                </validation>
+                <notice translate="true">Additional percentage bonus on all earned points. E.g., 10 = 10% bonus.</notice>
+            </settings>
+        </field>
+
+        <field name="behavior_bonus_points" formElement="input">
+            <settings>
+                <dataType>number</dataType>
+                <label translate="true">Behavior Bonus Points</label>
+                <dataScope>behavior_bonus_points</dataScope>
+                <validation>
+                    <rule name="validate-zero-or-greater" xsi:type="boolean">true</rule>
+                    <rule name="validate-digits" xsi:type="boolean">true</rule>
+                </validation>
+                <notice translate="true">Extra flat bonus points for behavior rule actions at this tier.</notice>
+            </settings>
+        </field>
+
+        <field name="spending_discount_percent" formElement="input">
+            <settings>
+                <dataType>number</dataType>
+                <label translate="true">Spending Discount (%)</label>
+                <dataScope>spending_discount_percent</dataScope>
+                <validation>
+                    <rule name="validate-zero-or-greater" xsi:type="boolean">true</rule>
+                    <rule name="validate-number" xsi:type="boolean">true</rule>
+                </validation>
+                <notice translate="true">Points discount when redeeming. E.g., 10 means customer needs 10% fewer points.</notice>
+            </settings>
+        </field>
+
+        <field name="free_shipping" formElement="select">
+            <settings>
+                <dataType>select</dataType>
+                <label translate="true">Free Shipping</label>
+                <dataScope>free_shipping</dataScope>
+            </settings>
+            <formElements>
+                <select>
+                    <settings>
+                        <options class="Magento\Config\Model\Config\Source\Yesno"/>
+                    </settings>
+                </select>
+            </formElements>
+        </field>
+
+        <field name="linked_cart_rule_id" formElement="input">
+            <settings>
+                <dataType>number</dataType>
+                <label translate="true">Linked Cart Rule ID</label>
+                <dataScope>linked_cart_rule_id</dataScope>
+                <validation>
+                    <rule name="validate-digits" xsi:type="boolean">true</rule>
+                </validation>
+                <notice translate="true">Optional: ID of a Magento cart price rule to apply for customers in this tier.</notice>
+            </settings>
+        </field>
+
+    </fieldset>
+
+    <!-- Tab: Customers -->
+    <fieldset name="customers">
+        <settings>
+            <label translate="true">Customers in This Tier</label>
+            <collapsible>true</collapsible>
+            <opened>false</opened>
+        </settings>
+
+        <insertListing name="meetanshi_rewardpoints_tier_customer_listing">
+            <settings>
+                <externalProvider>meetanshi_rewardpoints_tier_customer_listing.meetanshi_rewardpoints_tier_customer_listing_data_source</externalProvider>
+                <autoRender>true</autoRender>
+                <ns>meetanshi_rewardpoints_tier_customer_listing</ns>
+                <dataLinks>
+                    <imports>false</imports>
+                    <exports>false</exports>
+                </dataLinks>
+                <exports>
+                    <link name="tier_id">meetanshi_rewardpoints_tier_customer_listing.meetanshi_rewardpoints_tier_customer_listing_data_source:params.tier_id</link>
+                </exports>
+                <imports>
+                    <link name="tier_id">${ $.provider }:data.tier_id</link>
+                </imports>
+                <renderUrl path="mui/index/render">
+                    <param name="tier_id">${ $.tier_id }</param>
+                </renderUrl>
+            </settings>
+        </insertListing>
+
+    </fieldset>
+
+</form>

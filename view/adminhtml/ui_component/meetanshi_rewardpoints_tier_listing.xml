@@ -1,0 +1,187 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<listing xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+         xsi:noNamespaceSchemaLocation="urn:magento:module:Magento_Ui:etc/ui_configuration.xsd">
+
+    <argument name="data" xsi:type="array">
+        <item name="js_config" xsi:type="array">
+            <item name="provider" xsi:type="string">meetanshi_rewardpoints_tier_listing.meetanshi_rewardpoints_tier_listing_data_source</item>
+        </item>
+    </argument>
+
+    <settings>
+        <buttons>
+            <button name="add">
+                <url path="meetanshi_rewardpoints/tier/new"/>
+                <class>primary</class>
+                <label translate="true">Add New Tier</label>
+            </button>
+        </buttons>
+        <spinner>meetanshi_rewardpoints_tier_listing_columns</spinner>
+        <deps>
+            <dep>meetanshi_rewardpoints_tier_listing.meetanshi_rewardpoints_tier_listing_data_source</dep>
+        </deps>
+    </settings>
+
+    <dataSource name="meetanshi_rewardpoints_tier_listing_data_source" component="Magento_Ui/js/grid/provider">
+        <settings>
+            <storageConfig>
+                <param name="indexField" xsi:type="string">tier_id</param>
+            </storageConfig>
+            <updateUrl path="mui/index/render"/>
+        </settings>
+        <aclResource>Meetanshi_RewardPoints::tier</aclResource>
+        <dataProvider class="Meetanshi\RewardPoints\Ui\DataProvider\Tier\ListingDataProvider"
+                      name="meetanshi_rewardpoints_tier_listing_data_source">
+            <settings>
+                <requestFieldName>tier_id</requestFieldName>
+                <primaryFieldName>tier_id</primaryFieldName>
+            </settings>
+        </dataProvider>
+    </dataSource>
+
+    <listingToolbar name="listing_top">
+        <settings>
+            <sticky>true</sticky>
+        </settings>
+        <bookmark name="bookmarks"/>
+        <columnsControls name="columns_controls"/>
+        <filterSearch name="fulltext"/>
+        <filters name="listing_filters"/>
+        <massaction name="listing_massaction">
+            <action name="delete">
+                <settings>
+                    <confirm>
+                        <message translate="true">Are you sure you want to delete the selected tiers?</message>
+                        <title translate="true">Delete Tiers</title>
+                    </confirm>
+                    <url path="meetanshi_rewardpoints/tier/massDelete"/>
+                    <type>delete</type>
+                    <label translate="true">Delete</label>
+                </settings>
+            </action>
+            <action name="enable">
+                <settings>
+                    <url path="meetanshi_rewardpoints/tier/massStatus">
+                        <param name="status">1</param>
+                    </url>
+                    <type>enable</type>
+                    <label translate="true">Enable</label>
+                </settings>
+            </action>
+            <action name="disable">
+                <settings>
+                    <url path="meetanshi_rewardpoints/tier/massStatus">
+                        <param name="status">0</param>
+                    </url>
+                    <type>disable</type>
+                    <label translate="true">Disable</label>
+                </settings>
+            </action>
+        </massaction>
+        <paging name="listing_paging"/>
+    </listingToolbar>
+
+    <columns name="meetanshi_rewardpoints_tier_listing_columns">
+        <selectionsColumn name="ids">
+            <settings>
+                <indexField>tier_id</indexField>
+            </settings>
+        </selectionsColumn>
+
+        <column name="tier_id">
+            <settings>
+                <filter>textRange</filter>
+                <label translate="true">ID</label>
+                <sorting>asc</sorting>
+            </settings>
+        </column>
+
+        <column name="name">
+            <settings>
+                <filter>text</filter>
+                <label translate="true">Name</label>
+            </settings>
+        </column>
+
+        <column name="is_active" component="Meetanshi_RewardPoints/js/grid/columns/status">
+            <settings>
+                <options class="Meetanshi\RewardPoints\Model\Source\IsActive"/>
+                <filter>select</filter>
+                <dataType>select</dataType>
+                <label translate="true">Status</label>
+            </settings>
+        </column>
+
+        <column name="min_points">
+            <settings>
+                <filter>textRange</filter>
+                <label translate="true">Min Points</label>
+            </settings>
+        </column>
+
+        <column name="min_orders">
+            <settings>
+                <filter>textRange</filter>
+                <label translate="true">Min Orders</label>
+            </settings>
+        </column>
+
+        <column name="earning_bonus_percent">
+            <settings>
+                <filter>textRange</filter>
+                <label translate="true">Earning Bonus (%)</label>
+            </settings>
+        </column>
+
+        <column name="spending_discount_percent">
+            <settings>
+                <filter>textRange</filter>
+                <label translate="true">Spending Discount (%)</label>
+            </settings>
+        </column>
+
+        <column name="free_shipping" component="Magento_Ui/js/grid/columns/select">
+            <settings>
+                <options class="Meetanshi\RewardPoints\Model\Source\IsActive"/>
+                <filter>select</filter>
+                <dataType>select</dataType>
+                <label translate="true">Free Shipping</label>
+            </settings>
+        </column>
+
+        <column name="sort_order">
+            <settings>
+                <filter>textRange</filter>
+                <label translate="true">Sort Order</label>
+            </settings>
+        </column>
+
+        <column name="websites">
+            <settings>
+                <options class="Meetanshi\RewardPoints\Model\Source\WebsiteFilter"/>
+                <filter>select</filter>
+                <dataType>select</dataType>
+                <label translate="true">Websites</label>
+            </settings>
+        </column>
+
+        <column name="customer_groups">
+            <settings>
+                <options class="Meetanshi\RewardPoints\Model\Source\CustomerGroupFilter"/>
+                <filter>select</filter>
+                <dataType>select</dataType>
+                <label translate="true">Customer Groups</label>
+            </settings>
+        </column>
+
+        <actionsColumn name="actions"
+                       class="Meetanshi\RewardPoints\Ui\Component\Listing\Column\TierActions">
+            <settings>
+                <indexField>tier_id</indexField>
+                <label translate="true">Actions</label>
+            </settings>
+        </actionsColumn>
+
+    </columns>
+
+</listing>

@@ -1,0 +1,29 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<sections xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+          xsi:noNamespaceSchemaLocation="urn:magento:mftf:Page/etc/SectionObject.xsd">
+    <section name="RewardPointsDashboardSection">
+        <!-- Main dashboard wrapper -->
+        <element name="dashboardWrapper" type="block" selector=".rp-dashboard"/>
+        <!-- Balance card elements -->
+        <element name="balanceCard" type="block" selector=".rp-balance-card"/>
+        <element name="balanceValue" type="text" selector=".rp-balance-value"/>
+        <element name="balanceLabel" type="text" selector=".rp-balance-label"/>
+        <element name="totalEarnedValue" type="text" selector=".rp-balance-stats .rp-stat-value:nth-child(1)"/>
+        <!-- Recent transactions table -->
+        <element name="recentTransactionsTableWrap" type="block" selector=".rp-table-wrap"/>
+        <element name="recentTransactionsTable" type="block" selector=".rp-table"/>
+        <element name="recentTransactionsNoActivity" type="text" selector=".rp-no-txn"/>
+        <element name="viewAllTransactionsLink" type="text" selector=".rp-view-all"/>
+        <!-- Email notifications form -->
+        <element name="emailNotificationsForm" type="block" selector="#reward-points-settings-form"/>
+        <element name="subscribeBalanceCheckbox" type="checkbox" selector="#rp-subscribe-balance"/>
+        <element name="subscribeExpirationCheckbox" type="checkbox" selector="#rp-subscribe-expiration"/>
+        <element name="saveSettingsButton" type="button" selector=".rp-save-btn"/>
+        <element name="settingsMessage" type="text" selector="#rp-settings-message"/>
+        <!-- Tier card -->
+        <element name="tierCard" type="block" selector=".rp-tier-card"/>
+        <element name="tierName" type="text" selector=".rp-tier-name"/>
+        <element name="progressBar" type="block" selector=".rp-progress-bar"/>
+        <element name="progressFill" type="block" selector=".rp-progress-fill"/>
+    </section>
+</sections>

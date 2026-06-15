@@ -1,0 +1,44 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<tests xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+       xsi:noNamespaceSchemaLocation="urn:magento:mftf:Test/etc/testSchema.xsd">
+
+    <test name="RewardPointsNavigationLinksVisible">
+        <annotations>
+            <features value="Meetanshi Reward Points"/>
+            <stories value="Customer Account Navigation"/>
+            <title value="Reward Points sidebar navigation links are visible in My Account"/>
+            <description value="Verifies that the My Reward Points, Points History, and My Referrals links are present in the customer account sidebar navigation on the Luma theme."/>
+            <severity value="MAJOR"/>
+            <group value="RewardPoints"/>
+        </annotations>
+
+        <before>
+            <createData entity="CustomerWithPoints" stepKey="createCustomer"/>
+        </before>
+
+        <after>
+            <actionGroup ref="StorefrontCustomerLogoutActionGroup" stepKey="logoutCustomer"/>
+            <deleteData createDataKey="createCustomer" stepKey="deleteCustomer"/>
+        </after>
+
+        <!-- Log in and go to customer account dashboard -->
+        <actionGroup ref="LoginToStorefrontActionGroup" stepKey="loginToStorefront">
+            <argument name="Customer" value="$$createCustomer$$"/>
+        </actionGroup>
+
+        <!-- Navigate to the customer account area so the sidebar is rendered -->
+        <amOnPage url="/customer/account/" stepKey="navigateToMyAccount"/>
+        <waitForPageLoad time="30" stepKey="waitForAccountPageLoad"/>
+
+        <!-- Assert all three reward points nav links are present -->
+        <seeElement selector="{{CustomerAccountNavigationSection.rewardPointsLink}}" stepKey="seeMyRewardPointsLink"/>
+        <see selector="{{CustomerAccountNavigationSection.rewardPointsLink}}" userInput="My Reward Points" stepKey="seeMyRewardPointsText"/>
+
+        <seeElement selector="{{CustomerAccountNavigationSection.pointsHistoryLink}}" stepKey="seePointsHistoryLink"/>
+        <see selector="{{CustomerAccountNavigationSection.pointsHistoryLink}}" userInput="Points History" stepKey="seePointsHistoryText"/>
+
+        <seeElement selector="{{CustomerAccountNavigationSection.myReferralsLink}}" stepKey="seeMyReferralsLink"/>
+        <see selector="{{CustomerAccountNavigationSection.myReferralsLink}}" userInput="My Referrals" stepKey="seeMyReferralsText"/>
+    </test>
+
+</tests>

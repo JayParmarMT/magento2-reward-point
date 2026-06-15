@@ -1,0 +1,92 @@
+<!--
+    Reward Points checkout block.
+    Placed under billing-step > payment > beforeMethods (same area as the discount code block).
+    Uses Magento's standard collapsible widget pattern (same as Magento_SalesRule/payment/discount).
+-->
+<!-- ko if: isVisible() -->
+<div class="payment-option _collapsible opc-payment-additional reward-points-checkout-block"
+     data-bind="mageInit: {'collapsible': {'openedState': '_active'}}">
+
+    <div class="payment-option-title field choice" data-role="title">
+        <span class="action action-toggle" id="block-reward-points-heading" role="heading" aria-level="2">
+            <!-- ko i18n: 'Use Reward Points' --><!-- /ko -->
+        </span>
+    </div>
+
+    <div class="payment-option-content" data-role="content">
+        <div class="payment-option-inner">
+
+            <!-- Balance display -->
+            <div class="payment-option-inner reward-points-balance-row">
+                <span><!-- ko i18n: 'Available Balance:' --><!-- /ko --></span>
+                <strong data-bind="text: balance + ' pts'"></strong>
+            </div>
+
+            <!-- Message area -->
+            <!-- ko if: message() -->
+            <div class="message" data-bind="css: 'message-' + messageType(), text: message()"></div>
+            <!-- /ko -->
+
+            <!-- ── Not yet applied ── -->
+            <!-- ko ifnot: isApplied() -->
+            <div class="field reward-points-input-row">
+                <label class="label" for="reward-points-checkout-amount">
+                    <span><!-- ko i18n: 'Points to Redeem' --><!-- /ko --></span>
+                </label>
+                <div class="control reward-points-controls">
+                    <input type="range"
+                           class="reward-points-range-input"
+                           data-bind="attr: {min: minPoints, max: maxPoints, step: 1},
+                                      value: pointsToUse,
+                                      event: {input: function(d,e){ pointsToUse(parseInt(e.target.value)||minPoints); }}">
+                    <div class="reward-points-input-group">
+                        <input type="number"
+                               id="reward-points-checkout-amount"
+                               class="input-text"
+                               data-bind="attr: {min: minPoints, max: maxPoints},
+                                          value: pointsToUse">
+                        <span class="reward-points-pts-label"><!-- ko i18n: 'pts' --><!-- /ko --></span>
+                    </div>
+                </div>
+            </div>
+
+            <div class="actions-toolbar">
+                <div class="primary">
+                    <button type="button"
+                            class="action action-apply"
+                            data-bind="click: applyPoints, enable: !isLoading(), css: {disabled: isLoading()}">
+                        <span><!-- ko i18n: 'Apply' --><!-- /ko --></span>
+                    </button>
+                </div>
+            </div>
+            <!-- /ko -->
+
+            <!-- ── Already applied ── -->
+            <!-- ko if: isApplied() -->
+            <div class="reward-points-applied-summary">
+                <div class="reward-points-applied-row">
+                    <span><!-- ko i18n: 'Points Applied:' --><!-- /ko --></span>
+                    <strong data-bind="text: pointsToUse() + ' pts'"></strong>
+                </div>
+                <div class="reward-points-applied-row">
+                    <span><!-- ko i18n: 'Discount:' --><!-- /ko --></span>
+                    <strong class="reward-points-discount-value"
+                            data-bind="text: '-$' + parseFloat(currentDiscountAmount()).toFixed(2)"></strong>
+                </div>
+            </div>
+
+            <div class="actions-toolbar">
+                <div class="secondary">
+                    <button type="button"
+                            class="action action-cancel"
+                            data-bind="click: removePoints, enable: !isLoading(), css: {disabled: isLoading()}">
+                        <span><!-- ko i18n: 'Remove' --><!-- /ko --></span>
+                    </button>
+                </div>
+            </div>
+            <!-- /ko -->
+
+        </div>
+    </div>
+</div>
+<!-- /ko -->

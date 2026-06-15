@@ -1,0 +1,780 @@
+<?xml version="1.0"?>
+<schema xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+        xsi:noNamespaceSchemaLocation="urn:magento:framework:Setup/Declaration/Schema/etc/schema.xsd">
+
+    <!-- ========================================================
+         meetanshi_rewardpoints_account
+         One row per customer × website
+         ======================================================== -->
+    <table name="meetanshi_rewardpoints_account" resource="default" engine="innodb"
+           comment="Meetanshi RewardPoints — Customer Account">
+        <column xsi:type="int" name="account_id" unsigned="true" nullable="false"
+                identity="true" comment="Account ID"/>
+        <column xsi:type="int" name="customer_id" unsigned="true" nullable="false"
+                comment="Customer ID"/>
+        <column xsi:type="smallint" name="website_id" unsigned="true" nullable="false"
+                comment="Website ID"/>
+        <column xsi:type="int" name="points_balance" nullable="false" default="0"
+                comment="Current Points Balance"/>
+        <column xsi:type="int" name="total_earned" nullable="false" default="0"
+                comment="Total Points Earned"/>
+        <column xsi:type="int" name="total_spent" nullable="false" default="0"
+                comment="Total Points Spent"/>
+        <column xsi:type="smallint" name="is_enabled" nullable="false" default="1"
+                comment="Is Account Enabled"/>
+        <column xsi:type="smallint" name="is_subscribed_balance" nullable="false" default="0"
+                comment="Email Opt-in for Balance Updates"/>
+        <column xsi:type="smallint" name="is_subscribed_expiration" nullable="false" default="0"
+                comment="Email Opt-in for Expiration Notices"/>
+        <column xsi:type="int" name="current_tier_id" unsigned="true" nullable="true"
+                comment="Current Tier ID"/>
+        <column xsi:type="decimal" name="lifetime_invoice_amount" precision="20" scale="4"
+                nullable="false" default="0" comment="Lifetime Invoice Amount for Tier Calc"/>
+        <column xsi:type="timestamp" name="created_at" nullable="false" default="CURRENT_TIMESTAMP"
+                comment="Created At"/>
+        <column xsi:type="timestamp" name="updated_at" nullable="false" default="CURRENT_TIMESTAMP"
+                on_update="true" comment="Updated At"/>
+
+        <constraint xsi:type="primary" referenceId="PRIMARY">
+            <column name="account_id"/>
+        </constraint>
+        <constraint xsi:type="unique" referenceId="MEETANSHI_REWARDPOINTS_ACCOUNT_CUSTOMER_WEBSITE">
+            <column name="customer_id"/>
+            <column name="website_id"/>
+        </constraint>
+        <constraint xsi:type="foreign" referenceId="MEETANSHI_REWARDPOINTS_ACCOUNT_CUSTOMER_ID"
+                    table="meetanshi_rewardpoints_account" column="customer_id"
+                    referenceTable="customer_entity" referenceColumn="entity_id"
+                    onDelete="CASCADE"/>
+        <constraint xsi:type="foreign" referenceId="MEETANSHI_REWARDPOINTS_ACCOUNT_WEBSITE_ID"
+                    table="meetanshi_rewardpoints_account" column="website_id"
+                    referenceTable="store_website" referenceColumn="website_id"
+                    onDelete="CASCADE"/>
+
+        <index referenceId="MEETANSHI_REWARDPOINTS_ACCOUNT_CUSTOMER_ID_IDX" indexType="btree">
+            <column name="customer_id"/>
+        </index>
+        <index referenceId="MEETANSHI_REWARDPOINTS_ACCOUNT_WEBSITE_ID_IDX" indexType="btree">
+            <column name="website_id"/>
+        </index>
+    </table>
+
+    <!-- ========================================================
+         meetanshi_rewardpoints_transaction
+         Full ledger of all point movements
+         ======================================================== -->
+    <table name="meetanshi_rewardpoints_transaction" resource="default" engine="innodb"
+           comment="Meetanshi RewardPoints — Transaction Ledger">
+        <column xsi:type="int" name="transaction_id" unsigned="true" nullable="false"
+                identity="true" comment="Transaction ID"/>
+        <column xsi:type="int" name="account_id" unsigned="true" nullable="false"
+                comment="Account ID"/>
+        <column xsi:type="int" name="customer_id" unsigned="true" nullable="false"
+                comment="Customer ID (denormalized)"/>
+        <column xsi:type="smallint" name="store_id" unsigned="true" nullable="true"
+                comment="Store ID"/>
+        <column xsi:type="int" name="points_delta" nullable="false" default="0"
+                comment="Points Delta (positive = earn, negative = spend/expire)"/>
+        <column xsi:type="int" name="points_balance_after" nullable="false" default="0"
+                comment="Balance Snapshot After Transaction"/>
+        <column xsi:type="varchar" name="action_code" nullable="false" length="64"
+                comment="Action Code"/>
+        <column xsi:type="varchar" name="status" nullable="false" length="16" default="active"
+                comment="Transaction Status: pending|active|expired|cancelled"/>
+        <column xsi:type="text" name="comment" nullable="true"
+                comment="Admin/System Comment"/>
+        <column xsi:type="timestamp" name="expires_at" nullable="true"
+                comment="Expiration Timestamp (NULL = never)"/>
+        <column xsi:type="int" name="order_id" unsigned="true" nullable="true"
+                comment="Related Order ID"/>
+        <column xsi:type="int" name="creditmemo_id" unsigned="true" nullable="true"
+                comment="Related Credit Memo ID"/>
+        <column xsi:type="int" name="rule_id" unsigned="true" nullable="true"
+                comment="Rule ID (polymorphic, no FK)"/>
+        <column xsi:type="varchar" name="rule_type" nullable="true" length="32"
+                comment="Rule Type: catalog|cart|behavior|spending|referral|tier_bonus"/>
+        <column xsi:type="int" name="admin_user_id" unsigned="true" nullable="true"
+                comment="Admin User ID"/>
+        <column xsi:type="varchar" name="admin_user_name" nullable="true" length="255"
+                comment="Admin User Name Snapshot"/>
+        <column xsi:type="timestamp" name="created_at" nullable="false" default="CURRENT_TIMESTAMP"
+                comment="Created At"/>
+
+        <constraint xsi:type="primary" referenceId="PRIMARY">
+            <column name="transaction_id"/>
+        </constraint>
+        <constraint xsi:type="foreign" referenceId="MEETANSHI_REWARDPOINTS_TXN_ACCOUNT_ID"
+                    table="meetanshi_rewardpoints_transaction" column="account_id"
+                    referenceTable="meetanshi_rewardpoints_account" referenceColumn="account_id"
+                    onDelete="CASCADE"/>
+        <constraint xsi:type="foreign" referenceId="MEETANSHI_REWARDPOINTS_TXN_CUSTOMER_ID"
+                    table="meetanshi_rewardpoints_transaction" column="customer_id"
+                    referenceTable="customer_entity" referenceColumn="entity_id"
+                    onDelete="CASCADE"/>
+        <constraint xsi:type="foreign" referenceId="MEETANSHI_REWARDPOINTS_TXN_STORE_ID"
+                    table="meetanshi_rewardpoints_transaction" column="store_id"
+                    referenceTable="store" referenceColumn="store_id"
+                    onDelete="SET NULL"/>
+        <constraint xsi:type="foreign" referenceId="MEETANSHI_REWARDPOINTS_TXN_ORDER_ID"
+                    table="meetanshi_rewardpoints_transaction" column="order_id"
+                    referenceTable="sales_order" referenceColumn="entity_id"
+                    onDelete="SET NULL"/>
+        <constraint xsi:type="foreign" referenceId="MEETANSHI_REWARDPOINTS_TXN_CREDITMEMO_ID"
+                    table="meetanshi_rewardpoints_transaction" column="creditmemo_id"
+                    referenceTable="sales_creditmemo" referenceColumn="entity_id"
+                    onDelete="SET NULL"/>
+
+        <index referenceId="MEETANSHI_REWARDPOINTS_TXN_ACCOUNT_STATUS" indexType="btree">
+            <column name="account_id"/>
+            <column name="status"/>
+        </index>
+        <index referenceId="MEETANSHI_REWARDPOINTS_TXN_CUSTOMER_CREATED" indexType="btree">
+            <column name="customer_id"/>
+            <column name="created_at"/>
+        </index>
+        <index referenceId="MEETANSHI_REWARDPOINTS_TXN_STATUS_EXPIRES" indexType="btree">
+            <column name="status"/>
+            <column name="expires_at"/>
+        </index>
+        <index referenceId="MEETANSHI_REWARDPOINTS_TXN_ORDER_ID_IDX" indexType="btree">
+            <column name="order_id"/>
+        </index>
+    </table>
+
+    <!-- ========================================================
+         meetanshi_rewardpoints_earning_rate
+         ======================================================== -->
+    <table name="meetanshi_rewardpoints_earning_rate" resource="default" engine="innodb"
+           comment="Meetanshi RewardPoints — Earning Rate">
+        <column xsi:type="int" name="rate_id" unsigned="true" nullable="false"
+                identity="true" comment="Rate ID"/>
+        <column xsi:type="decimal" name="money_step" precision="12" scale="4" nullable="false"
+                default="1.0000" comment="Money Spent Amount (Y)"/>
+        <column xsi:type="int" name="points" nullable="false" default="1"
+                comment="Points to Earn (X)"/>
+        <column xsi:type="decimal" name="min_order_total" precision="12" scale="4" nullable="true"
+                comment="Minimum Order Total"/>
+        <column xsi:type="int" name="priority" nullable="false" default="0"
+                comment="Priority (0 = highest)"/>
+        <column xsi:type="smallint" name="is_active" nullable="false" default="1"
+                comment="Is Active"/>
+        <column xsi:type="timestamp" name="created_at" nullable="false" default="CURRENT_TIMESTAMP"
+                comment="Created At"/>
+        <column xsi:type="timestamp" name="updated_at" nullable="false" default="CURRENT_TIMESTAMP"
+                on_update="true" comment="Updated At"/>
+
+        <constraint xsi:type="primary" referenceId="PRIMARY">
+            <column name="rate_id"/>
+        </constraint>
+        <index referenceId="MEETANSHI_REWARDPOINTS_EARNING_RATE_PRIORITY" indexType="btree">
+            <column name="priority"/>
+        </index>
+    </table>
+
+    <!-- ========================================================
+         meetanshi_rewardpoints_spending_rate
+         ======================================================== -->
+    <table name="meetanshi_rewardpoints_spending_rate" resource="default" engine="innodb"
+           comment="Meetanshi RewardPoints — Spending Rate">
+        <column xsi:type="int" name="rate_id" unsigned="true" nullable="false"
+                identity="true" comment="Rate ID"/>
+        <column xsi:type="int" name="points" nullable="false" default="1"
+                comment="Points to Spend (X)"/>
+        <column xsi:type="decimal" name="currency_amount" precision="12" scale="4" nullable="false"
+                default="1.0000" comment="Discount Amount (Y)"/>
+        <column xsi:type="int" name="min_points_per_order" nullable="false" default="0"
+                comment="Minimum Points per Order"/>
+        <column xsi:type="int" name="priority" nullable="false" default="0"
+                comment="Priority (0 = highest)"/>
+        <column xsi:type="smallint" name="is_active" nullable="false" default="1"
+                comment="Is Active"/>
+        <column xsi:type="timestamp" name="created_at" nullable="false" default="CURRENT_TIMESTAMP"
+                comment="Created At"/>
+        <column xsi:type="timestamp" name="updated_at" nullable="false" default="CURRENT_TIMESTAMP"
+                on_update="true" comment="Updated At"/>
+
+        <constraint xsi:type="primary" referenceId="PRIMARY">
+            <column name="rate_id"/>
+        </constraint>
+        <index referenceId="MEETANSHI_REWARDPOINTS_SPENDING_RATE_PRIORITY" indexType="btree">
+            <column name="priority"/>
+        </index>
+    </table>
+
+    <!-- ========================================================
+         meetanshi_rewardpoints_catalog_rule
+         ======================================================== -->
+    <table name="meetanshi_rewardpoints_catalog_rule" resource="default" engine="innodb"
+           comment="Meetanshi RewardPoints — Catalog Earning Rule">
+        <column xsi:type="int" name="rule_id" unsigned="true" nullable="false"
+                identity="true" comment="Rule ID"/>
+        <column xsi:type="varchar" name="name" nullable="false" length="255" comment="Rule Name"/>
+        <column xsi:type="text" name="description" nullable="true" comment="Description"/>
+        <column xsi:type="smallint" name="is_active" nullable="false" default="1" comment="Is Active"/>
+        <column xsi:type="date" name="from_date" nullable="true" comment="From Date"/>
+        <column xsi:type="date" name="to_date" nullable="true" comment="To Date"/>
+        <column xsi:type="int" name="priority" nullable="false" default="0" comment="Priority"/>
+        <column xsi:type="varchar" name="action_type" nullable="false" length="32"
+                default="fixed" comment="Action: fixed|per_price|per_profit"/>
+        <column xsi:type="int" name="points" nullable="false" default="0" comment="Points (X)"/>
+        <column xsi:type="decimal" name="money_step" precision="12" scale="4" nullable="true"
+                comment="Money Step (Y)"/>
+        <column xsi:type="int" name="max_points" nullable="false" default="0"
+                comment="Max Points (0=unlimited)"/>
+        <column xsi:type="smallint" name="stop_rules_processing" nullable="false" default="0"
+                comment="Stop Further Rule Processing"/>
+        <column xsi:type="mediumtext" name="conditions_serialized" nullable="true"
+                comment="Conditions Serialized"/>
+        <column xsi:type="timestamp" name="created_at" nullable="false" default="CURRENT_TIMESTAMP"
+                comment="Created At"/>
+        <column xsi:type="timestamp" name="updated_at" nullable="false" default="CURRENT_TIMESTAMP"
+                on_update="true" comment="Updated At"/>
+
+        <constraint xsi:type="primary" referenceId="PRIMARY">
+            <column name="rule_id"/>
+        </constraint>
+        <index referenceId="MEETANSHI_REWARDPOINTS_CATALOG_RULE_IS_ACTIVE" indexType="btree">
+            <column name="is_active"/>
+        </index>
+    </table>
+
+    <!-- ========================================================
+         meetanshi_rewardpoints_catalog_rule_product
+         Pre-calculated rule-product assignments
+         ======================================================== -->
+    <table name="meetanshi_rewardpoints_catalog_rule_product" resource="default" engine="innodb"
+           comment="Meetanshi RewardPoints — Catalog Rule Product Index">
+        <column xsi:type="int" name="rule_product_id" unsigned="true" nullable="false"
+                identity="true" comment="Rule Product ID"/>
+        <column xsi:type="int" name="rule_id" unsigned="true" nullable="false" comment="Rule ID"/>
+        <column xsi:type="int" name="product_id" unsigned="true" nullable="false" comment="Product ID"/>
+        <column xsi:type="int" name="customer_group_id" unsigned="true" nullable="false"
+                comment="Customer Group ID"/>
+        <column xsi:type="int" name="website_id" unsigned="true" nullable="false" comment="Website ID"/>
+        <column xsi:type="int" name="points" nullable="false" default="0" comment="Points"/>
+        <column xsi:type="varchar" name="action_type" nullable="false" length="32" comment="Action"/>
+        <column xsi:type="decimal" name="money_step" precision="12" scale="4" nullable="true"/>
+        <column xsi:type="int" name="max_points" nullable="false" default="0"/>
+        <column xsi:type="int" name="priority" nullable="false" default="0"/>
+        <column xsi:type="smallint" name="stop_rules_processing" nullable="false" default="0"/>
+
+        <constraint xsi:type="primary" referenceId="PRIMARY">
+            <column name="rule_product_id"/>
+        </constraint>
+        <index referenceId="MEETANSHI_REWARDPOINTS_CATALOG_RULE_PRODUCT_LOOKUP" indexType="btree">
+            <column name="product_id"/>
+            <column name="website_id"/>
+            <column name="customer_group_id"/>
+        </index>
+    </table>
+
+    <!-- ========================================================
+         meetanshi_rewardpoints_cart_rule
+         ======================================================== -->
+    <table name="meetanshi_rewardpoints_cart_rule" resource="default" engine="innodb"
+           comment="Meetanshi RewardPoints — Cart Earning Rule">
+        <column xsi:type="int" name="rule_id" unsigned="true" nullable="false"
+                identity="true" comment="Rule ID"/>
+        <column xsi:type="varchar" name="name" nullable="false" length="255" comment="Rule Name"/>
+        <column xsi:type="text" name="description" nullable="true" comment="Description"/>
+        <column xsi:type="smallint" name="is_active" nullable="false" default="1" comment="Is Active"/>
+        <column xsi:type="date" name="from_date" nullable="true" comment="From Date"/>
+        <column xsi:type="date" name="to_date" nullable="true" comment="To Date"/>
+        <column xsi:type="int" name="priority" nullable="false" default="0" comment="Priority"/>
+        <column xsi:type="varchar" name="action_type" nullable="false" length="32"
+                default="fixed" comment="Action: fixed|per_price|per_qty"/>
+        <column xsi:type="int" name="points" nullable="false" default="0" comment="Points (X)"/>
+        <column xsi:type="decimal" name="money_step" precision="12" scale="4" nullable="true"
+                comment="Money/Qty Step (Y)"/>
+        <column xsi:type="int" name="max_points" nullable="false" default="0"
+                comment="Max Points (0=unlimited)"/>
+        <column xsi:type="smallint" name="stop_rules_processing" nullable="false" default="0"/>
+        <column xsi:type="smallint" name="is_shown_on_product_page" nullable="false" default="0"
+                comment="Show on Product Page"/>
+        <column xsi:type="mediumtext" name="conditions_serialized" nullable="true"/>
+        <column xsi:type="mediumtext" name="actions_serialized" nullable="true"
+                comment="Apply-to matching items conditions"/>
+        <column xsi:type="timestamp" name="created_at" nullable="false" default="CURRENT_TIMESTAMP"/>
+        <column xsi:type="timestamp" name="updated_at" nullable="false" default="CURRENT_TIMESTAMP"
+                on_update="true"/>
+
+        <constraint xsi:type="primary" referenceId="PRIMARY">
+            <column name="rule_id"/>
+        </constraint>
+    </table>
+
+    <!-- ========================================================
+         meetanshi_rewardpoints_behavior_rule
+         ======================================================== -->
+    <table name="meetanshi_rewardpoints_behavior_rule" resource="default" engine="innodb"
+           comment="Meetanshi RewardPoints — Behavior Earning Rule">
+        <column xsi:type="int" name="rule_id" unsigned="true" nullable="false"
+                identity="true" comment="Rule ID"/>
+        <column xsi:type="varchar" name="name" nullable="false" length="255" comment="Rule Name"/>
+        <column xsi:type="text" name="description" nullable="true"/>
+        <column xsi:type="smallint" name="is_active" nullable="false" default="1"/>
+        <column xsi:type="varchar" name="event_code" nullable="false" length="64"
+                comment="Event Code"/>
+        <column xsi:type="date" name="from_date" nullable="true"/>
+        <column xsi:type="date" name="to_date" nullable="true"/>
+        <column xsi:type="int" name="priority" nullable="false" default="0"/>
+        <column xsi:type="varchar" name="action_type" nullable="false" length="32" default="fixed"
+                comment="fixed|per_price|per_qty"/>
+        <column xsi:type="int" name="points" nullable="false" default="0"/>
+        <column xsi:type="decimal" name="step" precision="12" scale="4" nullable="true"/>
+        <column xsi:type="int" name="max_points" nullable="false" default="0"/>
+        <column xsi:type="int" name="expire_after_days" nullable="false" default="0"
+                comment="Override expiration (0=use global)"/>
+        <column xsi:type="int" name="cap_per_day" nullable="false" default="0"
+                comment="Max pts per day (0=unlimited)"/>
+        <column xsi:type="int" name="cap_per_month" nullable="false" default="0"/>
+        <column xsi:type="int" name="cap_per_year" nullable="false" default="0"/>
+        <column xsi:type="int" name="cap_lifetime" nullable="false" default="0"/>
+        <column xsi:type="smallint" name="stop_rules_processing" nullable="false" default="0"/>
+        <column xsi:type="varchar" name="display_name" nullable="true" length="255"
+                comment="Frontend Display Name"/>
+        <column xsi:type="varchar" name="history_message" nullable="true" length="255"
+                comment="Message in Reward History"/>
+        <column xsi:type="varchar" name="email_message" nullable="true" length="255"
+                comment="Message for Customer Email"/>
+        <column xsi:type="mediumtext" name="conditions_serialized" nullable="true"/>
+        <column xsi:type="mediumtext" name="extra_data" nullable="true"
+                comment="Event-specific extra config (JSON)"/>
+        <column xsi:type="timestamp" name="created_at" nullable="false" default="CURRENT_TIMESTAMP"/>
+        <column xsi:type="timestamp" name="updated_at" nullable="false" default="CURRENT_TIMESTAMP"
+                on_update="true"/>
+
+        <constraint xsi:type="primary" referenceId="PRIMARY">
+            <column name="rule_id"/>
+        </constraint>
+        <index referenceId="MEETANSHI_REWARDPOINTS_BEHAVIOR_RULE_EVENT" indexType="btree">
+            <column name="event_code"/>
+        </index>
+    </table>
+
+    <!-- ========================================================
+         meetanshi_rewardpoints_spending_rule
+         ======================================================== -->
+    <table name="meetanshi_rewardpoints_spending_rule" resource="default" engine="innodb"
+           comment="Meetanshi RewardPoints — Cart Spending Rule">
+        <column xsi:type="int" name="rule_id" unsigned="true" nullable="false"
+                identity="true" comment="Rule ID"/>
+        <column xsi:type="varchar" name="name" nullable="false" length="255"/>
+        <column xsi:type="text" name="description" nullable="true"/>
+        <column xsi:type="smallint" name="is_active" nullable="false" default="1"/>
+        <column xsi:type="date" name="from_date" nullable="true"/>
+        <column xsi:type="date" name="to_date" nullable="true"/>
+        <column xsi:type="int" name="priority" nullable="false" default="0"/>
+        <column xsi:type="varchar" name="spending_style" nullable="false" length="16"
+                default="flexible" comment="flexible|fixed"/>
+        <column xsi:type="varchar" name="spending_action" nullable="false" length="16"
+                default="fixed_points" comment="fixed_points|per_points"/>
+        <column xsi:type="int" name="points_step" nullable="false" default="1"
+                comment="X Points to Spend"/>
+        <column xsi:type="varchar" name="discount_action" nullable="false" length="32"
+                default="by_fixed" comment="by_fixed|by_percent|free_shipping"/>
+        <column xsi:type="decimal" name="discount_amount" precision="12" scale="4"
+                nullable="false" default="0.0000" comment="Discount Amount/Percent"/>
+        <column xsi:type="int" name="max_points" nullable="false" default="0"
+                comment="Max Redeemable Points (0=unlimited)"/>
+        <column xsi:type="int" name="min_points" nullable="false" default="0"
+                comment="Min Points to Spend"/>
+        <column xsi:type="smallint" name="apply_to_shipping" nullable="false" default="0"/>
+        <column xsi:type="smallint" name="stop_rules_processing" nullable="false" default="0"/>
+        <column xsi:type="mediumtext" name="conditions_serialized" nullable="true"/>
+        <column xsi:type="mediumtext" name="actions_serialized" nullable="true"
+                comment="Apply-to matching items conditions"/>
+        <column xsi:type="timestamp" name="created_at" nullable="false" default="CURRENT_TIMESTAMP"/>
+        <column xsi:type="timestamp" name="updated_at" nullable="false" default="CURRENT_TIMESTAMP"
+                on_update="true"/>
+
+        <constraint xsi:type="primary" referenceId="PRIMARY">
+            <column name="rule_id"/>
+        </constraint>
+    </table>
+
+    <!-- ========================================================
+         meetanshi_rewardpoints_referral_rule
+         ======================================================== -->
+    <table name="meetanshi_rewardpoints_referral_rule" resource="default" engine="innodb"
+           comment="Meetanshi RewardPoints — Referral Rule">
+        <column xsi:type="int" name="rule_id" unsigned="true" nullable="false"
+                identity="true" comment="Rule ID"/>
+        <column xsi:type="varchar" name="name" nullable="false" length="255"/>
+        <column xsi:type="text" name="description" nullable="true"/>
+        <column xsi:type="smallint" name="is_active" nullable="false" default="1"/>
+        <column xsi:type="date" name="from_date" nullable="true"/>
+        <column xsi:type="date" name="to_date" nullable="true"/>
+        <column xsi:type="int" name="priority" nullable="false" default="0"/>
+        <column xsi:type="smallint" name="stop_rules_processing" nullable="false" default="0"/>
+        <!-- Referrer action -->
+        <column xsi:type="varchar" name="referrer_action_type" nullable="false" length="32"
+                default="fixed" comment="fixed|per_price"/>
+        <column xsi:type="int" name="referrer_points" nullable="false" default="0"/>
+        <column xsi:type="decimal" name="referrer_money_step" precision="12" scale="4" nullable="true"/>
+        <!-- Referee action -->
+        <column xsi:type="varchar" name="referee_action_type" nullable="false" length="32"
+                default="fixed_points" comment="fixed_points|per_price|fixed_discount|percent_discount"/>
+        <column xsi:type="int" name="referee_points" nullable="false" default="0"/>
+        <column xsi:type="decimal" name="referee_money_step" precision="12" scale="4" nullable="true"/>
+        <column xsi:type="decimal" name="referee_discount" precision="12" scale="4"
+                nullable="false" default="0.0000" comment="Referee discount amount"/>
+        <column xsi:type="varchar" name="discount_type" nullable="false" length="32"
+                default="fixed" comment="fixed|percent"/>
+        <column xsi:type="smallint" name="referee_apply_to_shipping" nullable="false" default="0"/>
+        <column xsi:type="int" name="max_invitations" unsigned="true" nullable="false" default="0"
+                comment="Max referral invitations (0 = unlimited)"/>
+        <!-- Group restrictions -->
+        <column xsi:type="varchar" name="referrer_customer_group_ids" nullable="true" length="255"
+                comment="Comma-separated allowed referrer group IDs"/>
+        <column xsi:type="varchar" name="referee_customer_group_ids" nullable="true" length="255"
+                comment="Comma-separated allowed referee group IDs"/>
+        <column xsi:type="mediumtext" name="conditions_serialized" nullable="true"
+                comment="Serialized conditions tree"/>
+        <column xsi:type="timestamp" name="created_at" nullable="false" default="CURRENT_TIMESTAMP"/>
+        <column xsi:type="timestamp" name="updated_at" nullable="false" default="CURRENT_TIMESTAMP"
+                on_update="true"/>
+
+        <constraint xsi:type="primary" referenceId="PRIMARY">
+            <column name="rule_id"/>
+        </constraint>
+    </table>
+
+    <!-- ========================================================
+         meetanshi_rewardpoints_referral_code
+         ======================================================== -->
+    <table name="meetanshi_rewardpoints_referral_code" resource="default" engine="innodb"
+           comment="Meetanshi RewardPoints — Referral Code per Customer">
+        <column xsi:type="int" name="code_id" unsigned="true" nullable="false"
+                identity="true" comment="Code ID"/>
+        <column xsi:type="int" name="customer_id" unsigned="true" nullable="false"
+                comment="Customer ID"/>
+        <column xsi:type="int" name="website_id" unsigned="true" nullable="false"
+                comment="Website ID"/>
+        <column xsi:type="varchar" name="code" nullable="false" length="64"
+                comment="Unique Referral Code"/>
+        <column xsi:type="timestamp" name="created_at" nullable="false" default="CURRENT_TIMESTAMP"/>
+
+        <constraint xsi:type="primary" referenceId="PRIMARY">
+            <column name="code_id"/>
+        </constraint>
+        <constraint xsi:type="unique" referenceId="MEETANSHI_REWARDPOINTS_REFERRAL_CODE_UNIQUE">
+            <column name="code"/>
+        </constraint>
+        <constraint xsi:type="unique" referenceId="MEETANSHI_REWARDPOINTS_REFERRAL_CODE_CUSTOMER_WEBSITE">
+            <column name="customer_id"/>
+            <column name="website_id"/>
+        </constraint>
+        <constraint xsi:type="foreign" referenceId="MEETANSHI_REWARDPOINTS_REFERRAL_CODE_CUSTOMER"
+                    table="meetanshi_rewardpoints_referral_code" column="customer_id"
+                    referenceTable="customer_entity" referenceColumn="entity_id"
+                    onDelete="CASCADE"/>
+    </table>
+
+    <!-- ========================================================
+         meetanshi_rewardpoints_invitation
+         ======================================================== -->
+    <table name="meetanshi_rewardpoints_invitation" resource="default" engine="innodb"
+           comment="Meetanshi RewardPoints — Invitation Tracking">
+        <column xsi:type="int" name="invitation_id" unsigned="true" nullable="false"
+                identity="true" comment="Invitation ID"/>
+        <column xsi:type="int" name="referrer_customer_id" unsigned="true" nullable="false"
+                comment="Referrer Customer ID"/>
+        <column xsi:type="int" name="referee_customer_id" unsigned="true" nullable="true"
+                comment="Referee Customer ID (filled after signup)"/>
+        <column xsi:type="int" name="website_id" unsigned="true" nullable="false"/>
+        <column xsi:type="varchar" name="referee_email" nullable="false" length="255"
+                comment="Invited Email"/>
+        <column xsi:type="varchar" name="referral_code" nullable="false" length="64"
+                comment="Code Used"/>
+        <column xsi:type="varchar" name="status" nullable="false" length="32" default="sent"
+                comment="sent|signed_up|ordered"/>
+        <column xsi:type="int" name="referrer_points_earned" nullable="false" default="0"/>
+        <column xsi:type="decimal" name="referee_discount_earned" precision="12" scale="4"
+                nullable="false" default="0.0000"/>
+        <column xsi:type="int" name="referee_points_earned" nullable="false" default="0"/>
+        <column xsi:type="timestamp" name="created_at" nullable="false" default="CURRENT_TIMESTAMP"/>
+        <column xsi:type="timestamp" name="updated_at" nullable="false" default="CURRENT_TIMESTAMP"
+                on_update="true"/>
+
+        <constraint xsi:type="primary" referenceId="PRIMARY">
+            <column name="invitation_id"/>
+        </constraint>
+        <constraint xsi:type="foreign" referenceId="MEETANSHI_REWARDPOINTS_INVITATION_REFERRER"
+                    table="meetanshi_rewardpoints_invitation" column="referrer_customer_id"
+                    referenceTable="customer_entity" referenceColumn="entity_id"
+                    onDelete="CASCADE"/>
+        <index referenceId="MEETANSHI_REWARDPOINTS_INVITATION_REFEREE_EMAIL" indexType="btree">
+            <column name="referee_email"/>
+        </index>
+        <index referenceId="MEETANSHI_REWARDPOINTS_INVITATION_REFERRER_ID" indexType="btree">
+            <column name="referrer_customer_id"/>
+        </index>
+    </table>
+
+    <!-- ========================================================
+         meetanshi_rewardpoints_tier
+         ======================================================== -->
+    <table name="meetanshi_rewardpoints_tier" resource="default" engine="innodb"
+           comment="Meetanshi RewardPoints — Tier/Milestone">
+        <column xsi:type="int" name="tier_id" unsigned="true" nullable="false"
+                identity="true" comment="Tier ID"/>
+        <column xsi:type="varchar" name="name" nullable="false" length="255" comment="Tier Name"/>
+        <column xsi:type="text" name="description" nullable="true"/>
+        <column xsi:type="smallint" name="is_active" nullable="false" default="1"/>
+        <column xsi:type="varchar" name="image" nullable="true" length="255"
+                comment="Tier Logo Image Path"/>
+        <column xsi:type="int" name="min_points" nullable="false" default="0"
+                comment="Minimum Points Required"/>
+        <column xsi:type="int" name="min_orders" nullable="false" default="0"
+                comment="Minimum Number of Orders"/>
+        <column xsi:type="decimal" name="earning_bonus_percent" precision="5" scale="2"
+                nullable="false" default="0.00" comment="Earning Bonus %"/>
+        <column xsi:type="int" name="behavior_bonus_points" nullable="false" default="0"
+                comment="Fixed Bonus Points on Behavior Events"/>
+        <column xsi:type="decimal" name="spending_discount_percent" precision="5" scale="2"
+                nullable="false" default="0.00" comment="Spending Discount %"/>
+        <column xsi:type="smallint" name="free_shipping" nullable="false" default="0"
+                comment="Free Shipping Benefit"/>
+        <column xsi:type="int" name="linked_cart_rule_id" nullable="true"
+                comment="Linked Magento Cart Rule ID"/>
+        <column xsi:type="varchar" name="email_template" nullable="true" length="255"
+                comment="Email Template for Tier Notification"/>
+        <column xsi:type="int" name="sort_order" nullable="false" default="0"
+                comment="Sort Order"/>
+        <column xsi:type="timestamp" name="created_at" nullable="false" default="CURRENT_TIMESTAMP"/>
+        <column xsi:type="timestamp" name="updated_at" nullable="false" default="CURRENT_TIMESTAMP"
+                on_update="true"/>
+
+        <constraint xsi:type="primary" referenceId="PRIMARY">
+            <column name="tier_id"/>
+        </constraint>
+        <index referenceId="MEETANSHI_REWARDPOINTS_TIER_MIN_POINTS" indexType="btree">
+            <column name="min_points"/>
+        </index>
+    </table>
+
+    <!-- ========================================================
+         meetanshi_rewardpoints_tier_history
+         ======================================================== -->
+    <table name="meetanshi_rewardpoints_tier_history" resource="default" engine="innodb"
+           comment="Meetanshi RewardPoints — Tier Change History">
+        <column xsi:type="int" name="history_id" unsigned="true" nullable="false"
+                identity="true" comment="History ID"/>
+        <column xsi:type="int" name="customer_id" unsigned="true" nullable="false"
+                comment="Customer ID"/>
+        <column xsi:type="int" name="website_id" unsigned="true" nullable="false"
+                comment="Website ID"/>
+        <column xsi:type="int" name="from_tier_id" unsigned="true" nullable="true"
+                comment="From Tier ID"/>
+        <column xsi:type="int" name="to_tier_id" unsigned="true" nullable="true"
+                comment="To Tier ID"/>
+        <column xsi:type="varchar" name="change_type" nullable="false" length="16"
+                comment="up|down|initial"/>
+        <column xsi:type="timestamp" name="created_at" nullable="false" default="CURRENT_TIMESTAMP"/>
+
+        <constraint xsi:type="primary" referenceId="PRIMARY">
+            <column name="history_id"/>
+        </constraint>
+        <constraint xsi:type="foreign" referenceId="MEETANSHI_REWARDPOINTS_TIER_HISTORY_CUSTOMER"
+                    table="meetanshi_rewardpoints_tier_history" column="customer_id"
+                    referenceTable="customer_entity" referenceColumn="entity_id"
+                    onDelete="CASCADE"/>
+        <index referenceId="MEETANSHI_REWARDPOINTS_TIER_HISTORY_CUSTOMER_IDX" indexType="btree">
+            <column name="customer_id"/>
+            <column name="created_at"/>
+        </index>
+    </table>
+
+    <!-- ========================================================
+         meetanshi_rewardpoints_rule_website
+         Many-to-many rule → website
+         ======================================================== -->
+    <table name="meetanshi_rewardpoints_rule_website" resource="default" engine="innodb"
+           comment="Meetanshi RewardPoints — Rule to Website">
+        <column xsi:type="int" name="row_id" unsigned="true" nullable="false"
+                identity="true" comment="Row ID"/>
+        <column xsi:type="int" name="rule_id" unsigned="true" nullable="false" comment="Rule ID"/>
+        <column xsi:type="varchar" name="rule_type" nullable="false" length="32"
+                comment="catalog|cart|behavior|spending|referral|earning_rate|spending_rate|tier"/>
+        <column xsi:type="smallint" name="website_id" unsigned="true" nullable="false"
+                comment="Website ID"/>
+
+        <constraint xsi:type="primary" referenceId="PRIMARY">
+            <column name="row_id"/>
+        </constraint>
+        <constraint xsi:type="unique" referenceId="MEETANSHI_REWARDPOINTS_RULE_WEBSITE_UNIQUE">
+            <column name="rule_id"/>
+            <column name="rule_type"/>
+            <column name="website_id"/>
+        </constraint>
+        <constraint xsi:type="foreign" referenceId="MEETANSHI_REWARDPOINTS_RULE_WEBSITE_FK"
+                    table="meetanshi_rewardpoints_rule_website" column="website_id"
+                    referenceTable="store_website" referenceColumn="website_id"
+                    onDelete="CASCADE"/>
+        <index referenceId="MEETANSHI_REWARDPOINTS_RULE_WEBSITE_RULE_IDX" indexType="btree">
+            <column name="rule_id"/>
+            <column name="rule_type"/>
+        </index>
+    </table>
+
+    <!-- ========================================================
+         meetanshi_rewardpoints_rule_customer_group
+         Many-to-many rule → customer group
+         ======================================================== -->
+    <table name="meetanshi_rewardpoints_rule_customer_group" resource="default" engine="innodb"
+           comment="Meetanshi RewardPoints — Rule to Customer Group">
+        <column xsi:type="int" name="row_id" unsigned="true" nullable="false"
+                identity="true" comment="Row ID"/>
+        <column xsi:type="int" name="rule_id" unsigned="true" nullable="false" comment="Rule ID"/>
+        <column xsi:type="varchar" name="rule_type" nullable="false" length="32"
+                comment="catalog|cart|behavior|spending|referral|earning_rate|spending_rate|tier"/>
+        <column xsi:type="int" name="customer_group_id" unsigned="true" nullable="false"
+                comment="Customer Group ID"/>
+
+        <constraint xsi:type="primary" referenceId="PRIMARY">
+            <column name="row_id"/>
+        </constraint>
+        <constraint xsi:type="unique" referenceId="MEETANSHI_REWARDPOINTS_RULE_CG_UNIQUE">
+            <column name="rule_id"/>
+            <column name="rule_type"/>
+            <column name="customer_group_id"/>
+        </constraint>
+        <constraint xsi:type="foreign" referenceId="MEETANSHI_REWARDPOINTS_RULE_CG_FK"
+                    table="meetanshi_rewardpoints_rule_customer_group" column="customer_group_id"
+                    referenceTable="customer_group" referenceColumn="customer_group_id"
+                    onDelete="CASCADE"/>
+        <index referenceId="MEETANSHI_REWARDPOINTS_RULE_CG_RULE_IDX" indexType="btree">
+            <column name="rule_id"/>
+            <column name="rule_type"/>
+        </index>
+    </table>
+
+    <!-- ========================================================
+         meetanshi_rewardpoints_rule_label
+         Per-store-view rule labels
+         ======================================================== -->
+    <table name="meetanshi_rewardpoints_rule_label" resource="default" engine="innodb"
+           comment="Meetanshi RewardPoints — Rule Store Label">
+        <column xsi:type="int" name="label_id" unsigned="true" nullable="false"
+                identity="true" comment="Label ID"/>
+        <column xsi:type="int" name="rule_id" unsigned="true" nullable="false" comment="Rule ID"/>
+        <column xsi:type="varchar" name="rule_type" nullable="false" length="32"/>
+        <column xsi:type="smallint" name="store_id" unsigned="true" nullable="false"
+                comment="Store ID"/>
+        <column xsi:type="varchar" name="label" nullable="false" length="255"
+                comment="Label Text"/>
+        <column xsi:type="varchar" name="notification_message" nullable="true" length="255"
+                comment="Product Page Notification Message"/>
+
+        <constraint xsi:type="primary" referenceId="PRIMARY">
+            <column name="label_id"/>
+        </constraint>
+        <constraint xsi:type="unique" referenceId="MEETANSHI_REWARDPOINTS_RULE_LABEL_UNIQUE">
+            <column name="rule_id"/>
+            <column name="rule_type"/>
+            <column name="store_id"/>
+        </constraint>
+        <constraint xsi:type="foreign" referenceId="MEETANSHI_REWARDPOINTS_RULE_LABEL_STORE"
+                    table="meetanshi_rewardpoints_rule_label" column="store_id"
+                    referenceTable="store" referenceColumn="store_id"
+                    onDelete="CASCADE"/>
+    </table>
+
+    <!-- ========================================================
+         meetanshi_rewardpoints_behavior_log
+         Per-customer behavior throttling / cap enforcement
+         ======================================================== -->
+    <table name="meetanshi_rewardpoints_behavior_log" resource="default" engine="innodb"
+           comment="Meetanshi RewardPoints — Behavior Log for Cap Enforcement">
+        <column xsi:type="int" name="log_id" unsigned="true" nullable="false"
+                identity="true" comment="Log ID"/>
+        <column xsi:type="int" name="customer_id" unsigned="true" nullable="false"
+                comment="Customer ID"/>
+        <column xsi:type="int" name="rule_id" unsigned="true" nullable="false" comment="Rule ID"/>
+        <column xsi:type="varchar" name="event_code" nullable="false" length="64"
+                comment="Event Code"/>
+        <column xsi:type="int" name="points_earned_today" nullable="false" default="0"/>
+        <column xsi:type="int" name="points_earned_this_month" nullable="false" default="0"/>
+        <column xsi:type="int" name="points_earned_this_year" nullable="false" default="0"/>
+        <column xsi:type="int" name="points_earned_lifetime" nullable="false" default="0"/>
+        <column xsi:type="date" name="last_earned_date" nullable="true" comment="Last Earning Date"/>
+        <column xsi:type="timestamp" name="created_at" nullable="false" default="CURRENT_TIMESTAMP"/>
+        <column xsi:type="timestamp" name="updated_at" nullable="false" default="CURRENT_TIMESTAMP"
+                on_update="true"/>
+
+        <constraint xsi:type="primary" referenceId="PRIMARY">
+            <column name="log_id"/>
+        </constraint>
+        <constraint xsi:type="unique" referenceId="MEETANSHI_REWARDPOINTS_BEHAVIOR_LOG_UNIQUE">
+            <column name="customer_id"/>
+            <column name="rule_id"/>
+        </constraint>
+        <constraint xsi:type="foreign" referenceId="MEETANSHI_REWARDPOINTS_BEHAVIOR_LOG_CUSTOMER"
+                    table="meetanshi_rewardpoints_behavior_log" column="customer_id"
+                    referenceTable="customer_entity" referenceColumn="entity_id"
+                    onDelete="CASCADE"/>
+        <index referenceId="MEETANSHI_REWARDPOINTS_BEHAVIOR_LOG_RULE_IDX" indexType="btree">
+            <column name="rule_id"/>
+            <column name="event_code"/>
+        </index>
+    </table>
+
+    <!-- ========================================================
+         quote — extend core table with reward points columns
+         ======================================================== -->
+    <table name="quote" resource="default" comment="Sales Flat Quote">
+        <column xsi:type="int" name="reward_points_used" unsigned="true" nullable="true" default="0"
+                comment="Reward Points Applied to Cart"/>
+        <column xsi:type="decimal" name="reward_points_discount" scale="4" precision="12"
+                unsigned="true" nullable="true" default="0"
+                comment="Reward Points Discount Amount (order/display currency)"/>
+        <column xsi:type="decimal" name="base_reward_points_discount" scale="4" precision="12"
+                unsigned="true" nullable="true" default="0"
+                comment="Reward Points Discount Amount (base currency)"/>
+    </table>
+
+    <!-- ========================================================
+         sales_order — extend core table with reward points columns
+         ======================================================== -->
+    <table name="sales_order" resource="default" comment="Sales Flat Order">
+        <column xsi:type="int" name="reward_points_used" unsigned="true" nullable="true" default="0"
+                comment="Reward Points Redeemed on Order"/>
+        <column xsi:type="decimal" name="reward_points_discount" scale="4" precision="12"
+                unsigned="true" nullable="true" default="0"
+                comment="Reward Points Discount Amount (order/display currency)"/>
+        <column xsi:type="decimal" name="base_reward_points_discount" scale="4" precision="12"
+                unsigned="true" nullable="true" default="0"
+                comment="Reward Points Discount Amount (base currency)"/>
+    </table>
+
+    <!-- ========================================================
+         sales_invoice — reward points columns for invoice display/persistence
+         Using rp_ prefix to avoid conflict with Magento core columns.
+         ======================================================== -->
+    <table name="sales_invoice" resource="sales" comment="Sales Flat Invoice">
+        <column xsi:type="int" name="rp_reward_points_used" unsigned="true" nullable="true" default="0"
+                comment="Reward Points Used on Invoice"/>
+        <column xsi:type="decimal" name="rp_reward_points_discount" scale="4" precision="12"
+                unsigned="true" nullable="true" default="0"
+                comment="Reward Points Discount Amount on Invoice (order currency)"/>
+        <column xsi:type="decimal" name="rp_base_reward_points_discount" scale="4" precision="12"
+                unsigned="true" nullable="true" default="0"
+                comment="Reward Points Discount Amount on Invoice (base currency)"/>
+    </table>
+
+    <!-- ========================================================
+         sales_creditmemo — reward points columns for creditmemo display/persistence
+         ======================================================== -->
+    <table name="sales_creditmemo" resource="sales" comment="Sales Flat Creditmemo">
+        <column xsi:type="int" name="rp_reward_points_used" unsigned="true" nullable="true" default="0"
+                comment="Reward Points Used on Creditmemo"/>
+        <column xsi:type="decimal" name="rp_reward_points_discount" scale="4" precision="12"
+                unsigned="true" nullable="true" default="0"
+                comment="Reward Points Discount Amount on Creditmemo (order currency)"/>
+        <column xsi:type="decimal" name="rp_base_reward_points_discount" scale="4" precision="12"
+                unsigned="true" nullable="true" default="0"
+                comment="Reward Points Discount Amount on Creditmemo (base currency)"/>
+    </table>
+
+</schema>

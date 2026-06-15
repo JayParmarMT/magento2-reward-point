@@ -1,0 +1,38 @@
+/**
+ * Meetanshi RewardPoints — Admin Grid Status Badge Styles
+ */
+.meetanshi-status {
+    display: inline-block;
+    padding: 2px 10px;
+    border-radius: 3px;
+    font-size: 12px;
+    font-weight: 600;
+    line-height: 18px;
+    text-align: center;
+    white-space: nowrap;
+}
+
+.meetanshi-status--enabled {
+    background-color: #e6f4ea;
+    color: #1a7e33;
+    border: 1px solid #a8d5b5;
+}
+
+.meetanshi-status--disabled {
+    background-color: #fce8e8;
+    color: #c0392b;
+    border: 1px solid #f5b7b1;
+}
+
+.meetanshi-status--other {
+    background-color: #fff3e0;
+    color: #e65100;
+    border: 1px solid #ffcc80;
+}
+
+/* Invitation-specific: Pending = blue */
+.meetanshi-status--pending {
+    background-color: #e8f0fe;
+    color: #1a56db;
+    border: 1px solid #a4c3f8;
+}

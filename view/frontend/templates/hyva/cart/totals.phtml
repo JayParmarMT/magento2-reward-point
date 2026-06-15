@@ -1,0 +1,27 @@
+<?php
+/**
+ * Hyvä cart totals row — Reward Points discount.
+ *
+ * IMPORTANT: No PHP isDisplayed() guard here.
+ * The checkout.cart.totals block renders all children inside an Alpine x-for
+ * loop over totalsData.total_segments. The <template x-if> must always be
+ * present in the DOM so Alpine can render it reactively when points are
+ * applied via AJAX (update-totals event) — if the PHP guard returns early,
+ * the template is never in the DOM and the row never appears after AJAX apply.
+ *
+ * Segment code matches sales.xml: item name="reward_points".
+ *
+ * @var \Meetanshi\RewardPoints\Block\Frontend\Cart\RewardPointsTotal $block
+ * @var \Magento\Framework\Escaper $escaper
+ */
+
+if (!$block->isModuleEnabled()) {
+    return;
+}
+?>
+<template x-if="segment.code === 'reward_points'">
+    <div :class="wrapperClass">
+        <div x-text="segment.title"></div>
+        <div x-text="hyva.formatPrice(segment.value)" class="justify-self-end"></div>
+    </div>
+</template>

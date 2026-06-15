@@ -1,0 +1,215 @@
+<?php
+/**
+ * Transaction View Template
+ *
+ * @var \Meetanshi\RewardPoints\Block\Adminhtml\Transaction\View $block
+ * @var \Magento\Framework\Escaper $escaper
+ */
+
+$transaction = $block->getTransaction();
+?>
+<?php if (!$transaction): ?>
+    <div class="message message-error">
+        <?= $escaper->escapeHtml(__('Transaction not found.')) ?>
+    </div>
+<?php else: ?>
+
+<?php
+$delta      = (int) $transaction->getPointsDelta();
+$deltaColor = $delta >= 0 ? '#006400' : '#cc0000';
+$deltaLabel = ($delta >= 0 ? '+' : '') . $delta;
+
+$statusMap = [
+    'pending'   => ['label' => 'Pending',   'color' => '#996600'],
+    'active'    => ['label' => 'Active',    'color' => '#006400'],
+    'expired'   => ['label' => 'Expired',   'color' => '#999999'],
+    'cancelled' => ['label' => 'Cancelled', 'color' => '#cc0000'],
+];
+$statusKey   = (string) $transaction->getStatus();
+$statusLabel = $statusMap[$statusKey]['label'] ?? $statusKey;
+$statusColor = $statusMap[$statusKey]['color'] ?? '#333333';
+?>
+
+<!-- Page actions toolbar — Back button -->
+<div class="page-main-actions">
+    <div class="page-actions">
+        <div class="page-actions-toolbar">
+            <a href="<?= $escaper->escapeUrl($block->getBackUrl()) ?>"
+               class="action-default scalable back"
+               title="<?= $escaper->escapeHtmlAttr(__('Back')) ?>">
+                <span><?= $escaper->escapeHtml(__('Back')) ?></span>
+            </a>
+        </div>
+    </div>
+</div>
+
+<!-- =====================================================================
+     Row 1: General | Additional Information
+     ===================================================================== -->
+<section class="admin__page-section">
+    <div class="admin__page-section-title">
+        <span class="title"><?= $escaper->escapeHtml(__('Transaction Information')) ?></span>
+    </div>
+    <div class="admin__page-section-content">
+
+        <!-- General -->
+        <div class="admin__page-section-item">
+            <div class="admin__page-section-item-title">
+                <span class="title"><?= $escaper->escapeHtml(__('General')) ?></span>
+            </div>
+            <div class="admin__page-section-item-content">
+                <table class="admin__table-secondary">
+                    <tbody>
+                        <tr>
+                            <th><?= $escaper->escapeHtml(__('Transaction ID')) ?></th>
+                            <td>#<?= $escaper->escapeHtml((string) $transaction->getTransactionId()) ?></td>
+                        </tr>
+                        <tr>
+                            <th><?= $escaper->escapeHtml(__('Customer')) ?></th>
+                            <td>
+                                <?= $escaper->escapeHtml($block->getCustomerName($transaction)) ?>
+                                <span class="note">&nbsp;(<?= $escaper->escapeHtml(__('ID: %1', $transaction->getCustomerId())) ?>)</span>
+                            </td>
+                        </tr>
+                        <tr>
+                            <th><?= $escaper->escapeHtml(__('Account ID')) ?></th>
+                            <td><?= $escaper->escapeHtml((string) $transaction->getAccountId()) ?></td>
+                        </tr>
+                        <tr>
+                            <th><?= $escaper->escapeHtml(__('Action')) ?></th>
+                            <td><?= $escaper->escapeHtml($transaction->getActionCode()) ?></td>
+                        </tr>
+                        <tr>
+                            <th><?= $escaper->escapeHtml(__('Points')) ?></th>
+                            <td>
+                                <strong style="color:<?= $escaper->escapeHtmlAttr($deltaColor) ?>">
+                                    <?= $escaper->escapeHtml($deltaLabel) ?>
+                                </strong>
+                            </td>
+                        </tr>
+                        <tr>
+                            <th><?= $escaper->escapeHtml(__('Balance After')) ?></th>
+                            <td><?= $escaper->escapeHtml((string) $transaction->getPointsBalanceAfter()) ?></td>
+                        </tr>
+                        <tr>
+                            <th><?= $escaper->escapeHtml(__('Status')) ?></th>
+                            <td>
+                                <span style="color:<?= $escaper->escapeHtmlAttr($statusColor) ?>;font-weight:600">
+                                    <?= $escaper->escapeHtml(__($statusLabel)) ?>
+                                </span>
+                            </td>
+                        </tr>
+                        <?php if ($transaction->getComment()): ?>
+                        <tr>
+                            <th><?= $escaper->escapeHtml(__('Comment')) ?></th>
+                            <td><?= $escaper->escapeHtml((string) $transaction->getComment()) ?></td>
+                        </tr>
+                        <?php endif; ?>
+                        <?php if ($transaction->getExpiresAt()): ?>
+                        <tr>
+                            <th><?= $escaper->escapeHtml(__('Expires At')) ?></th>
+                            <td><?= $escaper->escapeHtml((string) $transaction->getExpiresAt()) ?></td>
+                        </tr>
+                        <?php endif; ?>
+                        <tr>
+                            <th><?= $escaper->escapeHtml(__('Created At')) ?></th>
+                            <td><?= $escaper->escapeHtml((string) $transaction->getCreatedAt()) ?></td>
+                        </tr>
+                    </tbody>
+                </table>
+            </div>
+        </div>
+
+        <!-- Additional Information — always rendered -->
+        <div class="admin__page-section-item">
+            <div class="admin__page-section-item-title">
+                <span class="title"><?= $escaper->escapeHtml(__('Additional Information')) ?></span>
+            </div>
+            <div class="admin__page-section-item-content">
+                <table class="admin__table-secondary">
+                    <tbody>
+                        <tr>
+                            <th><?= $escaper->escapeHtml(__('Admin User')) ?></th>
+                            <td>
+                                <?php if ($transaction->getAdminUserName()): ?>
+                                    <?= $escaper->escapeHtml((string) $transaction->getAdminUserName()) ?>
+                                    <?php if ($transaction->getAdminUserId()): ?>
+                                        <span class="note">&nbsp;(<?= $escaper->escapeHtml(__('ID: %1', $transaction->getAdminUserId())) ?>)</span>
+                                    <?php endif; ?>
+                                <?php else: ?>
+                                    <span class="note"><?= $escaper->escapeHtml(__('N/A')) ?></span>
+                                <?php endif; ?>
+                            </td>
+                        </tr>
+                        <tr>
+                            <th><?= $escaper->escapeHtml(__('Store ID')) ?></th>
+                            <td>
+                                <?php if ($transaction->getStoreId() !== null): ?>
+                                    <?= $escaper->escapeHtml((string) $transaction->getStoreId()) ?>
+                                <?php else: ?>
+                                    <span class="note"><?= $escaper->escapeHtml(__('N/A')) ?></span>
+                                <?php endif; ?>
+                            </td>
+                        </tr>
+                    </tbody>
+                </table>
+            </div>
+        </div>
+
+    </div><!-- /.admin__page-section-content -->
+</section>
+
+<!-- =====================================================================
+     Row 2: Related Records (only when at least one linked record exists)
+     ===================================================================== -->
+<?php if ($transaction->getOrderId() || $transaction->getCreditmemoId() || $transaction->getRuleId()): ?>
+<section class="admin__page-section">
+    <div class="admin__page-section-title">
+        <span class="title"><?= $escaper->escapeHtml(__('Related Records')) ?></span>
+    </div>
+    <div class="admin__page-section-content">
+        <div class="admin__page-section-item">
+            <div class="admin__page-section-item-content">
+                <table class="admin__table-secondary">
+                    <tbody>
+                        <?php if ($transaction->getOrderId()): ?>
+                        <tr>
+                            <th><?= $escaper->escapeHtml(__('Order')) ?></th>
+                            <td>
+                                <a href="<?= $escaper->escapeUrl($block->getUrl('sales/order/view', ['order_id' => $transaction->getOrderId()])) ?>">
+                                    <?= $escaper->escapeHtml(__('#%1', $transaction->getOrderId())) ?>
+                                </a>
+                            </td>
+                        </tr>
+                        <?php endif; ?>
+                        <?php if ($transaction->getCreditmemoId()): ?>
+                        <tr>
+                            <th><?= $escaper->escapeHtml(__('Credit Memo')) ?></th>
+                            <td>
+                                <a href="<?= $escaper->escapeUrl($block->getUrl('sales/creditmemo/view', ['creditmemo_id' => $transaction->getCreditmemoId()])) ?>">
+                                    <?= $escaper->escapeHtml(__('#%1', $transaction->getCreditmemoId())) ?>
+                                </a>
+                            </td>
+                        </tr>
+                        <?php endif; ?>
+                        <?php if ($transaction->getRuleId()): ?>
+                        <tr>
+                            <th><?= $escaper->escapeHtml(__('Rule')) ?></th>
+                            <td>
+                                <?php if ($transaction->getRuleType()): ?>
+                                    <span><?= $escaper->escapeHtml((string) $transaction->getRuleType()) ?></span>
+                                    &nbsp;
+                                <?php endif; ?>
+                                #<?= $escaper->escapeHtml((string) $transaction->getRuleId()) ?>
+                            </td>
+                        </tr>
+                        <?php endif; ?>
+                    </tbody>
+                </table>
+            </div>
+        </div>
+    </div>
+</section>
+<?php endif; ?>
+
+<?php endif; ?>

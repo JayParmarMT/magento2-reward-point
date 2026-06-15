@@ -1,0 +1,39 @@
+<?xml version="1.0"?>
+<page xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+      xsi:noNamespaceSchemaLocation="urn:magento:framework:View/Layout/etc/page_configuration.xsd">
+    <body>
+        <referenceBlock name="customer_account_navigation">
+
+            <!-- My Reward Points — just after Address Book -->
+            <block class="Meetanshi\RewardPoints\Block\Frontend\Account\NavigationLink"
+                   name="customer-account-navigation-reward-points-link"
+                   after="customer-account-navigation-address-link">
+                <arguments>
+                    <argument name="label" xsi:type="string" translate="true">My Reward Points</argument>
+                    <argument name="path" xsi:type="string">rewardpoints/account</argument>
+                </arguments>
+            </block>
+
+            <!-- Points History — immediately after My Reward Points -->
+            <block class="Meetanshi\RewardPoints\Block\Frontend\Account\NavigationLink"
+                   name="customer-account-navigation-reward-points-transactions-link"
+                   after="customer-account-navigation-reward-points-link">
+                <arguments>
+                    <argument name="label" xsi:type="string" translate="true">Points History</argument>
+                    <argument name="path" xsi:type="string">rewardpoints/account/transactions</argument>
+                </arguments>
+            </block>
+
+            <!-- My Referrals — immediately after Points History -->
+            <block class="Meetanshi\RewardPoints\Block\Frontend\Account\NavigationLink"
+                   name="customer-account-navigation-reward-points-referral-link"
+                   after="customer-account-navigation-reward-points-transactions-link">
+                <arguments>
+                    <argument name="label" xsi:type="string" translate="true">My Referrals</argument>
+                    <argument name="path" xsi:type="string">rewardpoints/referral</argument>
+                </arguments>
+            </block>
+
+        </referenceBlock>
+    </body>
+</page>

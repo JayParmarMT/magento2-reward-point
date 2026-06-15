@@ -1,0 +1,141 @@
+<?php
+/**
+ * Hyvä tier milestones template.
+ * Uses Tailwind CSS utility classes — Hyvä coding standard.
+ *
+ * @var \Meetanshi\RewardPoints\Block\Frontend\Account\Milestones $block
+ * @var \Magento\Framework\Escaper $escaper
+ */
+
+if (!$block->canShow()) {
+    return;
+}
+
+$tiers           = $block->getTiers();
+$currentTier     = $block->getCurrentTier();
+$nextTier        = $block->getNextTier();
+$customerPoints  = $block->getCustomerPoints();
+$pointsForNext   = $block->getPointsForNextTier();
+$progressBgColor = $escaper->escapeHtmlAttr($block->getProgressBgColor());
+$progressColor   = $escaper->escapeHtmlAttr($block->getProgressColor());
+?>
+
+<div class="my-6">
+
+    <!-- Section heading -->
+    <div class="mb-4 border-b border-container pb-2">
+        <strong class="text-lg font-bold text-primary"><?= $escaper->escapeHtml(__('My Rewards Tier')) ?></strong>
+    </div>
+
+    <!-- Current tier status -->
+    <div class="flex items-center gap-4 flex-wrap bg-yellow-50 border border-yellow-200 rounded-lg p-4 mb-6">
+        <?php if ($currentTier): ?>
+        <?php if ($currentTier->getImage()): ?>
+        <img src="<?= $escaper->escapeUrl('/media/meetanshi/rewardpoints/tier/' . $currentTier->getImage()) ?>"
+             alt="<?= $escaper->escapeHtmlAttr($currentTier->getName()) ?>"
+             class="w-12 h-12 object-contain flex-shrink-0"/>
+        <?php endif; ?>
+        <div>
+            <span class="text-xs uppercase text-yellow-700 tracking-wide"><?= $escaper->escapeHtml(__('Your Current Tier:')) ?></span>
+            <span class="ml-1 font-bold text-yellow-900"><?= $escaper->escapeHtml($currentTier->getName()) ?></span>
+        </div>
+        <?php else: ?>
+        <p class="text-sm text-secondary"><?= $escaper->escapeHtml(__('You have not reached any tier yet.')) ?></p>
+        <?php endif; ?>
+        <div class="ml-auto text-sm text-yellow-800">
+            <?= $escaper->escapeHtml(__('Your Points:')) ?>
+            <strong><?= $escaper->escapeHtml((string) $customerPoints) ?></strong>
+        </div>
+    </div>
+
+    <!-- Progress to next tier -->
+    <?php if ($nextTier && $pointsForNext > 0): ?>
+    <?php
+    $progressPercent = 0;
+    $prevTierPoints  = $currentTier ? $currentTier->getMinPoints() : 0;
+    $range           = $nextTier->getMinPoints() - $prevTierPoints;
+    if ($range > 0) {
+        $progressPercent = min(100, max(0, (int) round(($customerPoints - $prevTierPoints) / $range * 100)));
+    }
+    ?>
+    <div class="mb-6">
+        <h3 class="text-base font-semibold text-primary mb-2"><?= $escaper->escapeHtml(__('Progress to Next Tier')) ?></h3>
+        <p class="text-sm text-secondary mb-2"><?= $escaper->escapeHtml(__('Next: %1', $nextTier->getName())) ?></p>
+        <div class="rounded-full overflow-hidden h-3 mb-2"
+             style="background-color:<?= /* @noEscape */ $progressBgColor ?>;">
+            <div class="h-full rounded-full transition-all duration-500"
+                 style="width:<?= $escaper->escapeHtmlAttr((string) $progressPercent) ?>%;background-color:<?= /* @noEscape */ $progressColor ?>;"></div>
+        </div>
+        <p class="text-sm text-secondary">
+            <?= $escaper->escapeHtml(__('%1 more points needed to reach %2', $pointsForNext, $nextTier->getName())) ?>
+        </p>
+    </div>
+    <?php elseif (!$nextTier && $currentTier): ?>
+    <div class="mb-6">
+        <p class="text-sm font-semibold text-green-700"><?= $escaper->escapeHtml(__('You have reached the highest tier!')) ?></p>
+    </div>
+    <?php endif; ?>
+
+    <!-- All tiers -->
+    <?php if (!empty($tiers)): ?>
+    <div>
+        <h3 class="text-base font-semibold text-primary mb-3"><?= $escaper->escapeHtml(__('All Tiers')) ?></h3>
+        <div class="grid grid-cols-1 gap-3 sm:grid-cols-2">
+            <?php foreach ($tiers as $tier): ?>
+            <?php
+            $isCurrent  = $currentTier && $currentTier->getTierId() === $tier->getTierId();
+            $isAchieved = $customerPoints >= $tier->getMinPoints();
+            ?>
+            <?php if ($isCurrent): ?>
+            <div class="rounded-lg border-2 border-yellow-400 bg-yellow-50 p-4 flex items-start gap-3">
+            <?php elseif ($isAchieved): ?>
+            <div class="rounded-lg border-2 border-green-300 bg-green-50 p-4 flex items-start gap-3">
+            <?php else: ?>
+            <div class="rounded-lg border border-container bg-white p-4 flex items-start gap-3">
+            <?php endif; ?>
+                <?php if ($tier->getImage()): ?>
+                <div class="flex-shrink-0">
+                    <img src="<?= $escaper->escapeUrl('/media/meetanshi/rewardpoints/tier/' . $tier->getImage()) ?>"
+                         alt="<?= $escaper->escapeHtmlAttr($tier->getName()) ?>"
+                         class="w-10 h-10 object-contain"/>
+                </div>
+                <?php endif; ?>
+                <div class="flex-1 min-w-0">
+                    <div class="font-semibold text-primary text-sm flex items-center gap-2 flex-wrap">
+                        <?= $escaper->escapeHtml($tier->getName()) ?>
+                        <?php if ($isCurrent): ?>
+                        <span class="text-xs bg-yellow-400 text-white font-bold px-2 py-0.5 rounded-full">
+                            <?= $escaper->escapeHtml(__('Current')) ?>
+                        </span>
+                        <?php elseif ($isAchieved): ?>
+                        <span class="text-xs bg-green-500 text-white font-bold px-2 py-0.5 rounded-full">
+                            <?= $escaper->escapeHtml(__('Achieved')) ?>
+                        </span>
+                        <?php endif; ?>
+                    </div>
+                    <p class="text-xs text-secondary mt-1">
+                        <?= $escaper->escapeHtml(__('Requires %1 points', $tier->getMinPoints())) ?>
+                    </p>
+                    <?php if ($tier->getEarningBonusPercent() > 0): ?>
+                    <p class="text-xs text-green-700 mt-1">
+                        +<?= (float) $tier->getEarningBonusPercent() ?>% <?= $escaper->escapeHtml(__('earning bonus')) ?>
+                    </p>
+                    <?php endif; ?>
+                    <?php if ($tier->getSpendingDiscountPercent() > 0): ?>
+                    <p class="text-xs text-blue-700 mt-1">
+                        <?= (float) $tier->getSpendingDiscountPercent() ?>% <?= $escaper->escapeHtml(__('spending discount')) ?>
+                    </p>
+                    <?php endif; ?>
+                    <?php if ($tier->isFreeShipping()): ?>
+                    <p class="text-xs text-purple-700 mt-1">
+                        <?= $escaper->escapeHtml(__('Free shipping included')) ?>
+                    </p>
+                    <?php endif; ?>
+                </div>
+            </div>
+            <?php endforeach; ?>
+        </div>
+    </div>
+    <?php endif; ?>
+
+</div>

@@ -1,0 +1,32 @@
+<?xml version="1.0"?>
+<!--
+    Hyvä-specific checkout layout for Meetanshi_RewardPoints.
+
+    The Luma jsLayout / KnockoutJS checkout component does not work on Hyvä.
+    Hyvä Checkout uses a server-rendered + Alpine.js approach via
+    Hyva_Checkout blocks.  We inject the reward points apply block
+    into Hyvä Checkout's payment step "before methods" area.
+
+    The totals discount row is handled by a dedicated PHP block injected
+    into the Hyvä Checkout summary totals area.
+-->
+<page xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+      xsi:noNamespaceSchemaLocation="urn:magento:framework:View/Layout/etc/page_configuration.xsd">
+    <body>
+        <!-- Apply block: injected before payment methods in Hyvä Checkout -->
+        <referenceContainer name="checkout.payment.before.methods">
+            <block class="Meetanshi\RewardPoints\Block\Frontend\Cart\RewardPoints"
+                   name="rewardpoints.checkout.block.hyva"
+                   template="Meetanshi_RewardPoints::hyva/checkout/reward-points.phtml"
+                   before="-"/>
+        </referenceContainer>
+
+        <!-- Totals discount row in Hyvä Checkout order summary -->
+        <referenceBlock name="checkout.summary.totals">
+            <block class="Meetanshi\RewardPoints\Block\Frontend\Cart\RewardPointsTotal"
+                   name="rewardpoints.checkout.total.hyva"
+                   template="Meetanshi_RewardPoints::hyva/cart/totals.phtml"
+                   after="discount"/>
+        </referenceBlock>
+    </body>
+</page>

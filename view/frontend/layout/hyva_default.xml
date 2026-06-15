@@ -1,0 +1,47 @@
+<?xml version="1.0"?>
+<!--
+    Hyvä-specific default layout for Meetanshi_RewardPoints.
+
+    Correct Hyvä block/container names (from Magento_Theme/layout/default.xml):
+      - "cart-drawer.bottom"               — minicart drawer bottom area
+      - "header.customer.logged.in.links"  — account dropdown menu (SortableItems)
+        Address Book has sort_order=40; reward points link uses sort_order=50.
+-->
+<page xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+      xsi:noNamespaceSchemaLocation="urn:magento:framework:View/Layout/etc/page_configuration.xsd">
+    <head>
+        <css src="Meetanshi_RewardPoints::css/reward-points.css"/>
+    </head>
+    <body>
+
+        <!-- Balance in the Hyvä minicart drawer (cart-drawer.bottom) -->
+        <referenceContainer name="cart-drawer.bottom">
+            <block class="Magento\Framework\View\Element\Template"
+                   name="reward.points.minicart.balance.hyva"
+                   template="Meetanshi_RewardPoints::hyva/header/balance.phtml"
+                   before="-">
+                <arguments>
+                    <argument name="view_model" xsi:type="object">Meetanshi\RewardPoints\ViewModel\Header\Balance</argument>
+                    <argument name="placement" xsi:type="string">minicart</argument>
+                </arguments>
+            </block>
+        </referenceContainer>
+
+        <!--
+            My Reward Points link in the Hyvä account dropdown menu.
+            sort_order=50 places it just after Address Book (sort_order=40).
+            The block returns empty output when the module is disabled in admin config.
+        -->
+        <referenceBlock name="header.customer.logged.in.links">
+            <block class="Meetanshi\RewardPoints\Block\Frontend\Account\HeaderNavigationLink"
+                   name="customer.header.reward.points.link">
+                <arguments>
+                    <argument name="label" xsi:type="string" translate="true">My Reward Points</argument>
+                    <argument name="path" xsi:type="string">rewardpoints/account</argument>
+                    <argument name="sort_order" xsi:type="number">50</argument>
+                </arguments>
+            </block>
+        </referenceBlock>
+
+    </body>
+</page>

@@ -1,0 +1,13 @@
+<?xml version="1.0"?>
+<config xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+        xsi:noNamespaceSchemaLocation="urn:magento:module:Magento_Customer:etc/sections.xsd">
+    <action name="rewardpoints/account/saveSettings">
+        <section name="meetanshi-rewardpoints"/>
+    </action>
+    <action name="rewardpoints/cart/apply">
+        <section name="cart"/>
+    </action>
+    <action name="rewardpoints/cart/remove">
+        <section name="cart"/>
+    </action>
+</config>

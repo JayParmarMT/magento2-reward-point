@@ -1,0 +1,43 @@
+<?php
+/**
+ * Header / Minicart balance display
+ *
+ * @var \Magento\Framework\View\Element\Template $block
+ * @var \Meetanshi\RewardPoints\ViewModel\Header\Balance $viewModel
+ */
+$viewModel = $block->getData('view_model');
+$placement = (string) $block->getData('placement'); // 'top_links' or 'minicart'
+
+if (!$viewModel) {
+    return;
+}
+
+$isMinicart = $placement === 'minicart';
+
+if ($isMinicart) {
+    if (!$viewModel->isEnabledInMinicart()) {
+        return;
+    }
+} else {
+    if (!$viewModel->isEnabled()) {
+        return;
+    }
+}
+?>
+<?php if ($isMinicart): ?>
+<div class="reward-points-minicart-balance">
+    <a href="<?= $block->escapeUrl($viewModel->getAccountUrl()) ?>"
+       title="<?= $block->escapeHtml(__('My Reward Points')) ?>"
+       class="reward-points-minicart-link">
+        <span class="reward-points-balance-label"><?= $block->escapeHtml(__('Points:')) ?></span>
+        <span class="reward-points-balance-value"><?= $block->escapeHtml($viewModel->getFormattedBalance()) ?></span>
+    </a>
+</div>
+<?php else: ?>
+<li class="link reward-points-balance-link">
+    <a href="<?= $block->escapeUrl($viewModel->getAccountUrl()) ?>"
+       title="<?= $block->escapeHtml(__('My Reward Points')) ?>">
+        <?= $block->escapeHtml(__('Points:')) ?>&nbsp;<strong><?= $block->escapeHtml($viewModel->getFormattedBalance()) ?></strong>
+    </a>
+</li>
+<?php endif; ?>
